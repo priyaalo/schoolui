@@ -1,0 +1,204 @@
+      /* Container */
+     .container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: "Poppins", sans-serif;
+  background-color: white;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;   /* allow vertical scroll */
+  padding: 20px;
+  box-sizing: border-box;
+
+  /* hide scrollbar but keep scroll */
+  scrollbar-width: none;        /* Firefox */
+  -ms-overflow-style: none;     /* IE & Edge */
+}
+
+.container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+
+      /* Top Section */
+      .top {
+        margin-top: 100px;
+      }
+
+      .welcome {
+        font-size: 40px;
+        font-weight: 700;
+        background: linear-gradient(to bottom, #144196, #061530);
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .second {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 5px;
+      }
+
+      .subtitle {
+        color: #555;
+        font-size: 20px;
+        font-weight: 400;
+      }
+
+      .check {
+        display: flex;
+        gap: 17px;
+        padding: 5px;
+      }
+
+      .checkIn {
+        background: #2d8011;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 14px 14px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      .checkOut {
+        background: #ee3623;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 14px 14px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+     
+     .marqueeWrapper {
+  overflow: hidden;
+  width: 100%;
+  position: relative;
+  white-space: nowrap;
+}
+
+.marqueeContent {
+  display: inline-flex;
+   
+  animation: marquee 28s linear infinite;
+}
+
+.marqueeContent > div {
+  flex: 0 0 auto;
+  min-width: 350px;
+  white-space: normal;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    /* Move only half the total width because we duplicated events */
+    transform: translateX(-50%);
+  }
+}
+
+
+      /* Attendance Table */
+      .tableContainer {
+        flex: 1;
+        overflow: visible;
+        background-color: #3c96c70f;
+        padding: 14px;
+        border-radius: 8px;
+      }
+
+      .topBar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background-color: #3C96C70F;
+      }
+      .cardRow {
+        flex: 0 0 auto;
+        display: grid;
+        grid-template-columns: 300px 300px;
+        gap: 20px;
+        margin: 20px 0;
+        padding:10px;
+      }
+
+      .card {
+        
+        border-radius: 7px;
+        box-shadow: 0 1px 3px rgba(175, 175, 175, 0.7);
+        padding: 10px;
+        background: #fff;
+      }
+
+      .card h4 {
+        font-size: 18px;
+        color: #1D1D1D;
+        font-weight: 500;
+      }
+
+      p {
+        color: #717171;
+        font-size: 14px;
+      }
+
+      .circle,
+      .circle1 {
+        border-radius: 50%;
+        height: 40px;
+        width: 40px;
+        border: none;
+        color: #fff;
+        font-weight: bold;
+      }
+
+      .circle {
+        background-color: #FFB74D;
+        color: #000;
+      }
+
+      .circle1 {
+        background-color: #FF654D;
+      }
+
+      th {
+        background: linear-gradient(to bottom, #0b2d73, #000814);
+        padding: 10px;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 500;
+        text-align: center;
+      }
+
+      td {
+        padding: 10px;
+        text-align: center;
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .welcome { font-size: 28px; }
+      }
+
+      @media (max-width: 480px) {
+        .welcome { font-size: 20px; }
+        .subtitle { font-size: 14px; }
+        .table { font-size: 12px; min-width: 480px; }
+      }

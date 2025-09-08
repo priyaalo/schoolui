@@ -1,0 +1,309 @@
+import React, { useState, useEffect } from "react";
+import { FaTimes } from "react-icons/fa";
+import { DatePicker, TimePicker } from "antd";
+import styles from "./LeaveRequest.module.css";
+
+const LeaveRequestModal = ({ isOpen, onClose, onSubmit }) => {
+  const [errors, setErrors] = useState({});
+  const [formData, setFormData] = useState({
+    studentId: localStorage.getItem("studentId") || "",
+    leaveType: "",
+    fromDate: null,
+    toDate: null,
+    reason: "",
+    permissionDate: null,
+    fromTime: null,
+    toTime: null,
+  });
+
+  const [successMessage, setSuccessMessage] = useState("");
+
+  // ✅ Reset form whenever modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setFormData({
+        studentId: localStorage.getItem("studentId") || "",
+        leaveType: "",
+        fromDate: null,
+        toDate: null,
+        reason: "",
+        permissionDate: null,
+        fromTime: null,
+        toTime: null,
+      });
+      setErrors({});
+      setSuccessMessage("");
+    }
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => {
+      const updatedForm = { ...prev, [name]: value };
+      validateField(name, value, updatedForm);
+      return updatedForm;
+    });
+  };
+
+  const handleDateChange = (date, _dateString, name) => {
+    setFormData((prev) => {
+      const updatedForm = { ...prev, [name]: date };
+      validateField(name, date, updatedForm);
+      return updatedForm;
+    });
+  };
+
+  const handleTimeChange = (time, _timeString, name) => {
+    setFormData((prev) => {
+      const updatedForm = { ...prev, [name]: time };
+      validateField(name, time, updatedForm);
+      return updatedForm;
+    });
+  };
+
+  const validateField = (name, value, updatedForm = formData) => {
+    let newErrors = { ...errors };
+
+    if (name === "studentId") {
+      if (!value.trim()) newErrors.studentId = "Student ID is required";
+      else if (!/^alosodt\s\d{4}$/.test(value))
+        newErrors.studentId = "ID must be in format: alosodt 1234";
+      else newErrors.studentId = "";
+    }
+
+    if (name === "leaveType") {
+      newErrors.leaveType = value ? "" : "Please select a leave type";
+    }
+
+    if (
+      (name === "fromDate" || name === "toDate") &&
+      updatedForm.leaveType &&
+      updatedForm.leaveType !== "Permission"
+    ) {
+      if (!updatedForm.fromDate || !updatedForm.toDate)
+        newErrors.dates = "Both From and To dates are required";
+      else if (updatedForm.toDate.isBefore(updatedForm.fromDate))
+        newErrors.dates = "To Date cannot be earlier than From Date";
+      else newErrors.dates = "";
+    }
+
+    if (updatedForm.leaveType === "Permission") {
+      if (!updatedForm.permissionDate)
+        newErrors.permissionDate = "Permission date is required";
+      else newErrors.permissionDate = "";
+
+      if (!updatedForm.fromTime || !updatedForm.toTime)
+        newErrors.times = "Both From and To times are required";
+      else if (updatedForm.toTime.isBefore(updatedForm.fromTime))
+        newErrors.times = "To Time must be later than From Time";
+      else newErrors.times = "";
+    }
+
+    if (name === "reason") {
+      if (!value.trim()) newErrors.reason = "Reason is required";
+      else if (value.length < 5)
+        newErrors.reason = "Reason must be at least 5 characters";
+      else newErrors.reason = "";
+    }
+
+    setErrors(newErrors);
+  };
+
+  const validateAll = () => {
+    let newErrors = {};
+    if (!formData.studentId.trim())
+      newErrors.studentId = "Student ID is required";
+    else if (!/^alosodt\s\d{4}$/.test(formData.studentId))
+      newErrors.studentId = "ID must be in format: alosodt 1234";
+
+    if (!formData.leaveType)
+      newErrors.leaveType = "Please select a leave type";
+
+    if (formData.leaveType !== "Permission") {
+      if (!formData.fromDate || !formData.toDate)
+        newErrors.dates = "Both From and To dates are required";
+      else if (new Date(formData.toDate) < new Date(formData.fromDate))
+        newErrors.dates = "To Date cannot be earlier than From Date";
+    } else {
+      if (!formData.permissionDate)
+        newErrors.permissionDate = "Permission date is required";
+      if (!formData.fromTime || !formData.toTime)
+        newErrors.times = "Both From and To times are required";
+      else if (formData.toTime <= formData.fromTime)
+        newErrors.times = "To Time must be later than From Time";
+    }
+
+    if (!formData.reason.trim())
+      newErrors.reason = "Reason is required";
+    else if (formData.reason.length < 5)
+      newErrors.reason = "Reason must be at least 5 characters";
+
+    setErrors(newErrors);
+    return newErrors;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const finalErrors = validateAll();
+    const hasErrors = Object.values(finalErrors).some((err) => err !== "");
+
+    if (!hasErrors) {
+      if (onSubmit) onSubmit(formData);
+
+      // reset form on submit
+      setFormData({
+        studentId: localStorage.getItem("studentId") || "",
+        leaveType: "",
+        fromDate: null,
+        toDate: null,
+        reason: "",
+        permissionDate: null,
+        fromTime: null,
+        toTime: null,
+      });
+      setErrors({});
+
+      setSuccessMessage(
+        formData.leaveType === "Permission"
+          ? "Permission updated successfully!"
+          : "Leave request submitted successfully!"
+      );
+
+      setTimeout(() => setSuccessMessage(""), 3000);
+    }
+  };
+
+  return (
+    <div className={styles.modalOverlay}>
+      <section className={styles.container}>
+        <div className={styles.header}>
+          <h1>
+            Leave <span style={{ color: "rgb(30, 58, 138)" }}>Request</span>{" "}
+            Form
+          </h1>
+          <div className={styles.headericon} onClick={onClose}>
+            <FaTimes size={16} color="grey" />
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className={styles.form}>
+          {/* Student ID */}
+          <div className={styles.inputBox}>
+            <label>Student ID</label>
+            <input
+              type="text"
+              name="studentId"
+              value={formData.studentId}
+              onChange={handleChange}
+              readOnly
+              className={styles.readonlyInput}
+            />
+            {errors.studentId && (
+              <p className={styles.error}>{errors.studentId}</p>
+            )}
+          </div>
+
+          {/* Leave Type */}
+          <div className={styles.inputBox}>
+            <label>Leave Type</label>
+            <select
+              name="leaveType"
+              value={formData.leaveType}
+              onChange={handleChange}
+            >
+              <option value="" disabled hidden>
+                Select Leave Type
+              </option>
+              <option value="Sick Leave">Sick Leave</option>
+              <option value="Casual Leave">Casual Leave</option>
+              <option value="Permission">Permission</option>
+            </select>
+            {errors.leaveType && (
+              <p className={styles.error}>{errors.leaveType}</p>
+            )}
+          </div>
+
+          {/* Leave Period */}
+          {formData.leaveType && formData.leaveType !== "Permission" && (
+            <div className={styles.inputBox}>
+              <label>Leave Period</label>
+              <div className={styles.column}>
+                <DatePicker
+                  value={formData.fromDate}
+                  onChange={(date, dateString) =>
+                    handleDateChange(date, dateString, "fromDate")
+                  }
+                  placeholder="From"
+                />
+                <DatePicker
+                  value={formData.toDate}
+                  onChange={(date, dateString) =>
+                    handleDateChange(date, dateString, "toDate")
+                  }
+                  placeholder="To"
+                />
+              </div>
+              {errors.dates && <p className={styles.error}>{errors.dates}</p>}
+            </div>
+          )}
+
+          {/* Permission Time */}
+          {formData.leaveType === "Permission" && (
+            <div className={styles.inputBox}>
+              <label>Permission Time</label>
+              <div className={styles.formRow}>
+                <DatePicker
+                  value={formData.permissionDate}
+                  onChange={(date, dateString) =>
+                    handleDateChange(date, dateString, "permissionDate")
+                  }
+                  placeholder="Date"
+                />
+                <TimePicker
+                  value={formData.fromTime}
+                  onChange={(time, timeString) =>
+                    handleTimeChange(time, timeString, "fromTime")
+                  }
+                  placeholder="From"
+                />
+                <TimePicker
+                  value={formData.toTime}
+                  onChange={(time, timeString) =>
+                    handleTimeChange(time, timeString, "toTime")
+                  }
+                  placeholder="To"
+                />
+              </div>
+              {errors.permissionDate && (
+                <p className={styles.error}>{errors.permissionDate}</p>
+              )}
+              {errors.times && <p className={styles.error}>{errors.times}</p>}
+            </div>
+          )}
+
+          {/* Reason */}
+          <div className={styles.inputBox}>
+            <label>Reason</label>
+            <textarea
+              name="reason"
+              value={formData.reason}
+              onChange={handleChange}
+            />
+            {errors.reason && <p className={styles.error}>{errors.reason}</p>}
+          </div>
+
+          {/* Submit */}
+          <div className={styles.btn}>
+            <button type="submit" className={styles.submitBtn}>
+              Request Leave
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+  );
+};
+
+export default LeaveRequestModal;

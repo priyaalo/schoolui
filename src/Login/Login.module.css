@@ -1,0 +1,156 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+.loginPage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: radial-gradient(circle at top, #0a1b64, #010314);
+  background-image: url("../assets/AloLogo/backcolor.jpg");
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+  padding: 0;
+}
+
+.card {
+  background: #fff;
+  padding: 70px;
+  width: 100%;
+
+  max-width: 550px;
+  border-radius: 16px;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25);
+  text-align: center;
+  margin-bottom: 69px; /* ⬅ only move card slightly up */
+}
+
+/* Floating Logo */
+.logoWrapper {
+  text-align: center;
+  z-index: 2;
+  position: relative;
+  margin: 0; /* remove old margin */
+}
+
+.logoWrapper img {
+  height: 200px;
+  /* padding: 10px; */
+  border-radius: 80%; /* circle frame */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  margin: 0;
+  padding-top:20px;
+  padding-bottom:28px;
+}
+.card h2 {
+  font-size: 24px;
+}
+.logoWrapper h3 {
+  margin: 8px 0 0 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.schoolTagline {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #ddd;
+}
+
+/* Card */
+
+.card h2 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #222;
+  padding-bottom:5px;
+}
+
+.subTitle {
+  margin: 6px 0 20px 0;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+/* Input fields */
+.inputBox {
+  margin-bottom: 18px;
+  text-align: left;
+  margin-top: 30px;
+  
+}
+
+.inputBox input {
+  width: 100%;
+  padding: 14px 14px;
+  height:auto;
+  border-radius: 8px;
+  border: 1px solid #c3c3c3;
+  font-size: 0.95rem;
+  background-color: #c3c3c3;
+}
+
+.errorMsg {
+  font-size: 0.8rem;
+  color: red;
+  margin-top: 4px;
+}
+
+/* Password field wrapper */
+.passwordWrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.passwordWrapper input {
+  flex: 1;
+}
+
+.eyeIcon {
+  position: absolute;
+  right: 12px;
+  cursor: pointer;
+  color: #888;
+}
+
+/* Forgot password */
+.forgotPassword {
+  text-align: right;
+  margin-bottom: 18px;
+}
+
+.forgotPassword a {
+  font-size: 0.85rem;
+  color: #0a1b64;
+  text-decoration: none;
+}
+
+.forgotPassword a:hover {
+  text-decoration: underline;
+}
+
+/* Button */
+.loginBtn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(to right, #0a1b64, #020c3a);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+
+.loginBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.loginBtn:hover:not(:disabled) {
+  opacity: 0.9;
+}

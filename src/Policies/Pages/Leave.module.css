@@ -1,0 +1,24 @@
+.container {
+  padding: 1rem;
+  font-family: Arial, sans-serif;
+  color: #333;
+  line-height: 1.6;
+}
+
+.heading {
+  color: #004d99;
+  margin-top:80px; /* Primary heading color */
+}
+
+.subHeading {
+  color: #504f4f;
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+  font-weight: 400;
+  font-size: 20px;
+}
+
+
+.paragraph {
+  margin-bottom: 1rem;
+}

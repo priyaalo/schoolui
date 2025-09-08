@@ -1,0 +1,78 @@
+.dotsSpinner {
+  width: 3.6rem;
+  height: 3.4rem;
+  position: relative;
+  animation: spin 2s linear infinite;
+  margin: auto;
+}
+
+:root {
+  --col1: red;
+  --col2: yellow;
+  --col3: blue;
+  --size: 1.2rem;
+}
+
+.dotsSpinner > span {
+  display: block;
+  height: var(--size);
+  width: var(--size);
+  background-color: var(--col1);
+  border-radius: 50%;
+  position: absolute;
+  animation: pulse 3s ease-out infinite var(--delay),
+             colorChange 4s linear infinite;
+}
+
+/* Individual dots */
+.dot1 {
+  top: 0;
+  left: calc(50% - (var(--size) / 2));
+  --delay: 2s;
+}
+
+.dot2 {
+  bottom: 0;
+  left: 0;
+  --delay: 1s;
+}
+
+.dot3 {
+  bottom: 0;
+  right: 0;
+  --delay: 0s;
+}
+
+/* Animations */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes colorChange {
+  0% {
+    background-color: var(--col1);
+  }
+  33.33% {
+    background-color: var(--col2);
+  }
+  66.66% {
+    background-color: var(--col3);
+  }
+  100% {
+    background-color: var(--col1);
+  }
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}

@@ -1,0 +1,82 @@
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 50px;
+  margin: 10px;
+  gap: 15px;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.iconWrapper {
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px; /* adjust icon size */
+  color: white; /* default icon color */
+  background-color: #99cafa; /* default background, overridden by .birthday/.festival */
+}
+
+/* dynamic circle colors */
+.birthday {
+  background-color: #66b3ff; /* blue for birthday */
+  color: white; /* icon color */
+}
+
+.festival {
+  background-color: #f5b85e; /* orange for festival */
+  color: black; /* icon color for contrast */
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.subtitle {
+  font-size: 12px;
+  color: #555;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+.right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: bold;
+}
+
+.day {
+  font-size: 11.57px;
+  line-height: 1.2;
+  font-weight: 500;
+  color: #144196;
+}
+
+.monthYear {
+  font-size: 5.79px;
+  font-weight: 500;
+}
