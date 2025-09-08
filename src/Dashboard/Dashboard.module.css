@@ -84,7 +84,7 @@
 .marqueeContent {
   display: inline-flex;
    
-  animation: marquee 28s linear infinite;
+  animation: marquee 50s linear infinite;
 }
 
 .marqueeContent > div {

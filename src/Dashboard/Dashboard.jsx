@@ -113,7 +113,8 @@ const Dashboard = () => {
     setIsCheckingOut(true);
 
     try {
-      await checkOut(attendanceId, remarks, userId);
+      const checkoutTime = new Date().toISOString();
+      await checkOut(attendanceId, remarks, userId, checkoutTime);
       await fetchAttendance();
       await fetchUser();
 
@@ -190,7 +191,7 @@ const Dashboard = () => {
       <div className={styles.top}>
         <div className={styles.text}>
           <h1 className={styles.welcome}>
-            Welcome Back, {user?.name || "User"}
+            Welcome Back, {user?.name}
           </h1>
         </div>
         <div className={styles.second}>

@@ -27,7 +27,6 @@ export const checkIn=(userId)=>{
 
 //checkout
 export const checkOut = (attendanceId, remarks, userId, checkoutTime) => {
-  
   return apiService.put(`attendance/${attendanceId}`, {
     remarks,
     userId,

@@ -18,7 +18,7 @@ const LeaveRequestModal = ({ isOpen, onClose, onSubmit }) => {
 
   const [successMessage, setSuccessMessage] = useState("");
 
-  // ✅ Reset form whenever modal opens
+  // Reset form when modal opens
   useEffect(() => {
     if (isOpen) {
       setFormData({
@@ -66,6 +66,7 @@ const LeaveRequestModal = ({ isOpen, onClose, onSubmit }) => {
   const validateField = (name, value, updatedForm = formData) => {
     let newErrors = { ...errors };
 
+    // Student ID validation
     if (name === "studentId") {
       if (!value.trim()) newErrors.studentId = "Student ID is required";
       else if (!/^alosodt\s\d{4}$/.test(value))
@@ -73,10 +74,12 @@ const LeaveRequestModal = ({ isOpen, onClose, onSubmit }) => {
       else newErrors.studentId = "";
     }
 
+    // Leave Type validation
     if (name === "leaveType") {
       newErrors.leaveType = value ? "" : "Please select a leave type";
     }
 
+    // Leave Period validation
     if (
       (name === "fromDate" || name === "toDate") &&
       updatedForm.leaveType &&
@@ -89,18 +92,26 @@ const LeaveRequestModal = ({ isOpen, onClose, onSubmit }) => {
       else newErrors.dates = "";
     }
 
+    // Permission validation
     if (updatedForm.leaveType === "Permission") {
-      if (!updatedForm.permissionDate)
-        newErrors.permissionDate = "Permission date is required";
-      else newErrors.permissionDate = "";
+      if (name === "permissionDate") {
+        newErrors.permissionDate = value
+          ? ""
+          : "Permission date is required";
+      }
 
-      if (!updatedForm.fromTime || !updatedForm.toTime)
-        newErrors.times = "Both From and To times are required";
-      else if (updatedForm.toTime.isBefore(updatedForm.fromTime))
-        newErrors.times = "To Time must be later than From Time";
-      else newErrors.times = "";
+      if (name === "fromTime" || name === "toTime") {
+        if (!updatedForm.fromTime || !updatedForm.toTime) {
+          newErrors.times = "Both From and To times are required";
+        } else if (updatedForm.toTime.isBefore(updatedForm.fromTime)) {
+          newErrors.times = "To Time must be later than From Time";
+        } else {
+          newErrors.times = "";
+        }
+      }
     }
 
+    // Reason validation
     if (name === "reason") {
       if (!value.trim()) newErrors.reason = "Reason is required";
       else if (value.length < 5)
@@ -113,6 +124,7 @@ const LeaveRequestModal = ({ isOpen, onClose, onSubmit }) => {
 
   const validateAll = () => {
     let newErrors = {};
+
     if (!formData.studentId.trim())
       newErrors.studentId = "Student ID is required";
     else if (!/^alosodt\s\d{4}$/.test(formData.studentId))
@@ -124,14 +136,15 @@ const LeaveRequestModal = ({ isOpen, onClose, onSubmit }) => {
     if (formData.leaveType !== "Permission") {
       if (!formData.fromDate || !formData.toDate)
         newErrors.dates = "Both From and To dates are required";
-      else if (new Date(formData.toDate) < new Date(formData.fromDate))
+      else if (formData.toDate.isBefore(formData.fromDate))
         newErrors.dates = "To Date cannot be earlier than From Date";
     } else {
       if (!formData.permissionDate)
         newErrors.permissionDate = "Permission date is required";
+
       if (!formData.fromTime || !formData.toTime)
         newErrors.times = "Both From and To times are required";
-      else if (formData.toTime <= formData.fromTime)
+      else if (formData.toTime.isBefore(formData.fromTime))
         newErrors.times = "To Time must be later than From Time";
     }
 
@@ -152,7 +165,7 @@ const LeaveRequestModal = ({ isOpen, onClose, onSubmit }) => {
     if (!hasErrors) {
       if (onSubmit) onSubmit(formData);
 
-      // reset form on submit
+      // reset form
       setFormData({
         studentId: localStorage.getItem("studentId") || "",
         leaveType: "",
@@ -196,7 +209,6 @@ const LeaveRequestModal = ({ isOpen, onClose, onSubmit }) => {
               type="text"
               name="studentId"
               value={formData.studentId}
-              onChange={handleChange}
               readOnly
               className={styles.readonlyInput}
             />
@@ -262,6 +274,8 @@ const LeaveRequestModal = ({ isOpen, onClose, onSubmit }) => {
                   placeholder="Date"
                 />
                 <TimePicker
+                  use12Hours
+                  format="hh:mm A"
                   value={formData.fromTime}
                   onChange={(time, timeString) =>
                     handleTimeChange(time, timeString, "fromTime")
@@ -269,6 +283,8 @@ const LeaveRequestModal = ({ isOpen, onClose, onSubmit }) => {
                   placeholder="From"
                 />
                 <TimePicker
+                  use12Hours
+                  format="hh:mm A"
                   value={formData.toTime}
                   onChange={(time, timeString) =>
                     handleTimeChange(time, timeString, "toTime")

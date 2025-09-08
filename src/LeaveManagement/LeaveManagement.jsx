@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 import styles from "./LeaveManagement.module.css";
 import LeaveRequestModal from "../LeaveRequest/LeaveRequest";
-import { getLeaveTable, postLeaveRequest, monthCalculation } from "../api/serviceapi";
+import {
+  getLeaveTable,
+  postLeaveRequest,
+  monthCalculation,
+} from "../api/serviceapi";
 import { useParams } from "react-router-dom";
 import Pagination from "@mui/material/Pagination";
 import { FaEye } from "react-icons/fa";
@@ -12,17 +16,17 @@ const LeaveManagement = () => {
   const [loading, setLoading] = useState(true);
   const [successPopup, setSuccessPopup] = useState(false); // Inline success popup
   const { userId } = useParams();
-
   const [page, setPage] = useState(1);
   const rowsPerPage = 5;
-
-  const [leaveStats, setLeaveStats] = useState({
+const [leaveStats, setLeaveStats] = useState({
     sickLeaveTaken: 0,
     casualLeaveTaken: 0,
   });
-
-  const [isRemarksModalOpen, setRemarksModalOpen] = useState(false);
-  const [selectedRemark, setSelectedRemark] = useState("");
+  // Popup state for remarks
+  const [remarkPopup, setRemarkPopup] = useState({
+    isOpen: false,
+    text: "",
+  });
 
   const fetchTable = async () => {
     try {
@@ -42,33 +46,77 @@ const LeaveManagement = () => {
   }, [userId]);
 
   const leaveData = leaveTable.map((data) => {
+    let leaveType = data.leaveType;
+    let period = "";
+    let days = data.noOfDays;
+
+    let requestedOn = data.date
+      ? new Date(data.date).toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+          timeZone: "UTC",
+        })
+      : "";
     const from = data.fromDate
-      ? new Date(data.fromDate).toLocaleDateString("en-GB", { day: "2-digit", month: "short" })
+      ? new Date(data.fromDate).toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "short",
+        })
       : "";
     const to = data.toDate
-      ? new Date(data.toDate).toLocaleDateString("en-GB", { day: "2-digit", month: "short" })
+      ? new Date(data.toDate).toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "short",
+        })
       : "";
-    const requestedOn = data.date
-      ? new Date(data.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })
-      : "";
-    let period = from && to ? `${from} - ${to}` : from || to;
-    let leaveType = data.leaveType;
-    if (data.isPermission) {
+    period = from && to ? `${from} - ${to}` : from || to;
+
+    if (data.leaveType === "permission") {
       leaveType = "Permission";
-      period = data.date
-        ? new Date(data.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })
+      const permissionDate = data.permissionDate
+        ? new Date(data.permissionDate).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            timeZone: "UTC",
+          })
         : "N/A";
+      const startTime = data.startTime ? new Date(data.startTime) : null;
+      const endTime = data.endTime ? new Date(data.endTime) : null;
+      let timePeriod = "";
+      if (startTime && endTime) {
+        const options = {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+          timeZone: "UTC",
+        };
+        timePeriod = `${startTime.toLocaleTimeString("en-Us", options)}-${endTime.toLocaleTimeString(
+          "en-Us",
+          options
+        )}`;
+      }
+      let permissionHrs = data.permissionTime;
+      const hours = Math.floor(permissionHrs);
+      const mins = Math.round((permissionHrs - hours) * 60);
+      const formattedHrs = `${hours}h ${mins}m`;
+
+      requestedOn = permissionDate;
+      period = timePeriod;
+      days = formattedHrs;
     }
+
     return {
       id: data._id,
       name: data.userDetails?.name || "Unknown",
       type: leaveType,
-      remarks: data.discription || "No remarks",
+      remarks: data.discription,
       requestedOn,
       period,
-      days: data.noOfDays,
+      days,
       status: data.status === "Created" ? "Pending" : data.status,
-      respondedBy: "dummy data",
+      respondedBy: data.approvedBy?.name || "-",
     };
   });
 
@@ -85,7 +133,12 @@ const LeaveManagement = () => {
 
   const handleModalSubmit = async (formData) => {
     try {
-      let payload = { userId, status: "Created", discription: formData.reason };
+      let payload = {
+        userId,
+        status: "Created",
+        discription: formData.reason,
+      };
+
       if (formData.leaveType === "Sick Leave") {
         payload.leaveType = "Sick";
         payload.fromDate = formData.fromDate.format("YYYY-MM-DD") || null;
@@ -95,72 +148,61 @@ const LeaveManagement = () => {
         payload.fromDate = formData.fromDate.format("YYYY-MM-DD") || null;
         payload.toDate = formData.toDate.format("YYYY-MM-DD") || null;
       } else if (formData.leaveType === "Permission") {
-        payload.leaveType = "Permission";
+        payload.leaveType = "permission";
         payload.permissionDate = formData.permissionDate.format("YYYY-MM-DD") || null;
         payload.startTime = formData.fromTime.format("hh:mm A") || null;
         payload.endTime = formData.toTime.format("hh:mm A") || null;
       }
 
       await postLeaveRequest(payload);
+      // alert("Leave request submitted successfully");
       fetchTable();
       setIsModalOpen(false);
-
-      setSuccessPopup(true); // Show success
-      setTimeout(() => setSuccessPopup(false), 3000);
     } catch (err) {
-      console.error(err.message);
+      console.error(err.message, err.response?.data);
     }
   };
-
-  const openRemarks = (remark) => {
-    setSelectedRemark(remark || "No remarks");
-    setRemarksModalOpen(true);
-  };
-  const closeRemarks = () => {
-    setSelectedRemark("");
-    setRemarksModalOpen(false);
-  };
-
   const monthCalc = async () => {
-    try {
-      const response = await monthCalculation(userId);
-      const data = response.data?.data;
-      setLeaveStats({
-        sickLeaveTaken: data?.sick?.currentYear || 0,
-        casualLeaveTaken: data?.casual?.currentYear || 0,
-      });
-    } catch (err) {
-      console.error(err.message);
-    }
-  };
-
+  try {
+    const response = await monthCalculation(userId);
+    console.log("month calculation raw response:", response);
+ 
+    const data = response.data?.data;
+ 
+    const sickTaken = data?.sick?.currentYear || 0;
+    const casualTaken = data?.casual?.currentYear || 0;
+ 
+    setLeaveStats({
+      sickLeaveTaken: sickTaken,
+      casualLeaveTaken: casualTaken,
+    });
+  } catch (err) {
+    console.error("Error fetching month calculation:", err.message);
+  }
+};
+ 
   useEffect(() => {
-    if (userId) monthCalc();
+    if (userId) {
+      monthCalc();
+    }
   }, [userId]);
 
   return (
     <div className={styles.req}>
-      {/* Inline success popup */}
-      {successPopup && (
-        <div className={styles.successPopup}>
-          Leave request submitted successfully!
-        </div>
-      )}
-
       {/* Leave summary cards */}
       <div className={styles.row}>
         <div className={styles.col}>
           <div className={styles.card}>
             <button className={styles.circle}>SL</button>
             <h4>Sick Leave</h4>
-            <p>Available for the calendar year: {12 - leaveStats.sickLeaveTaken}</p>
+            <p>Available for the calendar year:{12-leaveStats.sickLeaveTaken}</p>
           </div>
         </div>
         <div className={styles.col}>
           <div className={styles.card}>
             <button className={styles.circle1}>CL</button>
             <h4>Casual Leave</h4>
-            <p>Available for the calendar year: {12 - leaveStats.casualLeaveTaken}</p>
+            <p>Available for the calendar year:{12-leaveStats.casualLeaveTaken}</p>
           </div>
         </div>
         <div className={styles.col}>
@@ -168,7 +210,8 @@ const LeaveManagement = () => {
             <button className={styles.circle}>SL</button>
             <h4>Requested Leave Status</h4>
             <p>
-              Recent requested Leave: <b>{leaveData.length > 0 ? leaveData[0]?.status || "Pending" : "Nill"}</b>
+              Recent requested Leave:{" "}
+              <b>{leaveData.length > 0 ? leaveData[0]?.status || "Pending" : "Nill"}</b>
             </p>
           </div>
         </div>
@@ -186,46 +229,52 @@ const LeaveManagement = () => {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>Remarks</th>
               <th>Name</th>
               <th>Type</th>
               <th>Requested On</th>
               <th>Period</th>
               <th>Days</th>
               <th>Status</th>
+              <th>Remarks</th>
               <th>Responded By</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan="8" style={{ textAlign: "center", padding: "1rem" }}>Loading...</td>
+                <td colSpan="8" style={{ textAlign: "center", padding: "1rem" }}>
+                  Loading...
+                </td>
               </tr>
             ) : paginatedRows.length > 0 ? (
               paginatedRows.map((data) => (
                 <tr key={data.id}>
-                  <td
-                    className={styles.remarksCell}
-                    onClick={() => openRemarks(data.remarks)}
-                    title="Click to view full remarks"
-                    style={{ textAlign: "center", cursor: "pointer" }}
-                  >
-                    <FaEye className={styles.eyeIcon} />
-                  </td>
                   <td>{data.name}</td>
                   <td>{data.type}</td>
                   <td>{data.requestedOn}</td>
                   <td>{data.period}</td>
-                  <td>{data.days} days</td>
+                  <td>{data.type === "Permission" ? data.days : `${data.days} days`}</td>
                   <td>
                     <span className={getStatusClass(data.status)}>{data.status}</span>
+                  </td>
+                  <td>
+                    {data.remarks ? (
+                      <FaEye
+                        style={{ cursor: "pointer" }}
+                        onClick={() => setRemarkPopup({ isOpen: true, text: data.remarks })}
+                      />
+                    ) : (
+                      "-"
+                    )}
                   </td>
                   <td>{data.respondedBy}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="8" style={{ textAlign: "center", padding: "1rem" }}>No leave records found</td>
+                <td colSpan="8" style={{ textAlign: "center", padding: "1rem" }}>
+                  No leave records found
+                </td>
               </tr>
             )}
           </tbody>
@@ -262,18 +311,13 @@ const LeaveManagement = () => {
         </div>
       </div>
 
-      {/* Custom Remarks Modal */}
-      {isRemarksModalOpen && (
-        <div className={styles.modalOverlay} onClick={closeRemarks}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <button className={styles.modalClose} onClick={closeRemarks} aria-label="Close">&times;</button>
-            <h3 className={styles.modalTitle}>Remarks</h3>
-            <div className={styles.modalContent}>
-              <p style={{ whiteSpace: "pre-wrap", margin: 0 }}>{selectedRemark}</p>
-            </div>
-            <div style={{ marginTop: 16, textAlign: "right" }}>
-              <button className={styles.modalOk} onClick={closeRemarks}>Close</button>
-            </div>
+      {/* Remark Popup */}
+      {remarkPopup.isOpen && (
+        <div className={styles.popupOverlay}>
+          <div className={styles.popupContent}>
+            <h3>Remarks</h3>
+            <p>{remarkPopup.text}</p>
+            <button onClick={() => setRemarkPopup({ isOpen: false, text: "" })}>Close</button>
           </div>
         </div>
       )}
