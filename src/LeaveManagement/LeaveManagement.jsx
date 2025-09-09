@@ -156,11 +156,14 @@ const [leaveStats, setLeaveStats] = useState({
 
       await postLeaveRequest(payload);
       // alert("Leave request submitted successfully");
+      
+      setSuccessPopup(true)
       fetchTable();
       setIsModalOpen(false);
-    } catch (err) {
-      console.error(err.message, err.response?.data);
-    }
+     setTimeout(() => setSuccessPopup(false), 3000);
+  } catch (err) {
+    console.error(err.message, err.response?.data);
+  }
   };
   const monthCalc = async () => {
   try {
@@ -321,6 +324,15 @@ const [leaveStats, setLeaveStats] = useState({
           </div>
         </div>
       )}
+      {/* Success Popup */}
+{successPopup && (
+  <div className={styles.successPopup}>
+    <div className={styles.successContent}>
+      <p>✅ Leave request submitted successfully!</p>
+    </div>
+  </div>
+)}
+
 
       {/* Leave Request modal */}
       <LeaveRequestModal

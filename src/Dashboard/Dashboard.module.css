@@ -1,5 +1,6 @@
       /* Container */
-     .container {
+   /* Keep scroll functionality but hide scrollbar */
+.container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -17,8 +18,11 @@
 }
 
 .container::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
+  width: 0px;
+  height: 0px;
+  background: transparent; /* fully hides */
 }
+
 
 
       /* Top Section */

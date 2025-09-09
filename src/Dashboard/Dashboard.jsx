@@ -47,7 +47,9 @@ const Dashboard = () => {
 
   const fetchAttendance = async () => {
     try {
-      const response = await getAttendance(userId);
+      const monthFlag=filter==="pastMonth";
+
+      const response = await getAttendance(userId,monthFlag);
       const allData = response.data.data.data || [];
 
       const formattedData = allData.map((att) => {
@@ -83,7 +85,7 @@ const Dashboard = () => {
       fetchUser();
       fetchAttendance();
     }
-  }, [navigate, userId]);
+  }, [navigate, userId,filter]);
 
   const handleCheckIn = async () => {
     if (isCheckingIn) return;
@@ -144,8 +146,8 @@ const Dashboard = () => {
     date: ele.date || "N/A",
     login: tableFormatTime(ele.inTime) || "N/A",
     logout: tableFormatTime(ele.outTime) || "N/A",
-    remarks: ele.Remarks || "Remarks",
-    classHours: ele.classHours || "0 hr 0 min",
+    remarks: ele.remarks || "Remarks",
+    classHours: ele.totalWorkHours || "0 hr 0 min",
     permission: "0 hr 0 min",
   }));
 
@@ -172,7 +174,7 @@ const Dashboard = () => {
       title: ev.title,
       subtitle: ev.description,
       date: moment(d).format("DD MMM YYYY"),
-      icon: ev.type === "festival" ? "festival" : "birthday",
+      icon: ev.eventType,
     };
   });
 
@@ -256,7 +258,7 @@ const Dashboard = () => {
           <div>Class Hours: -- : --</div>
           <select value={filter} onChange={(e) => setFilter(e.target.value)} className={styles.dropdown}>
             <option value="thisMonth">This Month</option>
-            <option value="today">Last Month</option>
+            <option value="pastMonth">Last Month</option>
           </select>
         </div>
 
@@ -272,17 +274,26 @@ const Dashboard = () => {
             </tr>
           </thead>
           <tbody>
-            {paginatedRows.map((row) => (
-              <tr key={row.id}>
-                <td>{row.date}</td>
-                <td>{row.login}</td>
-                <td>{row.logout}</td>
-                <td>{row.remarks}</td>
-                <td>{row.classHours}</td>
-                <td>{row.permission}</td>
-              </tr>
-            ))}
-          </tbody>
+  {paginatedRows.length === 0 ? (
+    <tr>
+      <td colSpan={6} style={{ textAlign: "center", padding: "15px" }}>
+        No records found
+      </td>
+    </tr>
+  ) : (
+    paginatedRows.map((row) => (
+      <tr key={row.id}>
+        <td>{row.date}</td>
+        <td>{row.login}</td>
+        <td>{row.logout}</td>
+        <td>{row.remarks}</td>
+        <td>{row.classHours}</td>
+        <td>{row.permission}</td>
+      </tr>
+    ))
+  )}
+</tbody>
+
         </table>
 
        <div style={{ display: "flex", justifyContent: "center", marginTop: "15px" }}>

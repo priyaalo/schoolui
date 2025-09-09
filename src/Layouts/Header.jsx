@@ -36,11 +36,11 @@ const Header = ({ handleLogout }) => {
   };
 
   useEffect(() => {
-    if (!userId) {
-      navigate("/login", { replace: true });
-      return;
-    }
-    fetchUser();
+  //   if (!userId) {
+  //     navigate("/login", { replace: true });
+  //     return;
+  //   }
+   fetchUser();
   }, [userId, navigate]);
 
   useEffect(() => {

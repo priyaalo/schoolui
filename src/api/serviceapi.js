@@ -16,10 +16,15 @@ export const getUserId = (userId) => {
 };
 
 //get attendance for the particular user 
-export const getAttendance = (userId) => {
-  return apiService.get(`/attendance?userId=${userId}`);
+// export const getAttendance = (userId) => {
+//   return apiService.get(`/attendance?userId=${userId}`);
+// };
+export const getAttendance = (_userId_, month = false) => {
+  const url = month
+    ? `/attendance?userId=${_userId_}&month=true`
+    : `/attendance?userId=${_userId_}`;
+  return apiService.get(url);
 };
-
 //checkin
 export const checkIn=(userId)=>{
   return apiService.post(`/attendance/create`,{userId});
@@ -36,7 +41,7 @@ export const checkOut = (attendanceId, remarks, userId, checkoutTime) => {
 
 //get events
 export const getEvent = () => {
-  return apiService.get(`/event`);
+  return apiService.get(`/event?status=ongoing,upcoming`);
 };
 
 

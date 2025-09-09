@@ -38,7 +38,7 @@ function App() {
 
       <Routes>
         {/* Default redirect */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        {/* <Route path="/login" element={<Navigate to="/login" replace />} /> */}
 
         {/* Login page */}
         <Route
