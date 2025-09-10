@@ -1,12 +1,13 @@
 import { Navigate } from "react-router-dom";
 
-const PrivateRoute = ({ children }) => {
-  const isAuthenticated = !!sessionStorage.getItem("authToken"); // check sessionStorage
-  if (!isAuthenticated) {
+const PrivateRoute = ({ isAuthenticated, children }) => {
+  const userId = localStorage.getItem("userId");
+
+  if (!isAuthenticated || !userId) {
     return <Navigate to="/login" replace />;
   }
+
   return children;
 };
 
 export default PrivateRoute;
-

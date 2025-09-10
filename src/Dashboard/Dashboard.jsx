@@ -1,6 +1,6 @@
-import { useNavigate, useParams } from "react-router-dom";
 import styles from "./Dashboard.module.css";
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate, useParams } from "react-router-dom";
 import CheckoutModal from "./CheckoutModal";
 import { ToastContainer, toast } from "react-toastify";
 import {
@@ -68,7 +68,7 @@ const Dashboard = () => {
      };
  
      fetchLateCount();
-   }, [userId]);
+   }, []);
 
 
   const fetchAttendance = async () => {

@@ -168,7 +168,7 @@ const handleModalSubmit = async (formData) => {
     fetchTable();
 
     // Close request form automatically after toast
-  setIsModalOpen(false);
+   setIsModalOpen(false)
 
   } catch (err) {
     console.error(err.message, err.response?.data);

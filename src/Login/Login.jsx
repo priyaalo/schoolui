@@ -42,20 +42,20 @@ const Login = ({ setLoginUser }) => {
         setLoading(true);
         const res = await LoginUser(email, password);
 
-       // Inside handleClick()
-if (res?.data?.data?.data.role === "user") {
-  let token = res?.data?.data.token;
-  let userId = res?.data?.data?.data.userId;
-  let studentId = res?.data?.data?.data.studentId;
+        if (res?.data?.data?.data.role === "user") {
+          let token = res?.data?.data.token;
+          let userId = res?.data?.data?.data.userId;
+          let studentId = res?.data?.data?.data.studentId;
+          let checkInStatus = res?.data?.data?.data.checkInStatus;
 
-  sessionStorage.setItem("authToken", token);
-  sessionStorage.setItem("userId", userId);
-  sessionStorage.setItem("studentId", studentId);
+          localStorage.setItem("authToken", token);
+          localStorage.setItem("userId", userId);
+          localStorage.setItem("studentId", studentId);
+          
 
-  setLoginUser(true); // update App state
-  navigate(`/dashboard/${userId}`, { replace: true });
-}
-
+          setLoginUser(true);
+          navigate(`/dashboard/${userId}`, { replace: true });
+        }
       } catch (err) {
         const errorMsg =
           err?.response?.data?.message || "Invalid username or password!";

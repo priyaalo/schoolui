@@ -9,14 +9,16 @@ import Header from "./Layouts/Header";
 import { useState } from "react";
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const location = useLocation();
-  const [isAuthenticated, setIsAuthenticated] = useState(!!sessionStorage.getItem("authToken"));
 
   const handleLogout = () => {
-    sessionStorage.clear(); // remove token & userId
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("userId");
     setIsAuthenticated(false);
   };
 
+  // Show Header only for authenticated users
   const showHeader = isAuthenticated && location.pathname !== "/login";
 
   return (
@@ -24,16 +26,16 @@ function App() {
       {showHeader && <Header handleLogout={handleLogout} />}
 
       <Routes>
-        {/* Default redirect */}
+        {/* Default redirect to login */}
         <Route path="/" element={<Navigate to="/login" replace />} />
 
-        {/* Login page */}
+        {/* Login Page */}
         <Route
           path="/login"
           element={
             isAuthenticated ? (
               <Navigate
-                to={`/dashboard/${sessionStorage.getItem("userId")}`}
+                to={`/dashboard/${localStorage.getItem("userId")}`}
                 replace
               />
             ) : (
@@ -46,7 +48,7 @@ function App() {
         <Route
           path="/dashboard/:userId"
           element={
-            <PrivateRoute>
+            <PrivateRoute isAuthenticated={isAuthenticated}>
               <Dashboard />
             </PrivateRoute>
           }
@@ -55,7 +57,7 @@ function App() {
         <Route
           path="/leave-management/:userId"
           element={
-            <PrivateRoute>
+            <PrivateRoute isAuthenticated={isAuthenticated}>
               <LeaveManagement />
             </PrivateRoute>
           }
@@ -64,7 +66,7 @@ function App() {
         <Route
           path="/policies/:userId"
           element={
-            <PrivateRoute>
+            <PrivateRoute isAuthenticated={isAuthenticated}>
               <Policies />
             </PrivateRoute>
           }
@@ -77,4 +79,4 @@ function App() {
   );
 }
 
-export default App;
+export default App; 
