@@ -44,7 +44,8 @@ const Dashboard = () => {
   const [onPermission, setOnPermission] = useState(false);
   const [per,setPer]=useState("");
 
-
+const[onEarlyPermission,setOnEarlyPermission]=useState(false)
+  const [earlyPer,setEarlyPer]=useState("");
 
   const fetchUser = async () => {
     try {
@@ -94,6 +95,7 @@ const Dashboard = () => {
 
       setAttendanceTable(formattedData);
       setPer(formattedData[0]._id);
+      setEarlyPer(formattedData[0]._id);
 
       const today = new Date().toISOString().split("T")[0];
       const todayAttendance = allData.find(
@@ -103,6 +105,7 @@ const Dashboard = () => {
      if (todayAttendance) {
         setAttendanceId(todayAttendance._id);
         setOnPermission(todayAttendance.onPermission === true);
+        setOnEarlyPermission(todayAttendance.onEarlyPermission === true);
       }
 
     } catch (err) {
@@ -119,28 +122,7 @@ const Dashboard = () => {
     }
   }, [navigate, userId,filter]);
 
-  // const handleCheckIn = async () => {
-  //   if (isCheckingIn) return;
-  //   setIsCheckingIn(true);
 
-  //   try {
-  //     const response = await checkIn(userId);
-  //     const newAttendanceId = response.data.data._id;
-  //     setAttendanceId(newAttendanceId);
-
-  //     await fetchAttendance();
-  //     await fetchUser();
-
-      // setCheckInStatus(true);
-
-  //     toast.success("Check-in successful!", { position: "top-center", autoClose: 3000 });
-  //   } catch (err) {
-  //     console.error(err);
-  //     toast.error("Check-in failed. Please try again.", { position: "top-center", autoClose: 3000 });
-  //   } finally {
-  //     setIsCheckingIn(false);
-  //   }
-  // };
 const handleCheckIn = async () => {
   if (isCheckingIn) return; // prevent multiple rapid clicks
   setIsCheckingIn(true);
@@ -155,7 +137,19 @@ const handleCheckIn = async () => {
         position: "top-center",
         autoClose: 3000,
       });
-    } else {
+    } 
+      else if (onEarlyPermission && earlyPer) {
+          await updateAttendance(earlyPer, new Date().toISOString(), userId);
+          await fetchAttendance();
+          await fetchUser();
+
+          toast.success("Permission check-in Updated!", {
+            position: "top-center",
+            autoClose: 3000,
+          });
+
+      }
+    else {
       const response = await checkIn(userId);
       const newAttendanceId = response.data.data._id;
       setAttendanceId(newAttendanceId);

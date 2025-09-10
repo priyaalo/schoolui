@@ -84,33 +84,23 @@
 }
 
 /* ================= Events Marquee ================= */
-.marqueeWrapper {
-  overflow: hidden;
+.marqueeContainer {
   width: 100%;
-  position: relative;
+  overflow: hidden;
   white-space: nowrap;
-  margin: 20px 0;
+  background: #f9f9f9;
+  padding: 5px 0;
 }
 
 .marqueeContent {
-  display: inline-flex;
-  animation: marquee 50s linear infinite;
-}
-
-.marqueeContent > div {
-  flex: 0 0 auto;
-  min-width: 300px; /* Responsive */
-  white-space: normal;
-  margin-right: 20px;
+  display: flex;
+  gap: 10px;
+  animation: marquee 25s linear infinite; /* adjust speed */
 }
 
 @keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); } /* moves by half since we duplicated content */
 }
 
 /* ================= Cards ================= */
