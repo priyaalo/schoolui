@@ -41,7 +41,7 @@ const Header = ({ handleLogout }) => {
   //     return;
   //   }
    fetchUser();
-  }, [userId, navigate]);
+  }, [userId]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {

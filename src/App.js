@@ -29,6 +29,8 @@ function App() {
   // Show Header only for authenticated users
   const showHeader = isAuthenticated && location.pathname !== "/login";
 
+  
+
   return (
     <>
       {showHeader && <Header handleLogout={handleLogout} />}
