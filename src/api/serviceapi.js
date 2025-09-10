@@ -14,18 +14,19 @@ export const LoginUser = (email, password) => {
 export const getUserId = (userId) => {
   return apiService.get(`/user?id=${userId}`);
 };
-export const attCardCalculation = (_userId_) => {
-  return apiService.get(`/attendance/lateCount?userId=${_userId_}`);
+
+export const attCardCalculation = (userId) => {
+  return apiService.get(`/attendance/lateCount?userId=${userId}`);
 };
 
 //get attendance for the particular user 
 // export const getAttendance = (userId) => {
 //   return apiService.get(`/attendance?userId=${userId}`);
 // };
-export const getAttendance = (_userId_, month = false) => {
+export const getAttendance = (userId, month = false) => {
   const url = month
-    ? `/attendance?userId=${_userId_}&month=true`
-    : `/attendance?userId=${_userId_}`;
+    ? `/attendance?userId=${userId}&month=true`
+    : `/attendance?userId=${userId}`;
   return apiService.get(url);
 };
 //checkin
@@ -61,5 +62,14 @@ export const postLeaveRequest = (leaveData) => {
 //month calculation
 export const monthCalculation=(userId)=>{
    return apiService.get(`/leave/month?userId=${userId}`) 
+}
+
+
+//update Attendance
+export const updateAttendance=(id,time,userId)=>{
+  return apiService.put(`/attendance/${id}`, {
+    inTime: time,
+    userId,
+  });
 }
 

@@ -238,66 +238,74 @@ const LeaveRequestModal = ({ isOpen, onClose, onSubmit }) => {
           </div>
 
           {/* Leave Period */}
-          {formData.leaveType && formData.leaveType !== "Permission" && (
-            <div className={styles.inputBox}>
-              <label>Leave Period</label>
-              <div className={styles.column}>
-                <DatePicker
-                  value={formData.fromDate}
-                  onChange={(date, dateString) =>
-                    handleDateChange(date, dateString, "fromDate")
-                  }
-                  placeholder="From"
-                />
-                <DatePicker
-                  value={formData.toDate}
-                  onChange={(date, dateString) =>
-                    handleDateChange(date, dateString, "toDate")
-                  }
-                  placeholder="To"
-                />
-              </div>
-              {errors.dates && <p className={styles.error}>{errors.dates}</p>}
-            </div>
-          )}
+         {formData.leaveType && formData.leaveType !== "Permission" && (
+  <div className={styles.inputBox}>
+    <label>Leave Period</label>
+    <div className={styles.column}>
+      <DatePicker
+        value={formData.fromDate}
+        onChange={(date, dateString) =>
+          handleDateChange(date, dateString, "fromDate")
+        }
+        placeholder="From"
+        disabledDate={(current) => current && current < new Date().setHours(0,0,0,0)} // Disable past dates
+      />
+      <DatePicker
+        value={formData.toDate}
+        onChange={(date, dateString) =>
+          handleDateChange(date, dateString, "toDate")
+        }
+        placeholder="To"
+        disabledDate={(current) =>
+          !formData.fromDate
+            ? current && current < new Date().setHours(0, 0, 0, 0)
+            : current && current < formData.fromDate.startOf("day") // Disable dates before From
+        }
+      />
+    </div>
+    {errors.dates && <p className={styles.error}>{errors.dates}</p>}
+  </div>
+)}
 
           {/* Permission Time */}
-          {formData.leaveType === "Permission" && (
-            <div className={styles.inputBox}>
-              <label>Permission Time</label>
-              <div className={styles.formRow}>
-                <DatePicker
-                  value={formData.permissionDate}
-                  onChange={(date, dateString) =>
-                    handleDateChange(date, dateString, "permissionDate")
-                  }
-                  placeholder="Date"
-                />
-                <TimePicker
-                  use12Hours
-                  format="hh:mm A"
-                  value={formData.fromTime}
-                  onChange={(time, timeString) =>
-                    handleTimeChange(time, timeString, "fromTime")
-                  }
-                  placeholder="From"
-                />
-                <TimePicker
-                  use12Hours
-                  format="hh:mm A"
-                  value={formData.toTime}
-                  onChange={(time, timeString) =>
-                    handleTimeChange(time, timeString, "toTime")
-                  }
-                  placeholder="To"
-                />
-              </div>
-              {errors.permissionDate && (
-                <p className={styles.error}>{errors.permissionDate}</p>
-              )}
-              {errors.times && <p className={styles.error}>{errors.times}</p>}
-            </div>
-          )}
+         {formData.leaveType === "Permission" && (
+  <div className={styles.inputBox}>
+    <label>Permission Time</label>
+    <div className={styles.formRow}>
+      <DatePicker
+        value={formData.permissionDate}
+        onChange={(date, dateString) =>
+          handleDateChange(date, dateString, "permissionDate")
+        }
+        placeholder="Date"
+        disabledDate={(current) => current && current < new Date().setHours(0,0,0,0)} // Disable past dates
+      />
+      <TimePicker
+        use12Hours
+        format="hh:mm A"
+        value={formData.fromTime}
+        onChange={(time, timeString) =>
+          handleTimeChange(time, timeString, "fromTime")
+        }
+        placeholder="From"
+      />
+      <TimePicker
+        use12Hours
+        format="hh:mm A"
+        value={formData.toTime}
+        onChange={(time, timeString) =>
+          handleTimeChange(time, timeString, "toTime")
+        }
+        placeholder="To"
+      />
+    </div>
+    {errors.permissionDate && (
+      <p className={styles.error}>{errors.permissionDate}</p>
+    )}
+    {errors.times && <p className={styles.error}>{errors.times}</p>}
+  </div>
+)}
+
 
           {/* Reason */}
           <div className={styles.inputBox}>

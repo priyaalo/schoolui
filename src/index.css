@@ -16,3 +16,7 @@ html, body {
   padding: 0;
   overflow-x: hidden; /* remove horizontal scrollbar */
 }
+body::-webkit-scrollbar {
+  display: none;
+}
+
