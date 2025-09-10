@@ -6,31 +6,18 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import Login from "./Login/Login";
 import PrivateRoute from "./api/PrivateRouter";
 import Header from "./Layouts/Header";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
-
   const location = useLocation();
-
-  useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    if (token) {
-      setIsAuthenticated(true);
-    }
-    setLoading(false);
-  }, []);
+  const [isAuthenticated, setIsAuthenticated] = useState(!!sessionStorage.getItem("authToken"));
 
   const handleLogout = () => {
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("userId");
+    sessionStorage.clear(); // remove token & userId
     setIsAuthenticated(false);
   };
 
-  // ✅ Show Header only when logged in and NOT on login page
-  const showHeader =
-    isAuthenticated && location.pathname !== "/login";
+  const showHeader = isAuthenticated && location.pathname !== "/login";
 
   return (
     <>
@@ -38,7 +25,7 @@ function App() {
 
       <Routes>
         {/* Default redirect */}
-        {/* <Route path="/login" element={<Navigate to="/login" replace />} /> */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
 
         {/* Login page */}
         <Route
@@ -46,7 +33,7 @@ function App() {
           element={
             isAuthenticated ? (
               <Navigate
-                to={`/dashboard/${localStorage.getItem("userId")}`}
+                to={`/dashboard/${sessionStorage.getItem("userId")}`}
                 replace
               />
             ) : (
@@ -59,10 +46,7 @@ function App() {
         <Route
           path="/dashboard/:userId"
           element={
-            <PrivateRoute
-              isAuthenticated={isAuthenticated}
-              loading={loading}
-            >
+            <PrivateRoute>
               <Dashboard />
             </PrivateRoute>
           }
@@ -71,10 +55,7 @@ function App() {
         <Route
           path="/leave-management/:userId"
           element={
-            <PrivateRoute
-              isAuthenticated={isAuthenticated}
-              loading={loading}
-            >
+            <PrivateRoute>
               <LeaveManagement />
             </PrivateRoute>
           }
@@ -83,10 +64,7 @@ function App() {
         <Route
           path="/policies/:userId"
           element={
-            <PrivateRoute
-              isAuthenticated={isAuthenticated}
-              loading={loading}
-            >
+            <PrivateRoute>
               <Policies />
             </PrivateRoute>
           }

@@ -1,6 +1,7 @@
 import { Navigate } from "react-router-dom";
 
-const PrivateRoute = ({ isAuthenticated, children }) => {
+const PrivateRoute = ({ children }) => {
+  const isAuthenticated = !!sessionStorage.getItem("authToken"); // check sessionStorage
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
@@ -8,3 +9,4 @@ const PrivateRoute = ({ isAuthenticated, children }) => {
 };
 
 export default PrivateRoute;
+

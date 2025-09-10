@@ -9,20 +9,22 @@ import {
 import { useParams } from "react-router-dom";
 import Pagination from "@mui/material/Pagination";
 import { FaEye } from "react-icons/fa";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const LeaveManagement = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [leaveTable, setLeaveTable] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [successPopup, setSuccessPopup] = useState(false); // Inline success popup
   const { userId } = useParams();
   const [page, setPage] = useState(1);
   const rowsPerPage = 5;
-const [leaveStats, setLeaveStats] = useState({
+
+  const [leaveStats, setLeaveStats] = useState({
     sickLeaveTaken: 0,
     casualLeaveTaken: 0,
   });
-  // Popup state for remarks
+
   const [remarkPopup, setRemarkPopup] = useState({
     isOpen: false,
     text: "",
@@ -35,6 +37,7 @@ const [leaveStats, setLeaveStats] = useState({
       setLeaveTable(res.data?.data?.result || []);
     } catch (err) {
       console.error("Error fetching leave table:", err.message);
+      toast.error("Failed to fetch leave table", { position: "top-right" });
       setLeaveTable([]);
     } finally {
       setLoading(false);
@@ -131,81 +134,97 @@ const [leaveStats, setLeaveStats] = useState({
     return "";
   };
 
-  const handleModalSubmit = async (formData) => {
-    try {
-      let payload = {
-        userId,
-        status: "Created",
-        discription: formData.reason,
-      };
+const handleModalSubmit = async (formData) => {
+  try {
+    let payload = {
+      userId,
+      status: "Created",
+      discription: formData.reason,
+    };
 
-      if (formData.leaveType === "Sick Leave") {
-        payload.leaveType = "Sick";
-        payload.fromDate = formData.fromDate.format("YYYY-MM-DD") || null;
-        payload.toDate = formData.toDate.format("YYYY-MM-DD") || null;
-      } else if (formData.leaveType === "Casual Leave") {
-        payload.leaveType = "Casual";
-        payload.fromDate = formData.fromDate.format("YYYY-MM-DD") || null;
-        payload.toDate = formData.toDate.format("YYYY-MM-DD") || null;
-      } else if (formData.leaveType === "Permission") {
-        payload.leaveType = "permission";
-        payload.permissionDate = formData.permissionDate.format("YYYY-MM-DD") || null;
-        payload.startTime = formData.fromTime.format("hh:mm A") || null;
-        payload.endTime = formData.toTime.format("hh:mm A") || null;
-      }
+    if (formData.leaveType === "Sick Leave") {
+      payload.leaveType = "Sick";
+      payload.fromDate = formData.fromDate.format("YYYY-MM-DD") || null;
+      payload.toDate = formData.toDate.format("YYYY-MM-DD") || null;
+    } else if (formData.leaveType === "Casual Leave") {
+      payload.leaveType = "Casual";
+      payload.fromDate = formData.fromDate.format("YYYY-MM-DD") || null;
+      payload.toDate = formData.toDate.format("YYYY-MM-DD") || null;
+    } else if (formData.leaveType === "Permission") {
+      payload.leaveType = "permission";
+      payload.permissionDate = formData.permissionDate.format("YYYY-MM-DD") || null;
+      payload.startTime = formData.fromTime.format("hh:mm A") || null;
+      payload.endTime = formData.toTime.format("hh:mm A") || null;
+    }
 
-      await postLeaveRequest(payload);
-      // alert("Leave request submitted successfully");
-      
-      setSuccessPopup(true)
-      fetchTable();
-      setIsModalOpen(false);
-     setTimeout(() => setSuccessPopup(false), 3000);
+    await postLeaveRequest(payload);
+
+    // Show success toast at center
+    toast.success(" Leave request submitted successfully!", {
+      position: "top-center",
+      autoClose: 2000, // close automatically after 2 seconds
+    });
+
+    fetchTable();
+
+    // Close request form automatically after toast
+  setIsModalOpen(false);
+
   } catch (err) {
     console.error(err.message, err.response?.data);
-  }
-  };
-  const monthCalc = async () => {
-  try {
-    const response = await monthCalculation(userId);
-    console.log("month calculation raw response:", response);
- 
-    const data = response.data?.data;
- 
-    const sickTaken = data?.sick?.currentYear || 0;
-    const casualTaken = data?.casual?.currentYear || 0;
- 
-    setLeaveStats({
-      sickLeaveTaken: sickTaken,
-      casualLeaveTaken: casualTaken,
+    const errorMsg =
+      err.response?.data?.message ||
+      err.response?.data ||
+      err.message ||
+      "Something went wrong";
+
+    toast.error(`${errorMsg}`, {
+      position: "top-center",
+      autoClose: 2000, // close automatically after 2 seconds
     });
-  } catch (err) {
-    console.error("Error fetching month calculation:", err.message);
+
+    // Close request form automatically after toast
+    setTimeout(() => setIsModalOpen(false), 1000);
+    setIsModalOpen(false)
   }
 };
- 
-  useEffect(() => {
-    if (userId) {
-      monthCalc();
+
+
+  const monthCalc = async () => {
+    try {
+      const response = await monthCalculation(userId);
+      const data = response.data?.data;
+      setLeaveStats({
+        sickLeaveTaken: data?.sick?.currentYear || 0,
+        casualLeaveTaken: data?.casual?.currentYear || 0,
+      });
+    } catch (err) {
+      console.error("Error fetching month calculation:", err.message);
+      toast.error("Failed to fetch leave summary", { position: "top-right" });
     }
+  };
+
+  useEffect(() => {
+    if (userId) monthCalc();
   }, [userId]);
 
   return (
     <div className={styles.req}>
+      <ToastContainer />
       {/* Leave summary cards */}
       <div className={styles.row}>
         <div className={styles.col}>
           <div className={styles.card}>
             <button className={styles.circle}>SL</button>
             <h4>Sick Leave</h4>
-            <p>Available for the calendar year:{12-leaveStats.sickLeaveTaken}</p>
+            <p>Available for the calendar year: {12 - leaveStats.sickLeaveTaken}</p>
           </div>
         </div>
         <div className={styles.col}>
           <div className={styles.card}>
             <button className={styles.circle1}>CL</button>
             <h4>Casual Leave</h4>
-            <p>Available for the calendar year:{12-leaveStats.casualLeaveTaken}</p>
+            <p>Available for the calendar year: {12 - leaveStats.casualLeaveTaken}</p>
           </div>
         </div>
         <div className={styles.col}>
@@ -316,23 +335,20 @@ const [leaveStats, setLeaveStats] = useState({
 
       {/* Remark Popup */}
       {remarkPopup.isOpen && (
-        <div className={styles.popupOverlay}>
-          <div className={styles.popupContent}>
+        <div
+          className={styles.popupOverlay}
+          onClick={() => setRemarkPopup({ isOpen: false, text: "" })}
+        >
+          <div
+            className={styles.popupContent}
+            onClick={(e) => e.stopPropagation()}
+          >
             <h3>Remarks</h3>
             <p>{remarkPopup.text}</p>
             <button onClick={() => setRemarkPopup({ isOpen: false, text: "" })}>Close</button>
           </div>
         </div>
       )}
-      {/* Success Popup */}
-{successPopup && (
-  <div className={styles.successPopup}>
-    <div className={styles.successContent}>
-      <p>✅ Leave request submitted successfully!</p>
-    </div>
-  </div>
-)}
-
 
       {/* Leave Request modal */}
       <LeaveRequestModal

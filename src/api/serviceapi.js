@@ -14,6 +14,9 @@ export const LoginUser = (email, password) => {
 export const getUserId = (userId) => {
   return apiService.get(`/user?id=${userId}`);
 };
+export const attCardCalculation = (_userId_) => {
+  return apiService.get(`/attendance/lateCount?userId=${_userId_}`);
+};
 
 //get attendance for the particular user 
 // export const getAttendance = (userId) => {

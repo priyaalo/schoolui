@@ -9,6 +9,7 @@ import {
   checkIn,
   checkOut,
   getEvent,
+  attCardCalculation
 } from "../api/serviceapi";
 import React, { useState, useEffect } from "react";
 import Pagination from "@mui/material/Pagination";
@@ -33,6 +34,14 @@ const Dashboard = () => {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [page, setPage] = useState(1);
   const rowsPerPage = 5;
+    const [remarkPopup, setRemarkPopup] = useState({ isOpen: false, text: "" });
+    const [selectedRemark, setSelectedRemark] = useState(null);
+    const [timeElapsed, setTimeElapsed] = useState("00:00:00");
+  const [checkInTime, setCheckInTime] = useState(null);
+  const [permissionHours, setPermissionHours] = useState(null);
+  const [lateLogins, setLateLogins] = useState([]);
+
+
 
   const fetchUser = async () => {
     try {
@@ -44,6 +53,23 @@ const Dashboard = () => {
       console.error("Error fetching user:", err.message);
     }
   };
+ 
+   useEffect(() => {
+     const fetchLateCount = async () => {
+       try {
+         const response = await attCardCalculation(userId);
+         const data = response.data.data;
+ 
+         setPermissionHours(data.totalPermissionTimePerMonth);
+         setLateLogins(data.lateLoginCount);
+       } catch (error) {
+         console.error("Error fetching late count:", error);
+       }
+     };
+ 
+     fetchLateCount();
+   }, [userId]);
+
 
   const fetchAttendance = async () => {
     try {
@@ -99,7 +125,7 @@ const Dashboard = () => {
       await fetchAttendance();
       await fetchUser();
 
-      setCheckInStatus(true);
+      // setCheckInStatus(true);
 
       toast.success("Check-in successful!", { position: "top-center", autoClose: 3000 });
     } catch (err) {
@@ -162,6 +188,36 @@ const Dashboard = () => {
       setLoadingEvents(false);
     }
   };
+
+    useEffect(() => {
+   if (!user?.checkInStatus) return;
+  const inTime = attendanceTable?.[0]?.inTime;
+  const startTime = inTime ? new Date(inTime) : null;
+   setCheckInTime(startTime);  
+   const timer=setInterval(()=>{
+    const currentDateTime = new Date();
+     const currentTime = new Date(
+       currentDateTime.getTime() + (5 * 60 + 30) * 60000 // ✅ keep your IST offset
+     );
+     let timeDifference = currentTime - startTime;
+      if (timeDifference < 0) {
+        setTimeElapsed("00:00:00");
+        return;
+      }
+       const hours = Math.floor(timeDifference / (1000 * 60 * 60));
+       const minutes = Math.floor(
+         (timeDifference % (1000 * 60 * 60)) / (1000 * 60)
+       );
+        const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+        setTimeElapsed(
+          `${hours.toString().padStart(2, "0")}:${minutes
+            .toString()
+            .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+        );
+ 
+   },1000)
+   return () => clearInterval(timer);
+  }, [user?.checkInStatus, attendanceTable]);
 
   useEffect(() => {
     fetchEvents();
@@ -240,14 +296,14 @@ const Dashboard = () => {
           <div className={styles.card}>
             <button className={styles.circle}>P</button>
             <h4>Remaining Permission Hours</h4>
-            <p>Available for This Month: 1.5 hrs</p>
+            <p>Available for This Month: {permissionHours !== null ?` ${permissionHours} Days` : "Loading..."}</p>
           </div>
         </div>
         <div className={styles.col}>
           <div className={styles.card}>
             <button className={styles.circle1}>L</button>
             <h4>Total Late Logins</h4>
-            <p>Total LateLogins this Month: 2 Days</p>
+            <p>Total LateLogins this Month: {lateLogins !== null ? `${lateLogins} Days` : "Loading..."}</p>
           </div>
         </div>
       </div>
@@ -255,7 +311,7 @@ const Dashboard = () => {
       {/* Attendance Table */}
       <div className={styles.tableContainer}>
         <div className={styles.topBar}>
-          <div>Class Hours: -- : --</div>
+          <div>Class Hours: {timeElapsed}</div>
           <select value={filter} onChange={(e) => setFilter(e.target.value)} className={styles.dropdown}>
             <option value="thisMonth">This Month</option>
             <option value="pastMonth">Last Month</option>
@@ -286,7 +342,21 @@ const Dashboard = () => {
         <td>{row.date}</td>
         <td>{row.login}</td>
         <td>{row.logout}</td>
-        <td>{row.remarks}</td>
+       <td
+  style={{
+    cursor: "pointer",
+    maxWidth: "150px",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+    color: "blue",
+  }}
+  onClick={() => setSelectedRemark(row.remarks)}  // open popup with remark
+  title="Click to view full remark"
+>
+  {row.remarks}
+</td>
+
         <td>{row.classHours}</td>
         <td>{row.permission}</td>
       </tr>
@@ -326,6 +396,29 @@ const Dashboard = () => {
 </div>
 
       </div>
+      {/* ✅ Remark Popup */}
+     {selectedRemark && (
+  <div
+    className={styles.popupOverlay}
+    onClick={() => setSelectedRemark(null)} // close on outside click
+  >
+    <div
+      className={styles.popupContent}
+      onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
+    >
+      <h3 className={styles.popupHeader}>Remark</h3>
+      <p className={styles.popupText}>{selectedRemark}</p>
+      <button
+        className={styles.popupCloseBtn}
+        onClick={() => setSelectedRemark(null)} // close button
+      >
+        Close
+      </button>
+    </div>
+  </div>
+)}
+
+
 
       {/* Checkout Modal */}
       <CheckoutModal isOpen={isCheckoutOpen} onClose={() => setCheckoutOpen(false)} onCheckout={handleCheckoutConfirm} />
