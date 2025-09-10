@@ -6,11 +6,19 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import Login from "./Login/Login";
 import PrivateRoute from "./api/PrivateRouter";
 import Header from "./Layouts/Header";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const location = useLocation();
+
+  // 🔑 Check localStorage on first render
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      setIsAuthenticated(true);
+    }
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("authToken");
@@ -79,4 +87,4 @@ function App() {
   );
 }
 
-export default App; 
+export default App;
