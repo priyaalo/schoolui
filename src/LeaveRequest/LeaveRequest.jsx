@@ -308,15 +308,22 @@ const LeaveRequestModal = ({ isOpen, onClose, onSubmit }) => {
 
 
           {/* Reason */}
-          <div className={styles.inputBox}>
-            <label>Reason</label>
-            <textarea
-              name="reason"
-              value={formData.reason}
-              onChange={handleChange}
-            />
-            {errors.reason && <p className={styles.error}>{errors.reason}</p>}
-          </div>
+         <div className={styles.inputBox}>
+  <label>Reason</label>
+  <textarea
+    name="reason"
+    value={formData.reason}
+    onChange={(e) => {
+      let val = e.target.value;
+      if (val.length > 0) {
+        val = val.charAt(0).toUpperCase() + val.slice(1);
+      }
+      handleChange({ target: { name: "reason", value: val } });
+    }}
+  />
+  {errors.reason && <p className={styles.error}>{errors.reason}</p>}
+</div>
+
 
           {/* Submit */}
           <div className={styles.btn}>

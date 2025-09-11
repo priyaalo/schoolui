@@ -18,16 +18,23 @@ const CheckoutModal = ({ isOpen, onClose, onCheckout }) => {
       <div className={styles.modal}>
         <p className={styles.title}>Want to check out?</p>
 
-        {/* Remarks box */}
-        <div className={styles.remarks}>
-          <textarea
-            id="remarks"
-            value={remarks}   // ✅ bind value to state
-            onChange={(e) => setRemarks(e.target.value)}
-            placeholder="Remarks"
-            className={styles.textarea}
-          />
-        </div>
+       <div className={styles.remarks}>
+  <textarea
+    id="remarks"
+    value={remarks} // bind value to state
+    onChange={(e) => {
+      let val = e.target.value;
+      if (val.length > 0) {
+        // capitalize first character
+        val = val.charAt(0).toUpperCase() + val.slice(1);
+      }
+      setRemarks(val);
+    }}
+    placeholder="Remarks"
+    className={styles.textarea}
+  />
+</div>
+
 
         {/* Actions */}
         <div className={styles.actions}>

@@ -19,11 +19,12 @@
   padding: 70px;
   width: 100%;
 
-  max-width: 550px;
+  max-width: 480px;
+  max-height:600px;
   border-radius: 16px;
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25);
   text-align: center;
-  margin-bottom: 69px; /* ⬅ only move card slightly up */
+  margin-bottom: 75px; /* ⬅ only move card slightly up */
 }
 
 /* Floating Logo */
@@ -43,10 +44,10 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   margin: 0;
   /* padding-top:20px; */
-  width:300px;
+  width:390px;
   /* padding-bottom:28px; */
   display:inline-block;
-  margin-top:15px;
+  margin-top:20px;
 }
 .card h2 {
   font-size: 24px;
@@ -90,7 +91,7 @@
 
 .inputBox input {
   width: 100%;
-  padding: 14px 14px;
+  padding: 15px 15px;
   height:auto;
   border-radius: 8px;
   border: 1px solid #c3c3c3;
@@ -141,7 +142,7 @@
 /* Button */
 .loginBtn {
   width: 100%;
-  padding: 12px;
+  padding: 13px;
   background: linear-gradient(to right, #0a1b64, #020c3a);
   border: none;
   border-radius: 8px;

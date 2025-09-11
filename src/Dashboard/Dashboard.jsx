@@ -134,8 +134,8 @@ const handleCheckIn = async () => {
       await fetchUser();
 
       toast.success("Permission check-in Updated!", {
-        position: "top-center",
-        autoClose: 3000,
+        position: "top-right",
+        autoClose: 1000,
       });
     } 
       else if (onEarlyPermission && earlyPer) {
@@ -144,8 +144,8 @@ const handleCheckIn = async () => {
           await fetchUser();
 
           toast.success("Permission check-in Updated!", {
-            position: "top-center",
-            autoClose: 3000,
+            position: "top-right",
+            autoClose: 1000,
           });
 
       }
@@ -158,8 +158,8 @@ const handleCheckIn = async () => {
       await fetchUser();
 
       toast.success("Check-in successful!", {
-        position: "top-center",
-        autoClose: 3000,
+        position: "top-right",
+        autoClose: 1000,
       });
     }
   } catch (err) {
@@ -171,7 +171,7 @@ const handleCheckIn = async () => {
       "Something went wrong, please try again.";
 
     // ✅ show toast every time, even if user clicks multiple times
-    toast.error(errMsg, { position: "top-center", autoClose: 3000 });
+    toast.error(errMsg, { position: "top-right", autoClose: 1000 });
   } finally {
     setIsCheckingIn(false); // reset flag so user can click again
   }
@@ -188,14 +188,14 @@ const handleCheckIn = async () => {
       await fetchAttendance();
       await fetchUser();
 
-      toast.success("Checkout successful!", { position: "top-center", autoClose: 3000 });
+      toast.success("Checkout successful!", { position: "top-right", autoClose: 1000 });
     }  catch (err) {
        let errMsg =
          err.response?.data?.message || // if API sends { message: "..." }
          err.response?.data || // fallback to raw response data
          err.message || // generic JS error message
          "Something went wrong, please try again.";
-      toast.error(errMsg, { position: "top-center", autoClose: 3000 });
+      toast.error(errMsg, { position: "top-right", autoClose: 1000 });
     }
      finally {
       setIsCheckingOut(false);
@@ -263,7 +263,7 @@ const handleCheckIn = async () => {
 
      //timer
   useEffect(() => {
-   if (!user?.checkInStatus) return;
+   if (!user?.checkInStatus||!checkInTime) return;
   const inTime = attendanceTable?.[0]?.inTime;
   const startTime = inTime ? new Date(inTime) : null;
    setCheckInTime(startTime);  
@@ -272,7 +272,7 @@ const handleCheckIn = async () => {
      const currentTime = new Date(
        currentDateTime.getTime() + (5 * 60 + 30) * 60000 // ✅ keep your IST offset
      );
-     let timeDifference = currentTime - startTime;
+     let timeDifference = currentTime - checkInTime;
       if (timeDifference < 0) {
         setTimeElapsed("00:00:00");
         return;
@@ -326,35 +326,44 @@ const handleCheckIn = async () => {
 
       {/* Events marquee */}
       {/* Events marquee */}
-<div className={styles.marqueeWrapper}>
+<div className={styles.marqueeContainer}>
   <div className={styles.marqueeContent}>
-    {events.map((ev, index) => (
-      <EventCard
-        key={`first-${index}`}
-        title={ev.title.charAt(0).toUpperCase() + ev.title.slice(1)}
-        subtitle={ev.subtitle.charAt(0).toUpperCase() + ev.subtitle.slice(1)}
-        date={ev.date}
-        type={ev.icon}
-      />
-    ))}
-    {events.map((ev, index) => (
-      <EventCard
-        key={`second-${index}`}
-        title={ev.title.charAt(0).toUpperCase() + ev.title.slice(1)}
-        subtitle={ev.subtitle.charAt(0).toUpperCase() + ev.subtitle.slice(1)}
-        date={ev.date}
-        type={ev.icon}
-      />
-    ))}
+    {events.length === 0 ? (
+      <span className={styles.noEvents}>No events found</span>
+    ) : events.length === 1 ? (
+      // repeat the single event multiple times to avoid gaps
+      Array(10).fill(events[0]).map((ev, index) => (
+        <EventCard
+          key={index}
+          title={ev.title.charAt(0).toUpperCase() + ev.title.slice(1)}
+          subtitle={ev.subtitle.charAt(0).toUpperCase() + ev.subtitle.slice(1)}
+          date={ev.date}
+          type={ev.icon}
+        />
+      ))
+    ) : (
+      // multiple events → duplicate once for seamless scroll
+      [...events, ...events].map((ev, index) => (
+        <EventCard
+          key={index}
+          title={ev.title.charAt(0).toUpperCase() + ev.title.slice(1)}
+          subtitle={ev.subtitle.charAt(0).toUpperCase() + ev.subtitle.slice(1)}
+          date={ev.date}
+          type={ev.icon}
+        />
+      ))
+    )}
   </div>
 </div>
+
+
 
       
 <div className={styles.cardRow}>
   <div className={styles.col}>
     <div className={styles.card}>
       <button className={styles.circle}>P</button>
-      <h4>Remaining Permission Hours</h4>
+      <h4>Permission Hours</h4>
       <p>Available for This Month: {permissionHours !== null ?` ${permissionHours}` : "Loading..."}</p>
     </div>
   </div>
@@ -362,7 +371,7 @@ const handleCheckIn = async () => {
     <div className={styles.card}>
       <button className={styles.circle1}>L</button>
       <h4>Total Late Logins</h4>
-      <p>Total LateLogins this Month: {lateLogins !== null ? `${lateLogins} Days` : "Loading..."}</p>
+      <p>Total LateLogins this Month: {lateLogins !== null ? `${lateLogins} ` : "Loading..."}</p>
     </div>
   </div>
 </div>
