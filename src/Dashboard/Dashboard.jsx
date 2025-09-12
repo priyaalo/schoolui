@@ -75,27 +75,35 @@ const[onEarlyPermission,setOnEarlyPermission]=useState(false)
    
 
 
-  const fetchAttendance = async () => {
+const fetchAttendance = async () => {
     try {
-      const monthFlag=filter==="pastMonth";
-
+      const monthFlag = filter === "pastMonth"; // true if "Last Month", false if "This Month"
       const response = await getAttendance(userId,monthFlag);
+      console.log('res',response)
       const allData = response.data.data.data || [];
+      
+      
 
       const formattedData = allData.map((att) => {
         if (att.date) {
-          const d = new Date(att.date);
-          const day = String(d.getDate()).padStart(2, "0");
-          const month = String(d.getMonth() + 1).padStart(2, "0");
-          const year = d.getFullYear();
-          return { ...att, date: `${day}-${month}-${year}` };
+          console.log("dateeeeeeee",att.date)
+       const d = new Date(att.date);
+       if (!isNaN(d)) {
+         const day = String(d.getDate()).padStart(2, "0");
+         const month = String(d.getMonth() + 1).padStart(2, "0");
+         const year = d.getFullYear();
+         return { ...att, date: `${day}-${month}-${year}` };
+       }
         }
         return att;
       });
+    
 
       setAttendanceTable(formattedData);
-      setPer(formattedData[0]._id);
-      setEarlyPer(formattedData[0]._id);
+      if (formattedData.length > 0) {
+        setPer(formattedData[0]._id);
+        setEarlyPer(formattedData[0]._id);
+      }
 
       const today = new Date().toISOString().split("T")[0];
       const todayAttendance = allData.find(
@@ -106,8 +114,8 @@ const[onEarlyPermission,setOnEarlyPermission]=useState(false)
         setAttendanceId(todayAttendance._id);
         setOnPermission(todayAttendance.onPermission === true);
         setOnEarlyPermission(todayAttendance.onEarlyPermission === true);
+        // setOnLeave(todayAttendance.onLeave === true); 
       }
-
     } catch (err) {
       console.error("Error fetching attendance:", err.message);
     }
@@ -223,16 +231,36 @@ const handleCheckIn = async () => {
     return `${hours} hr ${minutes} min`;
   };
 
-  const rows = attendanceTable.map((ele) => ({
+  // const rows = attendanceTable.map((ele) => ({
+  //   id: ele._id,
+  //   date: ele.date || "N/A",
+  //   login: tableFormatTime(ele.inTime) || "N/A",
+  //   logout: tableFormatTime(ele.outTime) || "N/A",
+  //   remarks: ele.remarks || "-",
+  //   classHours: ele.totalWorkHours || "-",
+  //   permission: formatPermissionHours(ele.permissionHours) || "-"
+  // }));
+const rows = attendanceTable.map((ele) => {
+  if (ele.onLeave === true) {
+    return {
+      id: ele._id,
+      isLeave: true, // custom flag
+      date: ele.date || "N/A",
+      leaveText: "Leave",
+    };
+  }
+
+  return {
     id: ele._id,
+    isLeave: false,
     date: ele.date || "N/A",
     login: tableFormatTime(ele.inTime) || "N/A",
     logout: tableFormatTime(ele.outTime) || "N/A",
     remarks: ele.remarks || "-",
     classHours: ele.totalWorkHours || "-",
-    permission: formatPermissionHours(ele.permissionHours) || "-"
-  }));
-
+    permission: formatPermissionHours(ele.permissionHours) || "-",
+  };
+});
 
   const fetchEvents = async () => {
     try {
@@ -262,8 +290,8 @@ const handleCheckIn = async () => {
 
 
      //timer
-  useEffect(() => {
-   if (!user?.checkInStatus||!checkInTime) return;
+   useEffect(() => {
+   if (!user?.checkInStatus||attendanceTable.length===0) return;
   const inTime = attendanceTable?.[0]?.inTime;
   const startTime = inTime ? new Date(inTime) : null;
    setCheckInTime(startTime);  
@@ -272,7 +300,7 @@ const handleCheckIn = async () => {
      const currentTime = new Date(
        currentDateTime.getTime() + (5 * 60 + 30) * 60000 // ✅ keep your IST offset
      );
-     let timeDifference = currentTime - checkInTime;
+     let timeDifference = currentTime - startTime;
       if (timeDifference < 0) {
         setTimeElapsed("00:00:00");
         return;
@@ -327,33 +355,33 @@ const handleCheckIn = async () => {
       {/* Events marquee */}
       {/* Events marquee */}
 <div className={styles.marqueeContainer}>
-  <div className={styles.marqueeContent}>
-    {events.length === 0 ? (
+  {events.length === 0 ? (
+    <div className={styles.noEventsWrapper}>
       <span className={styles.noEvents}>No events found</span>
-    ) : events.length === 1 ? (
-      // repeat the single event multiple times to avoid gaps
-      Array(10).fill(events[0]).map((ev, index) => (
-        <EventCard
-          key={index}
-          title={ev.title.charAt(0).toUpperCase() + ev.title.slice(1)}
-          subtitle={ev.subtitle.charAt(0).toUpperCase() + ev.subtitle.slice(1)}
-          date={ev.date}
-          type={ev.icon}
-        />
-      ))
-    ) : (
-      // multiple events → duplicate once for seamless scroll
-      [...events, ...events].map((ev, index) => (
-        <EventCard
-          key={index}
-          title={ev.title.charAt(0).toUpperCase() + ev.title.slice(1)}
-          subtitle={ev.subtitle.charAt(0).toUpperCase() + ev.subtitle.slice(1)}
-          date={ev.date}
-          type={ev.icon}
-        />
-      ))
-    )}
-  </div>
+    </div>
+  ) : (
+    <div className={styles.marqueeContent}>
+      {events.length === 1
+        ? Array(10).fill(events[0]).map((ev, index) => (
+            <EventCard
+              key={index}
+              title={ev.title.charAt(0).toUpperCase() + ev.title.slice(1)}
+              subtitle={ev.subtitle.charAt(0).toUpperCase() + ev.subtitle.slice(1)}
+              date={ev.date}
+              type={ev.icon}
+            />
+          ))
+        : events.map((ev, index) => (
+            <EventCard
+              key={index}
+              title={ev.title.charAt(0).toUpperCase() + ev.title.slice(1)}
+              subtitle={ev.subtitle.charAt(0).toUpperCase() + ev.subtitle.slice(1)}
+              date={ev.date}
+              type={ev.icon}
+            />
+          ))}
+    </div>
+  )}
 </div>
 
 
@@ -364,14 +392,14 @@ const handleCheckIn = async () => {
     <div className={styles.card}>
       <button className={styles.circle}>P</button>
       <h4>Permission Hours</h4>
-      <p>Available for This Month: {permissionHours !== null ?` ${permissionHours}` : "Loading..."}</p>
+      <p>Total Permission hour: {permissionHours !== null ?` ${permissionHours}` : "Loading..."}</p>
     </div>
   </div>
   <div className={styles.col}>
     <div className={styles.card}>
       <button className={styles.circle1}>L</button>
-      <h4>Total Late Logins</h4>
-      <p>Total LateLogins this Month: {lateLogins !== null ? `${lateLogins} ` : "Loading..."}</p>
+      <h4>Late Logins</h4>
+      <p>Total Late Logins: {lateLogins !== null ? `${lateLogins} ` : "Loading..."}</p>
     </div>
   </div>
 </div>
@@ -406,31 +434,50 @@ const handleCheckIn = async () => {
       </td>
     </tr>
   ) : (
-    paginatedRows.map((row) => (
-      <tr key={row.id}>
-        <td>{row.date}</td>
-        <td>{row.login}</td>
-        <td>{row.logout}</td>
-       <td
-  style={{
-    cursor: "pointer",
-    maxWidth: "150px",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-    color: "blue",
-  }}
-  onClick={() => setSelectedRemark(row.remarks)}  // open popup with remark
-  title="Click to view full remark"
->
-  {row.remarks}
-</td>
+              paginatedRows.map((row) =>
+                row.isLeave ? (
+                  <tr
+                    key={row.id}
+                    style={{ backgroundColor: "#f8d7da", color: "#721c24" }}
+                  >
+                    <td>{row.date}</td>
+                    <td
+                      colSpan={6}
+                      style={{ textAlign: "center", fontWeight: "bold" }}
+                    >
+                      {row.leaveText}
+                    </td>
+                  </tr>
+                ) : (
+                  <tr key={row.id}>
+                    <td>{row.date}</td>
+                    <td>{row.login}</td>
+                    <td>{row.logout}</td>
+                    <td
+                      style={{
+                        cursor: "pointer",
+                        maxWidth: "150px",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                        color: "blue",
+                      }}
+                      onClick={() => setSelectedRemark(row.remarks)} // open popup with remark
+                      title="Click to view full remark"
+                    >
+                      {row.remarks
+                        ? row.remarks.charAt(0).toUpperCase() +
+                          row.remarks.slice(1)
+                        : "-"}
+                    </td>
 
-        <td>{row.classHours}</td>
-        <td>{row.permission}</td>
-      </tr>
-    ))
-  )}
+                    <td>{row.classHours}</td>
+                    <td>{row.permission}</td>
+                  </tr>
+                )
+              )
+            )
+            }
 </tbody>
 
         </table>

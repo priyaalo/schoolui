@@ -160,3 +160,96 @@
 .loginBtn:hover:not(:disabled) {
   opacity: 0.9;
 }
+/* ================= MOBILE RESPONSIVE ================= */
+@media (max-width: 768px) {
+  .card {
+    padding: 40px 25px;
+    margin-bottom: 40px;
+    max-height: none;
+  }
+
+  .logoWrapper img {
+    width: 220px; /* smaller logo on tablet */
+    margin-top: 15px;
+  }
+
+  .card h2 {
+    font-size: 1.4rem;
+  }
+
+  .subTitle {
+    font-size: 0.85rem;
+  }
+
+  .inputBox input {
+    padding: 12px 12px;
+    font-size: 0.9rem;
+  }
+
+  .loginBtn {
+    padding: 12px;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .loginPage {
+    padding: 20px 10px;
+  }
+
+  .logoWrapper img {
+    width: 160px; /* smaller logo for mobile */
+    margin-top: 10px;
+  }
+
+  .card {
+    padding: 25px 20px;
+    margin-bottom: 30px;
+    border-radius: 12px;
+  }
+
+  .card h2 {
+    font-size: 1.2rem;
+  }
+
+  .subTitle {
+    font-size: 0.8rem;
+  }
+
+  .inputBox {
+    margin-top: 20px;
+    margin-bottom: 15px;
+  }
+
+  .inputBox input {
+    padding: 10px;
+    font-size: 0.85rem;
+  }
+
+  .loginBtn {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  .forgotPassword a {
+    font-size: 0.8rem;
+  }
+
+  .logoWrapper h3 {
+    font-size: 1rem;
+  }
+
+  .schoolTagline {
+    font-size: 0.75rem;
+  }
+}
+/* loader svg*/
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader svg path {
+  fill: #fff; /* make it white inside button */
+}

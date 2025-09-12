@@ -381,3 +381,6 @@ tr td:last-child {
 .popupContent button:hover {
   background-color: #061530;
 }
+.mainContent {
+  padding-top: 100px; /* default for desktop */
+}

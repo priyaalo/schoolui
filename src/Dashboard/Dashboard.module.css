@@ -272,10 +272,29 @@ td {
 /* 🎉 Events Marquee */
 /* ===================== */
 .marqueeContainer {
+  position: relative;
   width: 100%;
+  height: 120px; /* same height as your scrolling area */
   overflow: hidden;
-  /* background: #f9f9f9; */
-  padding: 5px 0;
+}
+
+.noEventsWrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f1eded;
+  width: 100%;
+}
+
+.noEvents {
+  font-size: 16px;
+  font-weight: 500;
+  color: #555;
+  text-align: center;
 }
 
 .marqueeContent {
@@ -294,6 +313,7 @@ td {
   font-size: 16px;
   color: #999;
   padding: 0 20px;
+
 }
 
 /* Animation moves half of duplicated content to make seamless scroll */
