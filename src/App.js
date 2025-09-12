@@ -1,3 +1,4 @@
+
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Dashboard from "./Dashboard/Dashboard";
 import LeaveManagement from "./LeaveManagement/LeaveManagement";
@@ -12,7 +13,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const location = useLocation();
 
-  // 🔑 Check localStorage on first render
+  // Check localStorage on first render
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     if (token) {
@@ -26,10 +27,7 @@ function App() {
     setIsAuthenticated(false);
   };
 
-  // Show Header only for authenticated users
   const showHeader = isAuthenticated && location.pathname !== "/login";
-
-  
 
   return (
     <>
@@ -44,10 +42,8 @@ function App() {
           path="/login"
           element={
             isAuthenticated ? (
-              <Navigate
-                to={`/dashboard/${localStorage.getItem("userId")}`}
-                replace
-              />
+              // ✅ Redirect to *last visited page* instead of forcing dashboard
+              <Navigate to={location.state?.from || `/dashboard/${localStorage.getItem("userId")}`} replace />
             ) : (
               <Login setLoginUser={setIsAuthenticated} />
             )
@@ -82,7 +78,7 @@ function App() {
           }
         />
 
-        {/* Fallback */}
+        {/* Catch all */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </>
