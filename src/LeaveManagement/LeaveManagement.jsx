@@ -109,6 +109,40 @@ const LeaveManagement = () => {
       period = timePeriod;
       days = formattedHrs;
     }
+    if (data.leaveType === "earlyPermission") {
+      leaveType = "Early Permission"; // fixed spacing
+      const permissionDate = data.permissionDate
+        ? new Date(data.permissionDate).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            timeZone: "UTC",
+          })
+        : "N/A";
+      const startTime = data.startTime ? new Date(data.startTime) : null;
+      const endTime = data.endTime ? new Date(data.endTime) : null;
+      let timePeriod = "";
+      if (startTime && endTime) {
+        const options = {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+          timeZone: "UTC",
+        };
+        timePeriod = `${startTime.toLocaleTimeString(
+          "en-Us",
+          options
+        )}-${endTime.toLocaleTimeString("en-Us", options)}`;
+      }
+      let permissionHrs = data.permissionTime;
+      const hours = Math.floor(permissionHrs);
+      const mins = Math.round((permissionHrs - hours) * 60);
+      const formattedHrs = `${hours}h ${mins}m`;
+
+      requestedOn = permissionDate;
+      period = timePeriod;
+      days = formattedHrs; // only hours & mins, not days
+    }
 
     return {
       id: data._id,
@@ -155,13 +189,20 @@ const handleModalSubmit = async (formData) => {
       payload.permissionDate = formData.permissionDate.format("YYYY-MM-DD") || null;
       payload.startTime = formData.fromTime.format("hh:mm A") || null;
       payload.endTime = formData.toTime.format("hh:mm A") || null;
+    }else if (formData.leaveType === "Early Permission") {
+      payload.leaveType = "earlyPermission";
+      payload.permissionDate =
+        formData.permissionDate.format("YYYY-MM-DD") || null;
+      payload.startTime = formData.fromTime.format("hh:mm A") || null;
+      payload.endTime = formData.toTime.format("hh:mm A") || null;
     }
+    
 
     await postLeaveRequest(payload);
 
     // Show success toast at center
     toast.success(" Leave request submitted successfully!", {
-      position: "top-center",
+      position: "top-right",
       autoClose: 2000, // close automatically after 2 seconds
     });
 
@@ -179,7 +220,7 @@ const handleModalSubmit = async (formData) => {
       "Something went wrong";
 
     toast.error(`${errorMsg}`, {
-      position: "top-center",
+      position: "top-right",
       autoClose: 2000, // close automatically after 2 seconds
     });
 
@@ -217,14 +258,14 @@ const handleModalSubmit = async (formData) => {
           <div className={styles.card}>
             <button className={styles.circle}>SL</button>
             <h4>Sick Leave</h4>
-            <p>Available for the calendar year: {12 - leaveStats.sickLeaveTaken}</p>
+            <p>Total Sick Leave: {leaveStats.sickLeaveTaken}</p>
           </div>
         </div>
         <div className={styles.col}>
           <div className={styles.card}>
             <button className={styles.circle1}>CL</button>
             <h4>Casual Leave</h4>
-            <p>Available for the calendar year: {12 - leaveStats.casualLeaveTaken}</p>
+            <p>Total Casual Leave: {leaveStats.casualLeaveTaken}</p>
           </div>
         </div>
         <div className={styles.col}>
@@ -275,7 +316,12 @@ const handleModalSubmit = async (formData) => {
                   <td>{data.type}</td>
                   <td>{data.requestedOn}</td>
                   <td>{data.period}</td>
-                  <td>{data.type === "Permission" ? data.days : `${data.days} days`}</td>
+                  <td>
+                    {data.type === "Permission" ||
+                    data.type === "Early Permission"
+                      ? data.days
+                      : `${data.days} days`}
+                  </td>
                   <td>
                     <span className={getStatusClass(data.status)}>{data.status}</span>
                   </td>

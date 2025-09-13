@@ -3,26 +3,65 @@ import { useNavigate, useLocation } from "react-router-dom";
 import styles from "./Header.module.css";
 import logo from "../assets/AloLogo/image.png";
 import LogoutModal from "../Logout/LogoutModal";
-import { getUserId } from "../api/serviceapi";
+import { getUserId,getNotification,
+  updateNotification, } from "../api/serviceapi";
 
 const Header = ({ handleLogout }) => {
   const userId = localStorage.getItem("userId");
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
+   const [notifi, setNotifi] = useState([]);
+  const [attId,setAttId]=useState("")
+  const [fetchCount, setFetchCount] = useState(0);
 
   const navigate = useNavigate();
   const location = useLocation();
 
   const dropdownRef = useRef(null);
+
   const notifyIconRef = useRef(null);
+   const fetchNotification = async () => {
+    try {
+      if (!userId) return;
+      const response = await getNotification(userId);
+      const data = response.data?.data?.data || [];
+      const id = response.data?.data?.data?.[0]?._id;
+      const count = response.data?.data?.fetchCount || 0;
+      console.log("noti", response.data?.data?.data);
+      setNotifi(data);
+      setAttId(id)
+      console.log("idddd", id);
+      setFetchCount(count);
+    } catch (err) {
+      console.error("Error fetching notifications:", err.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotification();
+    const interval = setInterval(() => {
+      fetchNotification();
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [userId]);
 
   // sample notifications
-  const notifications = [
-    { id: 1, type: "birthday", title: "User01 Birthday", subtitle: "AK0009", date: "22 Jan 2025", unread: true },
-    { id: 2, type: "birthday", title: "User02 Birthday", subtitle: "AK0012", date: "22 Jan 2025", unread: true },
-    { id: 3, type: "leave", title: "Your Sick Leave Approved", subtitle: "AK0010", date: "24 Jan 2025", unread: false },
-  ];
+  const notifications = notifi.map((n) => ({
+    id: n._id,
+    title: n.message,
+    date: n.date,
+  }));
+  const notificationClick = async (id) => {
+  try {
+    console.log("Clicked notification id:", id);
+    await updateNotification(id, true); // ✅ mark as read
+    fetchNotification(); // refresh list after update
+  } catch (err) {
+    console.error("Error updating notification:", err.message);
+  }
+};
 
   const fetchUser = async () => {
     try {
@@ -36,10 +75,7 @@ const Header = ({ handleLogout }) => {
   };
 
   useEffect(() => {
-  //   if (!userId) {
-  //     navigate("/login", { replace: true });
-  //     return;
-  //   }
+  
    fetchUser();
   }, [userId]);
 
@@ -136,7 +172,11 @@ const Header = ({ handleLogout }) => {
         </div>
 
         {/* Notifications (after logout) */}
-        <div className={styles.notificationWrapper} style={{ position: "relative" }}>
+        
+        <div
+          className={styles.notificationWrapper}
+          style={{ position: "relative" }}
+        >
           <i
             ref={notifyIconRef}
             className={`fa-solid fa-bell ${styles.notificationIcon}`}
@@ -144,38 +184,35 @@ const Header = ({ handleLogout }) => {
             role="button"
             tabIndex={0}
             onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") setShowNotifications((s) => !s);
+              if (e.key === "Enter" || e.key === " ")
+                setShowNotifications((s) => !s);
             }}
             aria-expanded={showNotifications}
             aria-label="Notifications"
           />
 
+          {/* ✅ Red Dot */}
+          {fetchCount > 0 && <span className={styles.redDot}></span>}
           {/* Dropdown */}
           {showNotifications && (
             <div className={styles.dropdown} ref={dropdownRef}>
               <h3 className={styles.dropdownHeader}>Notifications</h3>
-              {notifications.map((n) => (
-                <div key={n.id} className={styles.notificationItem}>
-                  <div>
-                    <button
-                      className={n.type === "birthday" ? styles.circleBlue : styles.circleOrange}
-                      aria-hidden
-                    >
-                      {n.type === "birthday" ? "BD" : "SL"}
-                    </button>
-                  </div>
 
-                  <div className={styles.textBlock}>
-                    <h4>{n.title}</h4>
-                    <p>{n.subtitle}</p>
+              {notifications.length === 0 ? (
+                <p className={styles.noNotifications}>No notifications</p>
+              ) : (
+                notifications.map((n) => (
+                  <div
+                    key={n.id}
+                    className={styles.notificationItem}
+                    onClick={() => notificationClick(n.id)}
+                  >
+                    <div className={styles.textBlock}>
+                      <h4>{n.title}</h4>
+                    </div>
                   </div>
-
-                  <div className={styles.dateBlock}>
-                    <span className={styles.day}>{n.date.split(" ")[0]}</span>
-                    <span className={styles.monthYear}>{n.date.split(" ").slice(1).join(" ")}</span>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           )}
         </div>

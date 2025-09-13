@@ -63,6 +63,21 @@ export const postLeaveRequest = (leaveData) => {
 export const monthCalculation=(userId)=>{
    return apiService.get(`/leave/month?userId=${userId}`) 
 }
+//geT NOTIFICATION
+
+// https://alosodt.com/api/notification/?userId=68c3fa78232eb7c9bb806737&notificationType=user
+export const getNotification=(userId)=>{
+  return apiService.get(`notification?userId=${userId}&notificationType=user`);
+}
+
+// https://alosodt.com/api/notification/68c3fb30232eb7c9bb806847
+
+//update notification
+export const updateNotification = (notificationId,read) => {
+  return apiService.put(`notification/${notificationId}`, {
+    isRead: read,
+  });
+}
 
 
 //update Attendance

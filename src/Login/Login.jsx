@@ -21,7 +21,7 @@ const Login = ({ setLoginUser }) => {
     let msg = "";
     if (name === "email") {
       if (!value.trim()) {
-        msg = "Username is required";
+        msg = "Email is required";
       } else if (!/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/.test(value)) {
         msg = "Enter a valid email address";
       }
@@ -48,7 +48,7 @@ const Login = ({ setLoginUser }) => {
 
     // Validate all fields on submit
     let newErrors = {};
-    if (!email.trim()) newErrors.userName = "Username is required";
+    if (!email.trim()) newErrors.userName = "Email is required";
     else if (!/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/.test(email))
       newErrors.userName = "Enter a valid email address";
 
@@ -75,7 +75,7 @@ const Login = ({ setLoginUser }) => {
         }
       } catch (err) {
         const errorMsg =
-          err?.response?.data?.message || "Invalid username or password!";
+          err?.response?.data?.message || "Invalid Email or password!";
         toast.error(errorMsg, {
           className: `${styles.customToast}`,
           closeButton: false,
@@ -87,6 +87,7 @@ const Login = ({ setLoginUser }) => {
   };
 
   return (
+   
     <div className={styles.loginPage}>
       <div className={styles.logoWrapper}>
         <img src={schoolLogo} alt="ALO School Logo" />
@@ -163,7 +164,7 @@ const Login = ({ setLoginUser }) => {
         </form>
       </div>
 
-      <ToastContainer position="top-center" autoClose={1000} />
+      <ToastContainer position="top-right" autoClose={1000} />
     </div>
   );
 };

@@ -20,7 +20,7 @@ import CheckInModal from "./CheckInModal";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { userId } = useParams();
+  const userId = localStorage.getItem("userId");
   const [user, setUser] = useState(null);
   const [attendanceTable, setAttendanceTable] = useState([]);
   const [isCheckoutOpen, setCheckoutOpen] = useState(false);
@@ -319,6 +319,11 @@ const rows = attendanceTable.map((ele) => {
    },1000)
    return () => clearInterval(timer);
   }, [user?.checkInStatus, attendanceTable]);
+  const capitalizeFirst = (text) => {
+  if (!text) return "-";
+  return text.charAt(0).toUpperCase() + text.slice(1);
+};
+
   
 
   // ✅ Infinite marquee: duplicate items for smooth scrolling
@@ -523,7 +528,13 @@ const rows = attendanceTable.map((ele) => {
       onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
     >
       <h3 className={styles.popupHeader}>Remark</h3>
-      <p className={styles.popupText}>{selectedRemark}</p>
+      <p className={styles.popupText}>
+              {" "}
+              {selectedRemark
+                ? selectedRemark.charAt(0).toUpperCase() +
+                  selectedRemark.slice(1)
+                : "-"}
+            </p>
       <button
         className={styles.popupCloseBtn}
         onClick={() => setSelectedRemark(null)} // close button

@@ -15,7 +15,8 @@ const LeaveRequestModal = ({ isOpen, onClose, onSubmit }) => {
     fromTime: null,
     toTime: null,
   });
-
+   
+const [loading, setLoading] = useState(false); // loader state
   const [successMessage, setSuccessMessage] = useState("");
 
   // Reset form when modal opens
@@ -93,11 +94,13 @@ const LeaveRequestModal = ({ isOpen, onClose, onSubmit }) => {
     }
 
     // Permission validation
-    if (updatedForm.leaveType === "Permission") {
+    // Permission / Early Permission validation
+    if (
+      updatedForm.leaveType === "Permission" ||
+      updatedForm.leaveType === "Early Permission"
+    ) {
       if (name === "permissionDate") {
-        newErrors.permissionDate = value
-          ? ""
-          : "Permission date is required";
+        newErrors.permissionDate = value ? "" : "Permission date is required";
       }
 
       if (name === "fromTime" || name === "toTime") {
@@ -133,12 +136,10 @@ const LeaveRequestModal = ({ isOpen, onClose, onSubmit }) => {
     if (!formData.leaveType)
       newErrors.leaveType = "Please select a leave type";
 
-    if (formData.leaveType !== "Permission") {
-      if (!formData.fromDate || !formData.toDate)
-        newErrors.dates = "Both From and To dates are required";
-      else if (formData.toDate.isBefore(formData.fromDate))
-        newErrors.dates = "To Date cannot be earlier than From Date";
-    } else {
+ if (
+      formData.leaveType === "Permission" ||
+      formData.leaveType === "Early Permission"
+    ) {
       if (!formData.permissionDate)
         newErrors.permissionDate = "Permission date is required";
 
@@ -146,8 +147,12 @@ const LeaveRequestModal = ({ isOpen, onClose, onSubmit }) => {
         newErrors.times = "Both From and To times are required";
       else if (formData.toTime.isBefore(formData.fromTime))
         newErrors.times = "To Time must be later than From Time";
+    } else {
+      if (!formData.fromDate || !formData.toDate)
+        newErrors.dates = "Both From and To dates are required";
+      else if (formData.toDate.isBefore(formData.fromDate))
+        newErrors.dates = "To Date cannot be earlier than From Date";
     }
-
     if (!formData.reason.trim())
       newErrors.reason = "Reason is required";
     else if (formData.reason.length < 5)
@@ -157,13 +162,15 @@ const LeaveRequestModal = ({ isOpen, onClose, onSubmit }) => {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const finalErrors = validateAll();
     const hasErrors = Object.values(finalErrors).some((err) => err !== "");
 
     if (!hasErrors) {
-      if (onSubmit) onSubmit(formData);
+       setLoading(true); // show loader
+       if (onSubmit) await onSubmit(formData);
+
 
       // reset form
       setFormData({
@@ -231,6 +238,7 @@ const LeaveRequestModal = ({ isOpen, onClose, onSubmit }) => {
               <option value="Sick Leave">Sick Leave</option>
               <option value="Casual Leave">Casual Leave</option>
               <option value="Permission">Permission</option>
+              <option value="Early Permission">Early Permission</option>
             </select>
             {errors.leaveType && (
               <p className={styles.error}>{errors.leaveType}</p>
@@ -238,75 +246,81 @@ const LeaveRequestModal = ({ isOpen, onClose, onSubmit }) => {
           </div>
 
           {/* Leave Period */}
-         {formData.leaveType && formData.leaveType !== "Permission" && (
-  <div className={styles.inputBox}>
-    <label>Leave Period</label>
-    <div className={styles.column}>
-      <DatePicker
-        value={formData.fromDate}
-        onChange={(date, dateString) =>
-          handleDateChange(date, dateString, "fromDate")
-        }
-        placeholder="From"
-        disabledDate={(current) => current && current < new Date().setHours(0,0,0,0)} // Disable past dates
-      />
-      <DatePicker
-        value={formData.toDate}
-        onChange={(date, dateString) =>
-          handleDateChange(date, dateString, "toDate")
-        }
-        placeholder="To"
-        disabledDate={(current) =>
-          !formData.fromDate
-            ? current && current < new Date().setHours(0, 0, 0, 0)
-            : current && current < formData.fromDate.startOf("day") // Disable dates before From
-        }
-      />
-    </div>
-    {errors.dates && <p className={styles.error}>{errors.dates}</p>}
-  </div>
-)}
+         {/* Leave Period */}
+          {formData.leaveType &&
+            formData.leaveType !== "Permission" &&
+            formData.leaveType !== "Early Permission" && (
+              <div className={styles.inputBox}>
+                <label>Leave Period</label>
+                <div className={styles.column}>
+                  <DatePicker
+                    value={formData.fromDate}
+                    onChange={(date, dateString) =>
+                      handleDateChange(date, dateString, "fromDate")
+                    }
+                    placeholder="From"
+                    disabledDate={(current) =>
+                      current && current < new Date().setHours(0, 0, 0, 0)
+                    }
+                  />
+                  <DatePicker
+                    value={formData.toDate}
+                    onChange={(date, dateString) =>
+                      handleDateChange(date, dateString, "toDate")
+                    }
+                    placeholder="To"
+                    disabledDate={(current) =>
+                      !formData.fromDate
+                        ? current && current < new Date().setHours(0, 0, 0, 0)
+                        : current && current < formData.fromDate.startOf("day")
+                    }
+                  />
+                </div>
+                {errors.dates && <p className={styles.error}>{errors.dates}</p>}
+              </div>
+            )}
 
           {/* Permission Time */}
-         {formData.leaveType === "Permission" && (
-  <div className={styles.inputBox}>
-    <label>Permission Time</label>
-    <div className={styles.formRow}>
-      <DatePicker
-        value={formData.permissionDate}
-        onChange={(date, dateString) =>
-          handleDateChange(date, dateString, "permissionDate")
-        }
-        placeholder="Date"
-        disabledDate={(current) => current && current < new Date().setHours(0,0,0,0)} // Disable past dates
-      />
-      <TimePicker
-        use12Hours
-        format="hh:mm A"
-        value={formData.fromTime}
-        onChange={(time, timeString) =>
-          handleTimeChange(time, timeString, "fromTime")
-        }
-        placeholder="From"
-      />
-      <TimePicker
-        use12Hours
-        format="hh:mm A"
-        value={formData.toTime}
-        onChange={(time, timeString) =>
-          handleTimeChange(time, timeString, "toTime")
-        }
-        placeholder="To"
-      />
-    </div>
-    {errors.permissionDate && (
-      <p className={styles.error}>{errors.permissionDate}</p>
-    )}
-    {errors.times && <p className={styles.error}>{errors.times}</p>}
-  </div>
-)}
-
-
+          {(formData.leaveType === "Permission" ||
+            formData.leaveType === "Early Permission") && (
+            <div className={styles.inputBox}>
+              <label>Permission Time</label>
+              <div className={styles.formRow}>
+                <DatePicker
+                  value={formData.permissionDate}
+                  onChange={(date, dateString) =>
+                    handleDateChange(date, dateString, "permissionDate")
+                  }
+                  placeholder="Date"
+                  disabledDate={(current) =>
+                    current && current < new Date().setHours(0, 0, 0, 0)
+                  }
+                />
+                <TimePicker
+                  use12Hours
+                  format="hh:mm A"
+                  value={formData.fromTime}
+                  onChange={(time, timeString) =>
+                    handleTimeChange(time, timeString, "fromTime")
+                  }
+                  placeholder="From"
+                />
+                <TimePicker
+                  use12Hours
+                  format="hh:mm A"
+                  value={formData.toTime}
+                  onChange={(time, timeString) =>
+                    handleTimeChange(time, timeString, "toTime")
+                  }
+                  placeholder="To"
+                />
+              </div>
+              {errors.permissionDate && (
+                <p className={styles.error}>{errors.permissionDate}</p>
+              )}
+              {errors.times && <p className={styles.error}>{errors.times}</p>}
+            </div>
+          )}
           {/* Reason */}
          <div className={styles.inputBox}>
   <label>Reason</label>
@@ -327,8 +341,40 @@ const LeaveRequestModal = ({ isOpen, onClose, onSubmit }) => {
 
           {/* Submit */}
           <div className={styles.btn}>
-            <button type="submit" className={styles.submitBtn}>
-              Request Leave
+            <button type="submit" className={styles.submitBtn} disabled={loading}>
+                {loading ? (
+                            <div className={styles.loader} title="1">
+                              <svg
+                                version="1.1"
+                                id="loader-1"
+                                xmlns="http://www.w3.org/2000/svg"
+                                x="0px"
+                                y="0px"
+                                width="24px"
+                                height="24px"
+                                viewBox="0 0 50 50"
+                                xmlSpace="preserve"
+                              >
+                                <path
+                                  fill="#fff"
+                                  d="M25.251,6.461c-10.318,0-18.683,8.365-18.683,18.683h4.068
+                           c0-8.071,6.543-14.615,14.615-14.615V6.461z"
+                                >
+                                  <animateTransform
+                                    attributeType="xml"
+                                    attributeName="transform"
+                                    type="rotate"
+                                    from="0 25 25"
+                                    to="360 25 25"
+                                    dur="0.6s"
+                                    repeatCount="indefinite"
+                                  />
+                                </path>
+                              </svg>
+                            </div>
+                          ) : (
+                            "Request Leave"
+                          )}
             </button>
           </div>
         </form>

@@ -10,35 +10,37 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  
 }
+
+/* Form Rows */
 .formRow {
   display: flex;
-  gap: 12px;         /* space between inputs */
-  width: 100%; 
-  color:white;      /* full width like other inputs */
+  gap: 12px;
+  width: 100%;
+  color: white;
 }
 
 .formRow input {
-  flex: 2;           /* each input takes equal space */
-  min-width: 0;      /* prevents flex overflow issue */
-}
-/* Make Antd pickers same width as inputs */
-.column :global(.ant-picker),
-.formRow :global(.ant-picker) {
-  flex: 1;        /* allow equal space */
-  width: 100%;    /* full width */
-  min-width: 0; 
-  color:white;  /* prevent flex overflow */
+  flex: 2;
+  min-width: 0;
 }
 
-/* Container */
+/* Antd Pickers */
+.column :global(.ant-picker),
+.formRow :global(.ant-picker) {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  color: white;
+}
+
+/* Container (Modal box) */
 .container {
-    background-color:white;
+  background-color: white;
   padding: 32px 36px;
   border-radius: 10px;
-  width: 480px;
-  max-height:100vh;
+  width: 480px;        /* default for desktop */
+  max-height: 100vh;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
   position: relative;
   display: flex;
@@ -49,7 +51,7 @@
 .header {
   position: relative;
   display: flex;
-  justify-content: center; /* centers the h1 */
+  justify-content: center;
   align-items: center;
   margin-bottom: 20px;
 }
@@ -62,17 +64,15 @@
 
 .headericon {
   position: absolute;
-  right: 0; /* sticks X to the right */
+  right: 0;
   cursor: pointer;
 }
-
 
 /* Form */
 .form {
   display: flex;
   flex-direction: column;
-  gap: 20px; /* equal space between form groups */
-
+  gap: 20px;
 }
 
 .inputBox {
@@ -107,8 +107,6 @@
   flex: 2;
 }
 
-
-
 /* Errors */
 .error {
   color: red;
@@ -138,25 +136,28 @@
 .submitBtn:hover {
   background-color: #f59e0b;
 }
-/* Force Antd DatePicker and TimePicker text to black */
+
+/* Antd Fixes */
 :global(.ant-picker-input input) {
   color: black !important;
 }
-/* For Ant Design Table */
+
 :global(.ant-table-thead > tr > th) {
   color: white !important;
-  background-color: #1e3a8a !important; /* optional dark bg */
+  background-color: #1e3a8a !important;
 }
 
-/* For plain HTML table */
 table th {
   color: white;
-  background-color: #1e3a8a; /* optional */
+  background-color: #1e3a8a;
 }
+
 :global(table th) {
   color: white !important;
   background-color: #1e3a8a !important;
 }
+
+/* Readonly input */
 .readonlyInput {
   background-color: #f5f5f5;
   cursor: not-allowed;
@@ -174,7 +175,7 @@ table th {
 }
 
 .popup {
-  background: #16a34a; /* bright green */
+  background: #16a34a;
   color: white;
   padding: 20px 35px;
   border-radius: 12px;
@@ -200,8 +201,9 @@ table th {
   from { opacity: 0; transform: translateY(-20px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
 .successMessage {
-  background: #22c55e; /* green */
+  background: #22c55e;
   color: white;
   padding: 10px 15px;
   border-radius: 8px;
@@ -209,4 +211,71 @@ table th {
   text-align: center;
   font-weight: 500;
   animation: fadeIn 0.3s ease;
+}
+
+/* Loader */
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader svg path {
+  fill: #fff;
+}
+
+/* ===================== Responsive ===================== */
+
+/* Tablet */
+@media (max-width: 992px) {
+  .container {
+    width: 90%;
+    padding: 24px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .container {
+    width: 95%;
+    padding: 20px;
+    max-height: 90vh;
+  }
+
+  .header h1 {
+    font-size: 20px;
+  }
+
+  .form {
+    gap: 15px;
+  }
+
+  .column,
+  .formRow {
+    flex-direction: column; /* stack inputs */
+    gap: 12px;
+  }
+
+  .submitBtn {
+    width: 100%; /* full width button */
+    padding: 12px;
+    font-size: 15px;
+  }
+}
+
+/* Small mobile */
+@media (max-width: 480px) {
+  .container {
+    width: 96%;
+    padding: 15px;
+  }
+
+  .header h1 {
+    font-size: 18px;
+  }
+
+  .submitBtn {
+    font-size: 14px;
+    padding: 10px;
+  }
 }

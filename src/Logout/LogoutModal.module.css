@@ -62,3 +62,13 @@
   background-color: #ccc;
   color: #333;
 }
+/* loader svg*/
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader svg path {
+  fill: #fff; /* make it white inside button */
+}

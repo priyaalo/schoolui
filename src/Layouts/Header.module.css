@@ -10,7 +10,7 @@
   position: fixed;
   width: 100%;
   z-index: 1000;
-  height:79px;
+  height:80px;
   align-content: center;
 }
 
@@ -564,4 +564,21 @@
     font-size: 11px;
     width: 150px;
   }
+}
+.redDot {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: red;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+
+.noNotifications {
+  text-align: center;
+  padding: 1rem;
+  color: gray;
+  font-style: italic;
 }
