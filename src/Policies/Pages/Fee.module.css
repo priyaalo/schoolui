@@ -1,3 +1,4 @@
+/* Base styles */
 .container {
   padding: 2rem;
   font-family: Arial, sans-serif;
@@ -7,12 +8,65 @@
 
 .heading {
   color: #004d99;
-  margin-top: 80px; /* A professional blue color */
+  margin-top: 80px; /* Desktop spacing */
+  font-size: 2rem;
 }
 
 .paragraph {
-  color: #721c24; 
+  color: #721c24;
   padding: 16px;
-  border-radius: 8px;  
+  border-radius: 8px;
   margin-top: 1.5rem;
+  font-size: 1rem;
+}
+
+/* Tablet (≤ 1024px) */
+@media (max-width: 1024px) {
+  .container {
+    padding: 1.5rem;
+  }
+
+  .heading {
+    font-size: 1.8rem;
+    margin-top: 60px;
+  }
+
+  .paragraph {
+    font-size: 0.95rem;
+    padding: 14px;
+  }
+}
+
+/* Mobile (≤ 768px) */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .heading {
+    font-size: 1.5rem;
+    margin-top: 50px;
+  }
+
+  .paragraph {
+    font-size: 0.9rem;
+    padding: 12px;
+  }
+}
+
+/* Small Mobile (≤ 480px) */
+@media (max-width: 480px) {
+  .container {
+    padding: 0.8rem;
+  }
+
+  .heading {
+    font-size: 1.3rem;
+    margin-top: 40px;
+  }
+
+  .paragraph {
+    font-size: 0.85rem;
+    padding: 10px;
+  }
 }
