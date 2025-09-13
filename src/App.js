@@ -1,4 +1,3 @@
-
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Dashboard from "./Dashboard/Dashboard";
 import LeaveManagement from "./LeaveManagement/LeaveManagement";
@@ -11,14 +10,14 @@ import { useState, useEffect } from "react";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true); // ✅ wait for localStorage check
   const location = useLocation();
 
-  // Check localStorage on first render
+  // On first render, check auth token
   useEffect(() => {
     const token = localStorage.getItem("authToken");
-    if (token) {
-      setIsAuthenticated(true);
-    }
+    if (token) setIsAuthenticated(true);
+    setCheckingAuth(false);
   }, []);
 
   const handleLogout = () => {
@@ -29,12 +28,14 @@ function App() {
 
   const showHeader = isAuthenticated && location.pathname !== "/login";
 
+  // Wait for auth check
+  if (checkingAuth) return null;
+
   return (
     <>
       {showHeader && <Header handleLogout={handleLogout} />}
 
       <Routes>
-        {/* Default redirect to login */}
         <Route path="/" element={<Navigate to="/login" replace />} />
 
         {/* Login Page */}
@@ -42,8 +43,11 @@ function App() {
           path="/login"
           element={
             isAuthenticated ? (
-              // ✅ Redirect to *last visited page* instead of forcing dashboard
-              <Navigate to={location.state?.from || `/dashboard/${localStorage.getItem("userId")}`} replace />
+              // ✅ Always go to Dashboard after login
+              <Navigate
+                to={`/dashboard/${localStorage.getItem("userId")}`}
+                replace
+              />
             ) : (
               <Login setLoginUser={setIsAuthenticated} />
             )
