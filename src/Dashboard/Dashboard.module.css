@@ -389,7 +389,7 @@ td {
 .marqueeWrapper {
   overflow: hidden;
   width: 100%;
-  background: #f9f9f9;
+
   padding: 10px 0;
   position: relative;
 }
@@ -409,7 +409,7 @@ td {
 .marqueeWrapper {
   overflow: hidden;
   width: 100%;
-  background: #f9f9f9;
+ 
   padding: 10px 0;
   position: relative;
 }
