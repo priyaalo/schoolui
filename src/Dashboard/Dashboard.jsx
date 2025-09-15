@@ -459,22 +459,26 @@ const rows = attendanceTable.map((ele) => {
                     <td>{row.login}</td>
                     <td>{row.logout}</td>
                     <td
-                      style={{
-                        cursor: "pointer",
-                        maxWidth: "150px",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                        color: "blue",
-                      }}
-                      onClick={() => setSelectedRemark(row.remarks)} // open popup with remark
-                      title="Click to view full remark"
-                    >
-                      {row.remarks
-                        ? row.remarks.charAt(0).toUpperCase() +
-                          row.remarks.slice(1)
-                        : "-"}
-                    </td>
+  style={{
+    cursor: row.remarks ? "pointer" : "default",
+    maxWidth: "150px",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+    color: row.remarks ? "blue" : "black",
+  }}
+  onClick={() => {
+    if (row.remarks && row.remarks.trim() !== "-") {
+      setSelectedRemark(row.remarks);
+    }
+  }}
+  title={row.remarks ? "Click to view full remark" : ""}
+>
+  {row.remarks
+    ? row.remarks.charAt(0).toUpperCase() + row.remarks.slice(1)
+    : "-"}
+</td>
+
 
                     <td>{row.classHours}</td>
                     <td>{row.permission}</td>
