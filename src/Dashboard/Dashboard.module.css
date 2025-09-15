@@ -27,7 +27,7 @@
 }
 
 .welcome {
-  font-size: 40px;
+  font-size: 36px;
   font-weight: 700;
   background: linear-gradient(to bottom, #144196, #061530);
   background-clip: text;
@@ -385,7 +385,7 @@ td {
   align-items: center;
   justify-content: center;
   height: 120px;
-  background: #f9f9f9;
+  
   border-radius: 8px;
 }
 .noEvents {
@@ -405,7 +405,7 @@ td {
   display: flex;
   width: max-content;
   gap: 20px;
-  animation: scrollMarquee 24s linear infinite;
+  animation: scrollMarquee 23s linear infinite;
 }
 .marqueeContent {
   display: flex;

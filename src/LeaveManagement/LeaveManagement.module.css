@@ -288,6 +288,32 @@ td {
     width: 100%;
     max-width: 90%;
   }
+   .req {
+    padding: 10px;
+  }
+  
+  .row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+    margin-top: 40px;
+  }
+
+  .col {
+    min-width: 100%;
+    padding: 15px;
+  }
+
+  .card, .form {
+    width: 100%;
+    max-width: 100%;
+    padding: 40px;
+  }
+
+  .table {
+    font-size: 12px;
+    border-radius: 6px;
+  }
   .form { padding: 20px 10px; }
   .table {
     display: block;
@@ -320,6 +346,43 @@ td {
     font-size: 12px;
   }
   .mainContent { padding-top: 60px; } /* tighter on very small */
+  @media (max-width: 480px) {
+  h4 { font-size: 14px; }
+  p { font-size: 13px; }
+
+  .button {
+    width: 100%;
+    font-size: 12px;
+    padding: 10px;
+  }
+
+  .circle, .circle1 {
+    height: 28px;
+    width: 28px;
+    font-size: 10px;
+  }
+
+  .pending, .approved, .rejected {
+    min-width: 60px;
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  .remarksCell {
+    max-width: 200px;
+    font-size: 12px;
+  }
+
+  .modal {
+    padding: 15px;
+    max-width: 95%;
+  }
+
+  .popupContent {
+    width: 95%;
+    padding: 15px;
+  }
+}
 }
 .capitalize {
   text-transform: capitalize;

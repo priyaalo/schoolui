@@ -187,12 +187,24 @@ const Header = ({ handleLogout }) => {
 
       {/* Desktop Right Section */}
       <div className={`${styles.rightSection} ${styles.hideOnMobile}`}>
-        <div className={styles.profile}>
+         <div className={styles.profile}>
           {userProfile?.profileURL ? (
-            <img src={userProfile.profileURL} alt={userProfile.name || "User"} className={styles.profilePic} />
+            <img
+              src={userProfile.profileURL}
+              alt={userProfile?.name || "User"}
+              className={styles.profilePic}
+            />
           ) : (
-            <FaUserCircle size={50} color="#ccc" className={styles.profilePic} />
+            <FaUserCircle
+              size={50}
+              color="#ccc"
+              className={styles.profilePic}
+            />
           )}
+          <div className={styles.profileInfo}>
+            <h4>{userProfile?.name || "User"}</h4>
+            <p>{userProfile?.courseDetails?.courseName || "loading ....."}</p>
+          </div>
         </div>
 
         <i
