@@ -17,8 +17,8 @@
 .logoWrapper {
   display: flex;
   align-items: center;
-  width: 250px; /* default desktop width */
-  height: 70px; /* default desktop height */
+  width: 260px; /* default desktop width */
+  height: 110px; /* default desktop height */
 }
 
 /* Logo image */

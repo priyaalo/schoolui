@@ -1,4 +1,4 @@
-/* Modal Overlay */
+/* ===================== Modal Overlay ===================== */
 .modalOverlay {
   position: fixed;
   top: 0;
@@ -12,42 +12,21 @@
   z-index: 1000;
 }
 
-/* Form Rows */
-.formRow {
-  display: flex;
-  gap: 12px;
-  width: 100%;
-  color: white;
-}
-
-.formRow input {
-  flex: 2;
-  min-width: 0;
-}
-
-/* Antd Pickers */
-.column :global(.ant-picker),
-.formRow :global(.ant-picker) {
-  flex: 1;
-  width: 100%;
-  min-width: 0;
-  color: white;
-}
-
-/* Container (Modal box) */
+/* ===================== Container (Modal box) ===================== */
 .container {
   background-color: white;
   padding: 32px 36px;
   border-radius: 10px;
-  width: 480px;        /* default for desktop */
-  max-height: 100vh;
+  width: 480px; /* Default (desktop) */
+  max-height: 95vh;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
   position: relative;
   display: flex;
   flex-direction: column;
+  overflow-y: auto; /* Prevent content cut on small screens */
 }
 
-/* Header */
+/* ===================== Header ===================== */
 .header {
   position: relative;
   display: flex;
@@ -66,9 +45,10 @@
   position: absolute;
   right: 0;
   cursor: pointer;
+  font-size: 22px;
 }
 
-/* Form */
+/* ===================== Form ===================== */
 .form {
   display: flex;
   flex-direction: column;
@@ -97,7 +77,18 @@
   min-height: 70px;
 }
 
-/* Row for multiple inputs */
+/* ===================== Rows ===================== */
+.formRow {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.formRow input {
+  flex: 2;
+  min-width: 0;
+}
+
 .column {
   display: flex;
   gap: 20px;
@@ -107,14 +98,22 @@
   flex: 2;
 }
 
-/* Errors */
+/* Antd Pickers fix */
+.column :global(.ant-picker),
+.formRow :global(.ant-picker) {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+}
+
+/* ===================== Errors ===================== */
 .error {
   color: red;
   font-size: 12px;
   margin-top: 2px;
 }
 
-/* Button */
+/* ===================== Button ===================== */
 .btn {
   display: flex;
   justify-content: center;
@@ -137,34 +136,26 @@
   background-color: #f59e0b;
 }
 
-/* Antd Fixes */
+/* ===================== Antd Fixes ===================== */
 :global(.ant-picker-input input) {
   color: black !important;
 }
 
-:global(.ant-table-thead > tr > th) {
-  color: white !important;
-  background-color: #1e3a8a !important;
-}
-
+:global(.ant-table-thead > tr > th),
+:global(table th),
 table th {
-  color: white;
-  background-color: #1e3a8a;
-}
-
-:global(table th) {
   color: white !important;
   background-color: #1e3a8a !important;
 }
 
-/* Readonly input */
+/* ===================== Readonly input ===================== */
 .readonlyInput {
   background-color: #f5f5f5;
   cursor: not-allowed;
   color: #555;
 }
 
-/* Popup styles */
+/* ===================== Popup ===================== */
 .overlay {
   position: fixed;
   inset: 0;
@@ -197,11 +188,6 @@ table th {
   font-weight: 600;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
 .successMessage {
   background: #22c55e;
   color: white;
@@ -213,7 +199,12 @@ table th {
   animation: fadeIn 0.3s ease;
 }
 
-/* Loader */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===================== Loader ===================== */
 .loader {
   display: flex;
   align-items: center;
@@ -224,17 +215,29 @@ table th {
   fill: #fff;
 }
 
-/* ===================== Responsive ===================== */
+/* ===================== Responsive Breakpoints ===================== */
 
-/* Tablet */
-@media (max-width: 992px) {
+/* Large laptops (below 1200px) */
+@media (max-width: 1200px) {
   .container {
-    width: 90%;
-    padding: 24px;
+    width: 70%;
+    padding: 28px;
   }
 }
 
-/* Mobile */
+/* Tablet (below 992px) */
+@media (max-width: 992px) {
+  .container {
+    width: 85%;
+    padding: 24px;
+  }
+
+  .header h1 {
+    font-size: 22px;
+  }
+}
+
+/* Mobile (below 768px) */
 @media (max-width: 768px) {
   .container {
     width: 95%;
@@ -263,7 +266,7 @@ table th {
   }
 }
 
-/* Small mobile */
+/* Small Mobile (below 480px) */
 @media (max-width: 480px) {
   .container {
     width: 96%;
@@ -274,8 +277,26 @@ table th {
     font-size: 18px;
   }
 
+  .headericon {
+    font-size: 18px;
+  }
+
   .submitBtn {
     font-size: 14px;
     padding: 10px;
+  }
+
+  .popup {
+    flex-direction: column;
+    gap: 8px;
+    padding: 15px 20px;
+  }
+
+  .popup .icon {
+    font-size: 30px;
+  }
+
+  .popup .text {
+    font-size: 16px;
   }
 }

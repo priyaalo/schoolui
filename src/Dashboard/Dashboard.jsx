@@ -105,17 +105,17 @@ const fetchAttendance = async () => {
         setEarlyPer(formattedData[0]._id);
       }
 
-      const today = new Date().toISOString().split("T")[0];
-      const todayAttendance = allData.find(
-        (att) => att.date?.startsWith(today) && !att.outTime
-      );
+     const pendingAttendance = [...allData]
+      .filter((att) => !att.outTime) // records with no checkout
+      .sort((a, b) => new Date(b.date) - new Date(a.date)); // latest first
 
-     if (todayAttendance) {
-        setAttendanceId(todayAttendance._id);
-        setOnPermission(todayAttendance.onPermission === true);
-        setOnEarlyPermission(todayAttendance.onEarlyPermission === true);
-        // setOnLeave(todayAttendance.onLeave === true); 
-      }
+    if (pendingAttendance.length > 0) {
+      const lastPending = pendingAttendance[0];
+      setAttendanceId(lastPending._id);
+      setOnPermission(lastPending.onPermission === true);
+      setOnEarlyPermission(lastPending.onEarlyPermission === true);
+    }
+    
     } catch (err) {
       console.error("Error fetching attendance:", err.message);
     }

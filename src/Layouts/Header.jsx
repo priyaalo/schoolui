@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import styles from "./Header.module.css";
-import logo from "../assets/AloLogo/image.png";
+import logo from "../assets/AloLogo/alo-logo.png";
 import LogoutModal from "../Logout/LogoutModal";
 import { getUserId, getNotification, updateNotification } from "../api/serviceapi";
 

@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { LoginUser } from "../api/serviceapi";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import schoolLogo from "../assets/AloLogo/alo-logo.png";
+import schoolLogo from "../assets/AloLogo/images.png";
 
 const Login = ({ setLoginUser }) => {
   const [email, setEmail] = useState("");

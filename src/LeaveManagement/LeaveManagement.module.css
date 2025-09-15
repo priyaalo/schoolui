@@ -107,24 +107,35 @@ th {
 }
 td {
   padding: 15px;
-  text-align: center;
-  font-size: 12px;
+  text-align: center;   /* centers badge */
+  font-size: 13px;
   font-weight: 500;
+  vertical-align: middle;
 }
 
+
 /* Status badges */
+/* Status badges - uniform size & alignment */
 .pending,
 .approved,
 .rejected {
-  color: white;
-  padding: 6px 10px;
-  border-radius: 4px;
-  font-size: 12px;
-  display: inline-block;
+  display: inline-flex;         /* keep text centered */
+  justify-content: center;
+  align-items: center;
+  min-width: 90px;              /* fixed width for consistency */
+  padding: 6px 12px;            /* equal padding */
+  border-radius: 20px;          /* pill style */
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: #fff;
+  text-align: center;
 }
-.pending { background-color: gray; }
-.approved { background-color: green; }
-.rejected { background-color: red; }
+
+/* Individual colors */
+.pending  { background-color: #9ca3af; }  /* gray */
+.approved { background-color: #16a34a; }  /* green */
+.rejected { background-color: #dc2626; }  /* red */
 
 .remarksCell {
   cursor: pointer;
