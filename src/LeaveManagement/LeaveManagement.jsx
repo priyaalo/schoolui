@@ -251,7 +251,20 @@ const handleModalSubmit = async (formData) => {
 
   return (
     <div className={styles.req}>
-      <ToastContainer />
+     <ToastContainer
+  position="top-right"
+  autoClose={2000}
+  hideProgressBar={false}
+  newestOnTop={true}
+  closeOnClick
+  rtl={false}
+  pauseOnFocusLoss
+  draggable
+  pauseOnHover
+  theme="colored"
+    style={{ marginTop: "80px" }} 
+/>
+
       {/* Leave summary cards */}
       <div className={styles.row}>
         <div className={styles.col}>

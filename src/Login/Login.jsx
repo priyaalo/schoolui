@@ -101,7 +101,7 @@ const Login = ({ setLoginUser }) => {
           <div className={styles.inputBox}>
             <input
               type="text"
-              placeholder="Email"
+              placeholder="Enter your Email"
               value={email}
               onChange={handleEmailChange}
             />

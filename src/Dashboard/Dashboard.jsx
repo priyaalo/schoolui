@@ -359,35 +359,30 @@ const rows = attendanceTable.map((ele) => {
 
       {/* Events marquee */}
       {/* Events marquee */}
-<div className={styles.marqueeContainer}>
-  {events.length === 0 ? (
-    <div className={styles.noEventsWrapper}>
-      <span className={styles.noEvents}>No events found</span>
+{/* Events Marquee */}
+{/* Events Marquee */}
+{events.length === 0 ? (
+  <div className={styles.noEventsWrapper}>
+    <span className={styles.noEvents}>No events found</span>
+  </div>
+) : (
+  <div className={styles.marqueeWrapper}>
+    <div className={styles.marqueeTrack}>
+      {/* Duplicate events multiple times to avoid gaps */}
+      {[...Array(5)].flatMap(() =>
+        events.map((ev, index) => (
+          <EventCard
+            key={`${ev.id}-${index}-${Math.random()}`}
+            title={ev.title.charAt(0).toUpperCase() + ev.title.slice(1)}
+            subtitle={ev.subtitle.charAt(0).toUpperCase() + ev.subtitle.slice(1)}
+            date={ev.date}
+            type={ev.icon}
+          />
+        ))
+      )}
     </div>
-  ) : (
-    <div className={styles.marqueeContent}>
-      {events.length === 1
-        ? Array(10).fill(events[0]).map((ev, index) => (
-            <EventCard
-              key={index}
-              title={ev.title.charAt(0).toUpperCase() + ev.title.slice(1)}
-              subtitle={ev.subtitle.charAt(0).toUpperCase() + ev.subtitle.slice(1)}
-              date={ev.date}
-              type={ev.icon}
-            />
-          ))
-        : events.map((ev, index) => (
-            <EventCard
-              key={index}
-              title={ev.title.charAt(0).toUpperCase() + ev.title.slice(1)}
-              subtitle={ev.subtitle.charAt(0).toUpperCase() + ev.subtitle.slice(1)}
-              date={ev.date}
-              type={ev.icon}
-            />
-          ))}
-    </div>
-  )}
-</div>
+  </div>
+)}
 
 
 

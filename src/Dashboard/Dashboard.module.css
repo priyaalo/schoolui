@@ -386,24 +386,47 @@ td {
   overflow: hidden;
 }
 
+.marqueeWrapper {
+  overflow: hidden;
+  width: 100%;
+  background: #f9f9f9;
+  padding: 10px 0;
+  position: relative;
+}
 .noEventsWrapper {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 120px;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+.noEvents {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #777;
+}
+.marqueeWrapper {
+  overflow: hidden;
   width: 100%;
-   
+  background: #f9f9f9;
+  padding: 10px 0;
+  position: relative;
 }
 
-.noEvents {
-  font-size: 16px;
-  font-weight: 500;
-  color: #555;
-  text-align: center;
- 
+.marqueeTrack {
+  display: flex;
+  width: max-content;
+  gap: 20px;
+  animation: scrollMarquee 24s linear infinite;
+}
+@keyframes scrollMarquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 .marqueeContent {

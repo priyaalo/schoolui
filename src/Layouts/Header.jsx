@@ -129,7 +129,11 @@ const Header = ({ handleLogout }) => {
         <div className={styles.profile}>
           <img src={userProfile?.profileURL || "/default-avatar.png"} alt={userProfile?.name || "User"} className={styles.profilePic} />
           <div className={styles.profileInfo}>
-            <h4>{userProfile?.name || "Loading..."}</h4>
+            <h4>
+  {userProfile?.name
+    ? userProfile.name.charAt(0).toUpperCase() + userProfile.name.slice(1)
+    : "Loading..."}
+</h4>
             <p>{userProfile?.courseDetails?.courseName || ""}</p>
           </div>
         </div>
