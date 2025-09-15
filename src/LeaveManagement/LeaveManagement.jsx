@@ -325,7 +325,8 @@ const handleModalSubmit = async (formData) => {
             ) : paginatedRows.length > 0 ? (
               paginatedRows.map((data) => (
                 <tr key={data.id}>
-                  <td>{data.name}</td>
+                 <td className={styles.capitalize}>{data.name}</td>
+
                   <td>{data.type}</td>
                   <td>{data.requestedOn}</td>
                   <td>{data.period}</td>

@@ -379,20 +379,7 @@ td {
 
 /* 🎉 Events Marquee */
 /* ===================== */
-.marqueeContainer {
-  position: relative;
-  width: 100%;
-  height: 120px; /* same height as your scrolling area */
-  overflow: hidden;
-}
 
-.marqueeWrapper {
-  overflow: hidden;
-  width: 100%;
-
-  padding: 10px 0;
-  position: relative;
-}
 .noEventsWrapper {
   display: flex;
   align-items: center;
@@ -420,30 +407,18 @@ td {
   gap: 20px;
   animation: scrollMarquee 24s linear infinite;
 }
+.marqueeContent {
+  display: flex;
+  gap: 20px;
+}
 @keyframes scrollMarquee {
   from {
     transform: translateX(0);
   }
   to {
-    transform: translateX(-50%);
+    transform: translateX(-20%);
   }
 }
 
-.marqueeContent {
-  display: flex;
-  gap: 15px;
-  width: max-content; /* ensure content width is correct */
-  animation: marquee 23s linear infinite;
-  align-items: center;
-}
-
-.marqueeContent > * {
-  flex-shrink: 0;
-}
 
 
-/* Animation moves half of duplicated content to make seamless scroll */
-@keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}

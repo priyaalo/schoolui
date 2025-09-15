@@ -16,14 +16,13 @@ const Header = ({ handleLogout }) => {
 
   const navigate = useNavigate();
   const location = useLocation();
-
   const dropdownRef = useRef(null);
   const notifyIconRef = useRef(null);
 
   // Fetch notifications
   const fetchNotification = async () => {
+    if (!userId) return;
     try {
-      if (!userId) return;
       const response = await getNotification(userId);
       const data = response.data?.data?.data || [];
       setNotifi(data);
@@ -34,8 +33,8 @@ const Header = ({ handleLogout }) => {
 
   // Fetch user profile
   const fetchUser = async () => {
+    if (!userId) return;
     try {
-      if (!userId) return;
       const res = await getUserId(userId);
       const profileData = res.data?.data?.data?.[0] || res.data?.data;
       setUserProfile(profileData);
@@ -47,11 +46,11 @@ const Header = ({ handleLogout }) => {
   useEffect(() => {
     fetchUser();
     fetchNotification();
-    const interval = setInterval(fetchNotification, 10000);
+    const interval = setInterval(fetchNotification, 10000); // refresh every 10s
     return () => clearInterval(interval);
   }, [userId]);
 
-  // Close dropdown when clicking outside
+  // Close dropdown if clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -68,9 +67,10 @@ const Header = ({ handleLogout }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showNotifications]);
 
-  // Close notifications when route changes
+  // Close dropdown & hamburger on route change
   useEffect(() => {
     setShowNotifications(false);
+    setIsMobileMenuOpen(false);
   }, [location.pathname]);
 
   const confirmLogout = () => {
@@ -78,19 +78,12 @@ const Header = ({ handleLogout }) => {
     navigate("/login", { replace: true });
   };
 
-  // Handle bell click: open dropdown and mark unread as read
   const handleBellClick = async () => {
     setShowNotifications((prev) => !prev);
-
-    const unreadNotifications = notifi.filter(n => !n.isRead);
-    if (unreadNotifications.length > 0) {
+    const unread = notifi.filter(n => !n.isRead);
+    if (unread.length) {
       try {
-        // Mark all unread notifications as read
-        await Promise.all(
-          unreadNotifications.map(n => updateNotification(n._id, true))
-        );
-
-        // Update local state immediately
+        await Promise.all(unread.map(n => updateNotification(n._id, true)));
         setNotifi(prev => prev.map(n => ({ ...n, isRead: true })));
       } catch (err) {
         console.error(err.message);
@@ -98,11 +91,66 @@ const Header = ({ handleLogout }) => {
     }
   };
 
+  const handleNavClick = (path) => {
+    navigate(path);
+    setIsMobileMenuOpen(false);
+  };
+
   return (
     <header className={styles.headerContainer}>
-      {/* Logo + Hamburger */}
+      {/* Logo */}
       <div className={styles.logoWrapper}>
-        <img src={logo} alt="ALO School Logo" className={styles.logo} />
+        <img src={logo} alt="ALO Logo" className={styles.logo} />
+      </div>
+
+      {/* Hamburger + Mobile Right Section */}
+      <div className={styles.rightSectionMobile}>
+        {/* Notification */}
+        <div className={styles.notificationWrapper}>
+          <i
+            ref={notifyIconRef}
+            className={`fa-solid fa-bell ${styles.notificationIcon}`}
+            onClick={handleBellClick}
+          />
+          {notifi.some(n => !n.isRead) && <span className={styles.redDot}></span>}
+          {showNotifications && (
+            <div className={styles.dropdown} ref={dropdownRef}>
+              <div className={styles.dropdownHeaderWrapper}>
+                <h3 className={styles.dropdownHeader}>Notifications</h3>
+                <button className={styles.closeBtn} onClick={() => setShowNotifications(false)}>&times;</button>
+              </div>
+              {notifi.length === 0 ? (
+                <p className={styles.noNotifications}>No notifications</p>
+              ) : (
+                notifi.map(n => {
+                  const dateObj = new Date(n.date);
+                  return (
+                    <div key={n._id} className={styles.notificationItem}>
+                      <div className={styles.textBlock}>
+                        <h4>{n.message}</h4>
+                        {n.subMessage && <p>{n.subMessage}</p>}
+                      </div>
+                      <div className={styles.dateBlock}>
+                        <span className={styles.day}>{dateObj.getDate()}</span>
+                        <span className={styles.monthYear}>
+                          {dateObj.toLocaleString("default", { month: "short", year: "2-digit" })}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Logout */}
+        <i
+          className={`fa-solid fa-arrow-right-from-bracket ${styles.logoutIcon}`}
+          onClick={() => setShowLogoutModal(true)}
+        />
+
+        {/* Hamburger */}
         <button
           className={styles.hamburger}
           onClick={() => setIsMobileMenuOpen(prev => !prev)}
@@ -118,46 +166,40 @@ const Header = ({ handleLogout }) => {
         <div className={styles.links}>
           <button
             className={`${styles.linkBtn} ${location.pathname.includes("/dashboard") ? styles.activeLink : ""}`}
-            onClick={() => navigate(`/dashboard/${userId}`)}
+            onClick={() => handleNavClick(`/dashboard/${userId}`)}
           >
             Attendance
           </button>
           <button
             className={`${styles.linkBtn} ${location.pathname.includes("/leave-management") ? styles.activeLink : ""}`}
-            onClick={() => navigate(`/leave-management/${userId}`)}
+            onClick={() => handleNavClick(`/leave-management/${userId}`)}
           >
             Leave Management
           </button>
           <button
             className={`${styles.linkBtn} ${location.pathname.includes("/policies") ? styles.activeLink : ""}`}
-            onClick={() => navigate(`/policies/${userId}`)}
+            onClick={() => handleNavClick(`/policies/${userId}`)}
           >
             Policies
           </button>
         </div>
       </nav>
 
-      {/* Right Section */}
-      <div className={styles.rightSection}>
-        {/* Profile */}
+      {/* Desktop Right Section */}
+      <div className={`${styles.rightSection} ${styles.hideOnMobile}`}>
         <div className={styles.profile}>
           {userProfile?.profileURL ? (
             <img src={userProfile.profileURL} alt={userProfile.name || "User"} className={styles.profilePic} />
           ) : (
             <FaUserCircle size={50} color="#ccc" className={styles.profilePic} />
           )}
-          <div className={styles.profileInfo}>
-            <h4>{userProfile?.name ? userProfile.name.charAt(0).toUpperCase() + userProfile.name.slice(1) : "Loading..."}</h4>
-            <p>{userProfile?.courseDetails?.courseName || ""}</p>
-          </div>
         </div>
 
-        {/* Logout */}
-        <div className={styles.logoutWrapper}>
-          <i className={`fa-solid fa-arrow-right-from-bracket ${styles.logoutIcon}`} onClick={() => setShowLogoutModal(true)} />
-        </div>
+        <i
+          className={`fa-solid fa-arrow-right-from-bracket ${styles.logoutIcon}`}
+          onClick={() => setShowLogoutModal(true)}
+        />
 
-        {/* Notifications */}
         <div className={styles.notificationWrapper}>
           <i
             ref={notifyIconRef}
@@ -165,43 +207,28 @@ const Header = ({ handleLogout }) => {
             onClick={handleBellClick}
           />
           {notifi.some(n => !n.isRead) && <span className={styles.redDot}></span>}
-
           {showNotifications && (
             <div className={styles.dropdown} ref={dropdownRef}>
-              {/* Dropdown Title + Close Icon */}
               <div className={styles.dropdownHeaderWrapper}>
-  <h3 className={styles.dropdownHeader}>Notifications</h3>
-  <button
-    className={styles.closeBtn}
-    onClick={() => setShowNotifications(false)}
-  >
-    &times;
-  </button>
-</div>
-
-
-              {/* Notifications */}
+                <h3 className={styles.dropdownHeader}>Notifications</h3>
+                <button className={styles.closeBtn} onClick={() => setShowNotifications(false)}>&times;</button>
+              </div>
               {notifi.length === 0 ? (
                 <p className={styles.noNotifications}>No notifications</p>
               ) : (
-                notifi.map((n) => {
+                notifi.map(n => {
                   const dateObj = new Date(n.date);
-                  const day = dateObj.getDate();
-                  const monthYear = dateObj.toLocaleString("default", { month: "short", year: "2-digit" });
-
                   return (
                     <div key={n._id} className={styles.notificationItem}>
                       <div className={styles.textBlock}>
-                        {/* Message */}
-                        <div className={styles.messageWrapper}>
-                          <span className={styles.message}>{n.message}</span>
-                          {n.subMessage && <span className={styles.subMessage}>{n.subMessage}</span>}
-                        </div>
-                        {/* Date */}
-                        <div className={styles.dateBlock}>
-                          <span className={styles.day}>{day}</span>
-                          <span className={styles.monthYear}>{monthYear}</span>
-                        </div>
+                        <h4>{n.message}</h4>
+                        {n.subMessage && <p>{n.subMessage}</p>}
+                      </div>
+                      <div className={styles.dateBlock}>
+                        <span className={styles.day}>{dateObj.getDate()}</span>
+                        <span className={styles.monthYear}>
+                          {dateObj.toLocaleString("default", { month: "short", year: "2-digit" })}
+                        </span>
                       </div>
                     </div>
                   );
@@ -212,6 +239,7 @@ const Header = ({ handleLogout }) => {
         </div>
       </div>
 
+      {/* Logout Modal */}
       {showLogoutModal && (
         <LogoutModal closeModal={() => setShowLogoutModal(false)} onConfirmLogout={confirmLogout} />
       )}

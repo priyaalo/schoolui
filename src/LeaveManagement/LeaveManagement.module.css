@@ -321,3 +321,6 @@ td {
   }
   .mainContent { padding-top: 60px; } /* tighter on very small */
 }
+.capitalize {
+  text-transform: capitalize;
+}
