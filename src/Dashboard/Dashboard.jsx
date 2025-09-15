@@ -470,9 +470,10 @@ const rows = attendanceTable.map((ele) => {
   title={row.remarks ? "Click to view full remark" : ""}
 >
   {row.remarks
-    ? row.remarks.charAt(0).toUpperCase() + row.remarks.slice(1)
+    ? row.remarks.split(".")[0]  // ✅ only first sentence
     : "-"}
 </td>
+
 
 
                     <td>{row.classHours}</td>

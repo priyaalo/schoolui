@@ -170,6 +170,7 @@ const [loading, setLoading] = useState(false); // loader state
     if (!hasErrors) {
        setLoading(true); // show loader
        if (onSubmit) await onSubmit(formData);
+       setLoading(false);
 
 
       // reset form

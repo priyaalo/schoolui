@@ -4,6 +4,7 @@ import styles from "./Header.module.css";
 import logo from "../assets/AloLogo/alo-logo.png";
 import LogoutModal from "../Logout/LogoutModal";
 import { getUserId, getNotification, updateNotification } from "../api/serviceapi";
+import { FaUserCircle } from "react-icons/fa";
 
 const Header = ({ handleLogout }) => {
   const userId = localStorage.getItem("userId");
@@ -11,7 +12,6 @@ const Header = ({ handleLogout }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
   const [notifi, setNotifi] = useState([]);
-  const [fetchCount, setFetchCount] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navigate = useNavigate();
@@ -20,19 +20,19 @@ const Header = ({ handleLogout }) => {
   const dropdownRef = useRef(null);
   const notifyIconRef = useRef(null);
 
+  // Fetch notifications
   const fetchNotification = async () => {
     try {
       if (!userId) return;
       const response = await getNotification(userId);
       const data = response.data?.data?.data || [];
-      const count = response.data?.data?.fetchCount || 0;
       setNotifi(data);
-      setFetchCount(count);
     } catch (err) {
       console.error(err.message);
     }
   };
 
+  // Fetch user profile
   const fetchUser = async () => {
     try {
       if (!userId) return;
@@ -51,6 +51,7 @@ const Header = ({ handleLogout }) => {
     return () => clearInterval(interval);
   }, [userId]);
 
+  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -67,22 +68,34 @@ const Header = ({ handleLogout }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showNotifications]);
 
+  // Close notifications when route changes
   useEffect(() => {
     setShowNotifications(false);
   }, [location.pathname]);
 
-  const notificationClick = async (id) => {
-    try {
-      await updateNotification(id, true);
-      fetchNotification();
-    } catch (err) {
-      console.error(err.message);
-    }
-  };
-
   const confirmLogout = () => {
     if (typeof handleLogout === "function") handleLogout();
     navigate("/login", { replace: true });
+  };
+
+  // Handle bell click: open dropdown and mark unread as read
+  const handleBellClick = async () => {
+    setShowNotifications((prev) => !prev);
+
+    const unreadNotifications = notifi.filter(n => !n.isRead);
+    if (unreadNotifications.length > 0) {
+      try {
+        // Mark all unread notifications as read
+        await Promise.all(
+          unreadNotifications.map(n => updateNotification(n._id, true))
+        );
+
+        // Update local state immediately
+        setNotifi(prev => prev.map(n => ({ ...n, isRead: true })));
+      } catch (err) {
+        console.error(err.message);
+      }
+    }
   };
 
   return (
@@ -92,7 +105,7 @@ const Header = ({ handleLogout }) => {
         <img src={logo} alt="ALO School Logo" className={styles.logo} />
         <button
           className={styles.hamburger}
-          onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+          onClick={() => setIsMobileMenuOpen(prev => !prev)}
         >
           <span className={`${styles.bar} ${isMobileMenuOpen ? styles.open : ""}`} />
           <span className={`${styles.bar} ${isMobileMenuOpen ? styles.open : ""}`} />
@@ -126,50 +139,82 @@ const Header = ({ handleLogout }) => {
 
       {/* Right Section */}
       <div className={styles.rightSection}>
+        {/* Profile */}
         <div className={styles.profile}>
-          <img src={userProfile?.profileURL || "/default-avatar.png"} alt={userProfile?.name || "User"} className={styles.profilePic} />
+          {userProfile?.profileURL ? (
+            <img src={userProfile.profileURL} alt={userProfile.name || "User"} className={styles.profilePic} />
+          ) : (
+            <FaUserCircle size={50} color="#ccc" className={styles.profilePic} />
+          )}
           <div className={styles.profileInfo}>
-            <h4>
-  {userProfile?.name
-    ? userProfile.name.charAt(0).toUpperCase() + userProfile.name.slice(1)
-    : "Loading..."}
-</h4>
+            <h4>{userProfile?.name ? userProfile.name.charAt(0).toUpperCase() + userProfile.name.slice(1) : "Loading..."}</h4>
             <p>{userProfile?.courseDetails?.courseName || ""}</p>
           </div>
         </div>
 
+        {/* Logout */}
         <div className={styles.logoutWrapper}>
           <i className={`fa-solid fa-arrow-right-from-bracket ${styles.logoutIcon}`} onClick={() => setShowLogoutModal(true)} />
         </div>
 
+        {/* Notifications */}
         <div className={styles.notificationWrapper}>
           <i
             ref={notifyIconRef}
             className={`fa-solid fa-bell ${styles.notificationIcon}`}
-            onClick={() => setShowNotifications((s) => !s)}
+            onClick={handleBellClick}
           />
-          {fetchCount > 0 && <span className={styles.redDot}></span>}
+          {notifi.some(n => !n.isRead) && <span className={styles.redDot}></span>}
 
           {showNotifications && (
             <div className={styles.dropdown} ref={dropdownRef}>
-              <h3 className={styles.dropdownHeader}>Notifications</h3>
+              {/* Dropdown Title + Close Icon */}
+              <div className={styles.dropdownHeaderWrapper}>
+  <h3 className={styles.dropdownHeader}>Notifications</h3>
+  <button
+    className={styles.closeBtn}
+    onClick={() => setShowNotifications(false)}
+  >
+    &times;
+  </button>
+</div>
+
+
+              {/* Notifications */}
               {notifi.length === 0 ? (
                 <p className={styles.noNotifications}>No notifications</p>
               ) : (
-                notifi.map((n) => (
-                  <div key={n._id} className={styles.notificationItem} onClick={() => notificationClick(n._id)}>
-                    <div className={styles.textBlock}>
-                      <h4>{n.message}</h4>
+                notifi.map((n) => {
+                  const dateObj = new Date(n.date);
+                  const day = dateObj.getDate();
+                  const monthYear = dateObj.toLocaleString("default", { month: "short", year: "2-digit" });
+
+                  return (
+                    <div key={n._id} className={styles.notificationItem}>
+                      <div className={styles.textBlock}>
+                        {/* Message */}
+                        <div className={styles.messageWrapper}>
+                          <span className={styles.message}>{n.message}</span>
+                          {n.subMessage && <span className={styles.subMessage}>{n.subMessage}</span>}
+                        </div>
+                        {/* Date */}
+                        <div className={styles.dateBlock}>
+                          <span className={styles.day}>{day}</span>
+                          <span className={styles.monthYear}>{monthYear}</span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           )}
         </div>
       </div>
 
-      {showLogoutModal && <LogoutModal closeModal={() => setShowLogoutModal(false)} onConfirmLogout={confirmLogout} />}
+      {showLogoutModal && (
+        <LogoutModal closeModal={() => setShowLogoutModal(false)} onConfirmLogout={confirmLogout} />
+      )}
     </header>
   );
 };

@@ -7,10 +7,11 @@ import Login from "./Login/Login";
 import PrivateRoute from "./api/PrivateRouter";
 import Header from "./Layouts/Header";
 import { useState, useEffect } from "react";
+import ScrollToTop from "./ScrollToTop";   // ✅ import here
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [checkingAuth, setCheckingAuth] = useState(true); // ✅ wait for localStorage check
+  const [checkingAuth, setCheckingAuth] = useState(true);
   const location = useLocation();
 
   // On first render, check auth token
@@ -28,11 +29,13 @@ function App() {
 
   const showHeader = isAuthenticated && location.pathname !== "/login";
 
-  // Wait for auth check
   if (checkingAuth) return null;
 
   return (
     <>
+      {/* ✅ This makes every route change reset scroll */}
+      <ScrollToTop />
+
       {showHeader && <Header handleLogout={handleLogout} />}
 
       <Routes>
@@ -43,7 +46,6 @@ function App() {
           path="/login"
           element={
             isAuthenticated ? (
-              // ✅ Always go to Dashboard after login
               <Navigate
                 to={`/dashboard/${localStorage.getItem("userId")}`}
                 replace
