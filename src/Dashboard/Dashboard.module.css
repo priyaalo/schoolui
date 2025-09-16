@@ -10,9 +10,8 @@
   padding: 20px;
   box-sizing: border-box;
 
-  /* Hide scrollbar but keep scroll */
-  scrollbar-width: none;        /* Firefox */
-  -ms-overflow-style: none;     /* IE & Edge */
+  scrollbar-width: none;       
+  -ms-overflow-style: none;   
 }
 
 .container::-webkit-scrollbar {
@@ -21,7 +20,7 @@
   background: transparent; /* fully hides */
 }
 
-/* ================= Top Section ================= */
+
 .top {
   margin-top: 100px;
 }
@@ -112,18 +111,6 @@
   flex: 1 1 200px; /* all columns take equal width, min 200px */
 }
 
-/* .card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 20px;
-  width: 100%; /* take full width of col */
-  
-
-/* .card h4 {
-  font-size: 18px;
-  color: #1d1d1d;
-  font-weight: 500;
-} */
 
 p {
   color: #717171;
@@ -149,7 +136,7 @@ p {
   background-color: #ff654d;
 }
 
-/* ================= Attendance Table ================= */
+
 .tableContainer {
   flex: 1;
   overflow: visible;
@@ -191,7 +178,7 @@ td {
   font-weight: 500;
 }
 
-/* Remarks cell with ellipsis */
+
 .remarksCell {
   max-width: 150px;
   white-space: nowrap;
@@ -201,7 +188,7 @@ td {
   color: blue;
 }
 
-/* ================= Popup Overlay ================= */
+
 .popupOverlay {
   position: fixed;
   top: 0;
@@ -247,18 +234,21 @@ td {
   font-weight: bold;
   transition: 0.3s;
 }
-
+.dropdown{
+  width:fit-content;
+  outline-color: #007bff;
+ 
+}
 .popupCloseBtn:hover {
   color: black;
   background: #f1f1f1;
 }
 
-/* ================= Responsive ================= */
 @media (max-width: 1024px) {
   .welcome { font-size: 32px; }
   .subtitle { font-size: 18px; }
 }
-/* Tablet (≤ 768px) */
+
 @media (max-width: 768px) {
   .welcome {
     font-size: 28px;
@@ -309,7 +299,7 @@ td {
   }
 }
 
-/* Mobile (≤ 480px) */
+
 @media (max-width: 480px) {
   .welcome {
     font-size: 20px;
@@ -373,8 +363,7 @@ td {
   }
 }
 
-/* 🎉 Events Marquee */
-/* ===================== */
+
 
 .noEventsWrapper {
   display: flex;
