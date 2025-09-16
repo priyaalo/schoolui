@@ -962,3 +962,70 @@
   
   
 }
+/* ================= iPad Portrait (768px–820px) ================= */
+@media (min-width: 768px) and (max-width: 820px) {
+  .headerContainer {
+    height: 70px;
+    padding: 16px 20px;
+  }
+
+  .logoWrapper {
+    width: 160px;
+  }
+
+  .nav {
+    gap: 40px;
+  }
+
+  .linkBtn {
+    font-size: 15px;
+    padding: 6px 12px;
+  }
+
+  .rightSection {
+    gap: 12px;
+  }
+
+  .profilePic {
+    width: 42px;
+    height: 42px;
+  }
+
+  .dropdown {
+    width: 360px;
+    top: 70px; /* place right below header */
+    right: 15px;
+  }
+}
+
+/* ================= iPad Landscape (821px–1024px) ================= */
+@media (min-width: 821px) and (max-width: 1024px) {
+  .headerContainer {
+    height: 75px;
+    padding: 18px 24px;
+  }
+
+  .logoWrapper {
+    width: 180px;
+  }
+
+  .nav {
+    gap: 50px;
+  }
+
+  .linkBtn {
+    font-size: 16px;
+  }
+
+ 
+  .profilePic {
+    width: 48px;
+    height: 48px;
+  }
+
+  .dropdown {
+    width: 400px;
+    top: 75px;
+    right: 20px;
+  }
+}
