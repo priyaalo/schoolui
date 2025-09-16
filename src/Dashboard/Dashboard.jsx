@@ -80,8 +80,9 @@ const Dashboard = () => {
     }
   };
 
-  const fetchAttendance = async () => {
+  const fetchAttendance = async (showLoader=true) => {
     try {
+      if(showLoader)setLoading(true)
       const monthFlag = filter === "pastMonth";
       const response = await getAttendance(userId, monthFlag);
       const allData = response.data.data.data || [];
@@ -119,7 +120,7 @@ const Dashboard = () => {
     } catch (err) {
       console.error("Error fetching attendance:", err.message);
     }finally{
-      setLoading(false)
+       if(showLoader)setLoading(false)
     }
   };
 
@@ -141,10 +142,15 @@ const Dashboard = () => {
       navigate("/");
     } else {
       fetchUser();
-      fetchAttendance();
+      fetchAttendance(true);
       fetchLateCount();
     }
-  }, [navigate, userId, filter]);
+  }, [navigate, userId]);
+  useEffect(() => {
+  if (userId) {
+    fetchAttendance(false); // ✅ don’t show loader when changing filter
+  }
+}, [filter, userId]);
 
   useEffect(() => {
     fetchEvents();
@@ -194,12 +200,12 @@ const Dashboard = () => {
     try {
       if (onPermission && per) {
         await updateAttendance(per, new Date().toISOString(), userId);
-        await fetchAttendance();
+        await fetchAttendance(false);
         await fetchUser();
         toast.success("Permission check-in Updated!", { autoClose: 1000 });
       } else if (onEarlyPermission && earlyPer) {
         await updateAttendance(earlyPer, new Date().toISOString(), userId);
-        await fetchAttendance();
+        await fetchAttendance(false);
         await fetchUser();
         toast.success("Permission check-in Updated!", { autoClose: 1000 });
       } else {
@@ -207,7 +213,7 @@ const Dashboard = () => {
         const newAttendanceId = response.data.data._id;
         setAttendanceId(newAttendanceId);
         await fetchLateCount();
-        await fetchAttendance();
+        await fetchAttendance(false);
         await fetchUser();
         toast.success("Check-in successful!", { autoClose: 1000 });
       }
@@ -322,6 +328,20 @@ const Dashboard = () => {
   const paginatedRows = rows.slice((page - 1) * rowsPerPage, page * rowsPerPage);
   const pageCount = Math.ceil(rows.length / rowsPerPage);
 
+
+    const getTodayDate = () => {
+      const today = new Date();
+      const day = String(today.getDate()).padStart(2, "0");
+      const month = String(today.getMonth() + 1).padStart(2, "0");
+      const year = today.getFullYear();
+      return `${day}-${month}-${year}`;
+    };
+
+    const todayDate = getTodayDate();
+
+    const hasTodayAttendance = attendanceTable.some(
+      (att) => att.date === todayDate
+    );
   // ==================== RENDER ====================
 
   return (
@@ -343,6 +363,7 @@ const Dashboard = () => {
               <button
                 onClick={() => setCheckInModalOpen(true)}
                 className={styles.checkIn}
+                disabled={hasTodayAttendance}
               >
                 Check-in
               </button>
