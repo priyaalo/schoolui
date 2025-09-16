@@ -397,6 +397,7 @@
   .headerContainer {
     padding: 10px;
   }
+ 
 
   .logoWrapper {
     width: 150px;
@@ -488,8 +489,8 @@
 /* Dropdown container */
 .dropdown {
   position: absolute;
-  top: 100%;
-  right: 0;
+  top: 200%;
+  right: -20px;
 
   border-radius: 8px;
    /* width: 280px; */
@@ -703,6 +704,7 @@
     gap: 10px;
     width: 100%;
   }
+
 
   .linkBtn {
     font-size: 13px;
@@ -963,37 +965,85 @@
   
 }
 /* ================= iPad Portrait (768px–820px) ================= */
+/* ================= iPad Portrait (768px–820px inclusive) ================= */
+/* ================= iPad Portrait (768px–820px) ================= */
+/* ================= iPad Portrait (768px–820px) ================= */
 @media (min-width: 768px) and (max-width: 820px) {
   .headerContainer {
     height: 70px;
     padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .logoWrapper {
     width: 160px;
   }
 
+  /* NAV hidden by default; opens when .mobileOpen is applied */
   .nav {
-    gap: 40px;
+    display: none;
+    position: absolute;
+    top: 70px;
+    left: 0;
+    width: 100%;
+    background: #061530;
+    padding: 14px 18px;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 10005;
+  }
+  .nav.mobileOpen {
+    display: flex;
   }
 
   .linkBtn {
     font-size: 15px;
-    padding: 6px 12px;
+    padding: 8px 12px;
+    text-align: center;
+    width: 100%;
+    color: white;
   }
 
-  .rightSection {
-    gap: 12px;
+  /* show the mobile-right section (hamburger + bell + logout) */
+  .rightSectionMobile {
+    display: flex;
+    align-items: center;
+    gap: 14px;
   }
 
-  .profilePic {
-    width: 42px;
-    height: 42px;
+  /* hide desktop right-section (profile) */
+  .hideOnMobile {
+    display: none !important;
   }
+
+  /* Hamburger styles */
+  .hamburger {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 6px;
+    z-index: 10007;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .bar {
+    width: 24px;
+    height: 3px;
+    background-color: white;
+    border-radius: 2px;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+  .bar.open:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+  .bar.open:nth-child(2) { opacity: 0; }
+  .bar.open:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
 
   .dropdown {
-    width: 360px;
-    top: 70px; /* place right below header */
+    width: 340px;
+    top: 70px;
     right: 15px;
   }
 }
@@ -1003,24 +1053,77 @@
   .headerContainer {
     height: 75px;
     padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .logoWrapper {
     width: 180px;
   }
 
+  /* NAV hidden by default; opens when .mobileOpen is applied */
   .nav {
-    gap: 50px;
+    display: none;
+    position: absolute;
+    top: 75px;
+    left: 0;
+    width: 100%;
+    background: #061530;
+    padding: 16px 20px;
+    flex-direction: column;
+    gap: 14px;
+    z-index: 10005;
+  }
+  .nav.mobileOpen {
+    display: flex;
   }
 
   .linkBtn {
     font-size: 16px;
+    padding: 8px 12px;
+    text-align: center;
+    width: 100%;
+    color: white;
   }
 
- 
+  /* show the mobile-right section (hamburger + bell + logout) */
+  .rightSectionMobile {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  /* hide desktop right-section (profile) */
+  .hideOnMobile {
+    display: none !important;
+  }
+
+  /* Hamburger styles (same as portrait) */
+  .hamburger {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 6px;
+    z-index: 10007;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .bar {
+    width: 26px;
+    height: 3px;
+    background-color: white;
+    border-radius: 2px;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+  .bar.open:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+  .bar.open:nth-child(2) { opacity: 0; }
+  .bar.open:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
   .profilePic {
-    width: 48px;
-    height: 48px;
+    display: none;
   }
 
   .dropdown {
