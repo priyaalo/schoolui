@@ -264,25 +264,46 @@ const Dashboard = () => {
     return `${hours} hr ${minutes} min`;
   };
 
-  const rows = attendanceTable.map((ele) =>
-    ele.onLeave
-      ? {
-          id: ele._id,
-          isLeave: true,
-          date: ele.date || "N/A",
-          leaveText: "Leave",
-        }
-      : {
-          id: ele._id,
-          isLeave: false,
-          date: ele.date || "N/A",
-          login: tableFormatTime(ele.inTime),
-          logout: tableFormatTime(ele.outTime),
-          remarks: ele.remarks || "-",
-          classHours: ele.totalWorkHours || "-",
-          permission: formatPermissionHours(ele.permissionHours) || "-",
-        }
-  );
+  // const rows = attendanceTable.map((ele) =>
+  //   ele.onLeave
+  //     ? {
+  //         id: ele._id,
+  //         isLeave: true,
+  //         date: ele.date || "N/A",
+  //         leaveText: "Leave",
+  //       }
+  //     : {
+  //         id: ele._id,
+  //         isLeave: false,
+  //         date: ele.date || "N/A",
+  //         login: tableFormatTime(ele.inTime),
+  //         logout: tableFormatTime(ele.outTime),
+  //         remarks: ele.remarks || "-",
+  //         classHours: ele.totalWorkHours || "-",
+  //         permission: formatPermissionHours(ele.permissionHours) || "-",
+  //       }
+  // );
+  const rows = attendanceTable.map((ele) => {
+  if (ele.onLeave === true) {
+    return {
+      id: ele._id,
+      isLeave: true, // custom flag
+      date: ele.date || "N/A",
+      leaveText: "Leave",
+    };
+  }
+
+  return {
+    id: ele._id,
+    isLeave: false,
+    date: ele.date || "N/A",
+    login: tableFormatTime(ele.inTime) || "N/A",
+    logout: tableFormatTime(ele.outTime) || "N/A",
+    remarks: ele.remarks || "-",
+    classHours: ele.totalWorkHours || "-",
+    permission: formatPermissionHours(ele.permissionHours) || "-",
+  };
+});
 
   const events = event.map((ev) => {
     const d = new Date(ev.date);
@@ -416,22 +437,26 @@ const Dashboard = () => {
                   No records found
                 </td>
               </tr>
-            ) : (
+            ) :(
               paginatedRows.map((row) =>
                 row.isLeave ? (
                   <tr
                     key={row.id}
-                    style={{ backgroundColor: "#f8d7da", color: "#721c24" }}
+                    style={{
+                      backgroundColor: "#f8d7da",
+                      color: "#721c24",
+                      fontWeight: "bold",
+                    }}
                   >
                     <td>{row.date}</td>
-                    <td
-                      colSpan={6}
-                      style={{ textAlign: "center", fontWeight: "bold" }}
-                    >
-                      {row.leaveText}
-                    </td>
+                    <td></td>
+                    <td></td>
+                    <td style={{ textAlign: "center" }}>Leave</td>{" "}
+                    {/* ✅ Only Remarks */}
+                    <td></td>
+                    <td></td>
                   </tr>
-                ) : (
+                ) :  (
                   <tr key={row.id}>
                     <td>{row.date}</td>
                     <td>{row.login}</td>
