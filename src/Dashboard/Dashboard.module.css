@@ -407,3 +407,6 @@ td {
 
 
 
+.checkIn:disabled {
+  cursor: not-allowed;      /* red circle with slash 🚫 */
+}
