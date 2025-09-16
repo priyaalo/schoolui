@@ -245,6 +245,7 @@ const Dashboard = () => {
       setCheckoutOpen(false);
     }
   };
+  
 
   const handleCheckOut = () => setCheckoutOpen(true);
 
@@ -293,6 +294,8 @@ const Dashboard = () => {
       icon: ev.eventType,
     };
   });
+  const loopedEvents = Array(20).fill(events).flat();
+    const duration = loopedEvents.length * 1;
 
   const handlePageChange = (e, value) => setPage(value);
   const paginatedRows = rows.slice((page - 1) * rowsPerPage, page * rowsPerPage);

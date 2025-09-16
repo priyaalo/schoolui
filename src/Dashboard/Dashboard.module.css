@@ -401,7 +401,7 @@ td {
   display: flex;
   width: max-content;
   gap: 20px;
-  animation: scrollMarquee 23s linear infinite;
+  animation: scrollMarquee 20s linear infinite;
 }
 .marqueeContent {
   display: flex;
