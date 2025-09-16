@@ -99,9 +99,13 @@ const Header = ({ handleLogout }) => {
   return (
     <header className={styles.headerContainer}>
       {/* Logo */}
-      <div className={styles.logoWrapper}>
-        <img src={logo} alt="ALO Logo" className={styles.logo} />
-      </div>
+      <div 
+  className={styles.logoWrapper} 
+  onClick={() => navigate(`/dashboard/${userId}`)} 
+  style={{ cursor: "pointer" }} // makes it look clickable
+>
+  <img src={logo} alt="ALO Logo" className={styles.logo} />
+</div>
 
       {/* Hamburger + Mobile Right Section */}
       <div className={styles.rightSectionMobile}>

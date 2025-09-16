@@ -490,7 +490,7 @@
 .dropdown {
   position: absolute;
   top: 200%;
-  right: -20px;
+  right: -10px;
 
   border-radius: 8px;
    /* width: 280px; */
@@ -505,15 +505,26 @@
   margin-bottom: 8px;
   /* border-bottom: 1px solid #eee; */
   padding-bottom: 6px;
+  display:flex;
+  align-items:center;
 }
 .closeBtn {
   background: none;
   border: none;
-  font-size: 18px;
+  font-size: 25px;
+  display:flex;
+  align-items:center;
   font-weight: bold;
   cursor: pointer;
-  color: #555;
+  color: rgb(14, 14, 94);
   transition: color 0.2s;
+  margin-bottom:7px;
+}
+.dropdownHeaderWrapper{
+  display:flex;
+  justify-content: space-between;
+  align-items:center;
+
 }
 
 .closeBtn:hover {
@@ -901,7 +912,7 @@
   .dropdown {
     width: calc(100vw - 16px); /* almost full width */
     right: 8px;                 /* small right padding */
-    top: 33%;                  /* below bell */
+    top: 23%;                  /* below bell */
     max-height: 250px;          /* scrollable */
   }
  

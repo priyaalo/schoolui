@@ -282,7 +282,7 @@ td {
   .row {
     flex-direction: column;
     align-items: center;
-    padding: 10px;
+    
   }
   .card, .card1 {
     width: 100%;
@@ -301,7 +301,7 @@ td {
 
   .col {
     min-width: 100%;
-    padding: 15px;
+    padding: 20px;
   }
 
   .card, .form {
@@ -325,12 +325,6 @@ td {
 }
 
 @media (max-width: 480px) {
-  .button {
-    width: 100%;
-    font-size: 10px;
-   
-    margin-top:40px;
-  }
   
   .circle, .circle1 {
     height: 35px;
@@ -346,6 +340,17 @@ td {
     height: 28px;
     font-size: 12px;
   }
+   .card1 {
+    padding: 15px;   /* tighter padding on very small devices */
+  }
+
+  .button {
+    position:relative;
+    margin-top: 5px;   /* almost no gap */
+    font-size: 14px;
+    padding: 10px;
+  left:8%;
+  }
   .mainContent { padding-top: 60px; } /* tighter on very small */
   @media (max-width: 480px) {
   h4 { font-size: 14px; }
@@ -355,6 +360,8 @@ td {
     width: 100%;
     font-size: 12px;
     padding: 10px;
+    display:flex;
+    justify-content: center;
   }
 
   .circle, .circle1 {
@@ -379,6 +386,7 @@ td {
     padding: 15px;
     max-width: 95%;
   }
+  
 
   .popupContent {
     width: 95%;

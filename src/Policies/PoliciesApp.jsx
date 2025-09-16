@@ -12,7 +12,7 @@ function PoliciesApp() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
+    // setLoading(true);
 
     const timer = setTimeout(() => {
       setLoading(false);
