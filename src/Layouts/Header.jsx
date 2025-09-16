@@ -46,7 +46,7 @@ const Header = ({ handleLogout }) => {
   useEffect(() => {
     fetchUser();
     fetchNotification();
-    const interval = setInterval(fetchNotification, 10000); // refresh every 10s
+    const interval = setInterval(fetchNotification, 2000); // refresh every 10s
     return () => clearInterval(interval);
   }, [userId]);
 

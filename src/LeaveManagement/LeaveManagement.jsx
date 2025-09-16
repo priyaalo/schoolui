@@ -11,6 +11,7 @@ import Pagination from "@mui/material/Pagination";
 import { FaEye } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Loader from "../loader/Loader"
 
 const LeaveManagement = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -251,6 +252,7 @@ const handleModalSubmit = async (formData) => {
 
   return (
     <div className={styles.req}>
+      {loading && <Loader />}
      <ToastContainer
   position="top-right"
   autoClose={2000}
@@ -316,13 +318,7 @@ const handleModalSubmit = async (formData) => {
             </tr>
           </thead>
           <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan="8" style={{ textAlign: "center", padding: "1rem" }}>
-                  Loading...
-                </td>
-              </tr>
-            ) : paginatedRows.length > 0 ? (
+            {paginatedRows.length > 0 ? (
               paginatedRows.map((data) => (
                 <tr key={data.id}>
                  <td className={styles.capitalize}>{data.name}</td>

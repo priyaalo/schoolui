@@ -1,16 +1,25 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import styles from "./PoliciesApp.module.css";
 
 import Terms from "./Pages/Terms";
 import Privacy from "./Pages/Privacy";
 import Leave from "./Pages/Leave";
 import Fee from "./Pages/Fee";
+import Loader from "../loader/Loader"
 
 function PoliciesApp() {
   const [activePage, setActivePage] = useState("privacy"); // default: Privacy
+const [loading, setLoading] = useState(true); 
+ useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false); // hide loader after 0.5s
+    }, 500);
 
+    return () => clearTimeout(timer);
+  }, [activePage]); // run only when activePage changes
   return (
     <div className={styles.container}>
+      {loading && <Loader />} {/* show loader only while loading */}
       <div className={styles.content}>
         {activePage === "terms" && <Terms />}
         {activePage === "privacy" && <Privacy />}

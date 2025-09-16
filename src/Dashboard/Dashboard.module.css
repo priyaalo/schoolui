@@ -269,7 +269,11 @@ td {
     font-size: 16px;
     margin-left: 8px;
   }
-
+ .table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
   .second {
     flex-direction: column;
     align-items: flex-start;
@@ -295,15 +299,7 @@ td {
     gap: 15px;
   }
 
-  .tableContainer {
-    overflow-x: auto; /* allow scrolling */
-  }
-
-  .table {
-    min-width: 500px; /* keep readable */
-    font-size: 12px;
-  }
-
+  
   .marqueeContainer {
     height: 100px;
   }

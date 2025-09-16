@@ -9,6 +9,7 @@ import moment from "moment";
 import CheckoutModal from "./CheckoutModal";
 import CheckInModal from "./CheckInModal";
 import EventCard from "../EventCard/EventCard";
+import Loader from "../loader/Loader"
 
 import {
   getUserId,
@@ -52,6 +53,7 @@ const Dashboard = () => {
   const [selectedRemark, setSelectedRemark] = useState(null);
 
   const [page, setPage] = useState(1);
+  const [loading,setLoading]=useState(true)
   const rowsPerPage = 5;
 
   // ==================== API CALLS ====================
@@ -116,6 +118,8 @@ const Dashboard = () => {
       }
     } catch (err) {
       console.error("Error fetching attendance:", err.message);
+    }finally{
+      setLoading(false)
     }
   };
 
@@ -298,6 +302,7 @@ const Dashboard = () => {
 
   return (
     <div className={styles.container}>
+      {loading && <Loader/>}
       <ToastContainer />
 
       {/* Top section */}
