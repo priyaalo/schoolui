@@ -10,6 +10,7 @@ import CheckoutModal from "./CheckoutModal";
 import CheckInModal from "./CheckInModal";
 import EventCard from "../EventCard/EventCard";
 import Loader from "../loader/Loader"
+import noDataImg from "../assets/AloLogo/nodatasearch.png"
 
 import {
   getUserId,
@@ -212,6 +213,11 @@ const Dashboard = () => {
         const response = await checkIn(userId);
         const newAttendanceId = response.data.data._id;
         setAttendanceId(newAttendanceId);
+        const apiDate = response.data.data.date; // "2025-09-17T06:15:49.897Z"
+      const formattedDate = new Date(apiDate).toISOString().split("T")[0]; // "2025-09-17"
+
+      // Save to localStorage
+      localStorage.setItem("checkInDate", formattedDate);
         await fetchLateCount();
         await fetchAttendance(false);
         await fetchUser();
@@ -455,7 +461,15 @@ const Dashboard = () => {
             {paginatedRows.length === 0 ? (
               <tr>
                 <td colSpan={6} style={{ textAlign: "center", padding: "15px" }}>
-                  No records found
+                  <img
+                    src={noDataImg}
+                    alt="No Data Found"
+                    style={{
+                      width: "120px",
+                      height: "120px",
+                      objectFit: "contain",
+                    }}
+                  />
                 </td>
               </tr>
             ) :(
@@ -510,36 +524,42 @@ const Dashboard = () => {
         </table>
 
         {/* Pagination */}
-        <div
-          style={{ display: "flex", justifyContent: "center", marginTop: "15px" }}
-        >
-          <Pagination
-            count={pageCount}
-            page={page}
-            onChange={handlePageChange}
-            showFirstButton
-            showLastButton
-            sx={{
-              "& .MuiPaginationItem-root": {
-                borderRadius: "8px",
-                marginX: "6px",
-                transition: "all 0.3s ease",
-                "&:hover": {
+        {paginatedRows.length > 0 && (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              marginTop: "15px",
+            }}
+          >
+            <Pagination
+              count={pageCount}
+              page={page}
+              onChange={handlePageChange}
+              showFirstButton
+              showLastButton
+              sx={{
+                "& .MuiPaginationItem-root": {
+                  borderRadius: "8px",
+                  marginX: "6px",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    background: "linear-gradient(to right, #144196, #061530)",
+                    color: "#fff",
+                  },
+                },
+                "& .Mui-selected": {
                   background: "linear-gradient(to right, #144196, #061530)",
                   color: "#fff",
+                  fontWeight: "bold",
+                  "&:hover": {
+                    background: "linear-gradient(to right, #0b2d73, #061530)",
+                  },
                 },
-              },
-              "& .Mui-selected": {
-                background: "linear-gradient(to right, #144196, #061530)",
-                color: "#fff",
-                fontWeight: "bold",
-                "&:hover": {
-                  background: "linear-gradient(to right, #0b2d73, #061530)",
-                },
-              },
-            }}
-          />
-        </div>
+              }}
+            />
+          </div>
+        )}
       </div>
 
       {/* Remark Popup */}

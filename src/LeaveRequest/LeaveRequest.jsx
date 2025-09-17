@@ -4,6 +4,7 @@ import { DatePicker, TimePicker } from "antd";
 import styles from "./LeaveRequest.module.css";
 
 const LeaveRequestModal = ({ isOpen, onClose, onSubmit }) => {
+  const checkInDate = localStorage.getItem("checkInDate"); 
   const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     studentId: localStorage.getItem("studentId") || "",
@@ -254,15 +255,22 @@ const [loading, setLoading] = useState(false); // loader state
               <div className={styles.inputBox}>
                 <label>Leave Period</label>
                 <div className={styles.column}>
-                  <DatePicker
+                     <DatePicker
                     value={formData.fromDate}
                     onChange={(date, dateString) =>
                       handleDateChange(date, dateString, "fromDate")
                     }
                     placeholder="From"
-                    disabledDate={(current) =>
-                      current && current < new Date().setHours(0, 0, 0, 0)
-                    }
+                    disabledDate={(current) => {
+                      const todayCheckIn = checkInDate
+                        ? new Date(checkInDate)
+                        : null;
+                      return (
+                        (current &&
+                          current < new Date().setHours(0, 0, 0, 0)) || // disable past
+                        (todayCheckIn && current.isSame(todayCheckIn, "day")) // disable check-in date
+                      );
+                    }}
                   />
                   <DatePicker
                     value={formData.toDate}
@@ -270,11 +278,18 @@ const [loading, setLoading] = useState(false); // loader state
                       handleDateChange(date, dateString, "toDate")
                     }
                     placeholder="To"
-                    disabledDate={(current) =>
-                      !formData.fromDate
-                        ? current && current < new Date().setHours(0, 0, 0, 0)
-                        : current && current < formData.fromDate.startOf("day")
-                    }
+                    disabledDate={(current) => {
+                      const todayCheckIn = checkInDate
+                        ? new Date(checkInDate)
+                        : null;
+                      return (
+                        (!formData.fromDate
+                          ? current && current < new Date().setHours(0, 0, 0, 0)
+                          : current &&
+                            current < formData.fromDate.startOf("day")) ||
+                        (todayCheckIn && current.isSame(todayCheckIn, "day"))
+                      );
+                    }}
                   />
                 </div>
                 {errors.dates && <p className={styles.error}>{errors.dates}</p>}

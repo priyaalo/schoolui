@@ -12,6 +12,7 @@ import { FaEye } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Loader from "../loader/Loader"
+import noDataImg from "../assets/AloLogo/nodatasearch.png"
 
 const LeaveManagement = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -351,7 +352,15 @@ const handleModalSubmit = async (formData) => {
             ) : (
               <tr>
                 <td colSpan="8" style={{ textAlign: "center", padding: "1rem" }}>
-                  No leave records found
+                  <img
+                    src={noDataImg}
+                    alt="No Data Found"
+                    style={{
+                      width: "120px",
+                      height: "120px",
+                      objectFit: "contain",
+                    }}
+                  />
                 </td>
               </tr>
             )}
@@ -359,34 +368,43 @@ const handleModalSubmit = async (formData) => {
         </table>
 
         {/* Pagination */}
-        <div style={{ display: "flex", justifyContent: "center", marginTop: "15px" }}>
-          <Pagination
-            count={pageCount}
-            page={page}
-            onChange={handlePageChange}
-            showFirstButton
-            showLastButton
-            sx={{
-              "& .MuiPaginationItem-root": {
-                borderRadius: "8px",
-                marginX: "6px",
-                transition: "all 0.3s ease",
-                "&:hover": {
+        {/* Pagination - show only if data exists */}
+        {leaveData.length > 0 && (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              marginTop: "15px",
+            }}
+          >
+            <Pagination
+              count={pageCount}
+              page={page}
+              onChange={handlePageChange}
+              showFirstButton
+              showLastButton
+              sx={{
+                "& .MuiPaginationItem-root": {
+                  borderRadius: "8px",
+                  marginX: "6px",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    background: "linear-gradient(to right, #144196, #061530)",
+                    color: "#fff",
+                  },
+                },
+                "& .Mui-selected": {
                   background: "linear-gradient(to right, #144196, #061530)",
                   color: "#fff",
+                  fontWeight: "bold",
+                  "&:hover": {
+                    background: "linear-gradient(to right, #0b2d73, #061530)",
+                  },
                 },
-              },
-              "& .Mui-selected": {
-                background: "linear-gradient(to right, #144196, #061530)",
-                color: "#fff",
-                fontWeight: "bold",
-                "&:hover": {
-                  background: "linear-gradient(to right, #0b2d73, #061530)",
-                },
-              },
-            }}
-          />
-        </div>
+              }}
+            />
+          </div>
+        )}
       </div>
 
       {/* Remark Popup */}

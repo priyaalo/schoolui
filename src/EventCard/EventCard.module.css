@@ -30,15 +30,34 @@
   background-color: #99cafa; /* default background, overridden by .birthday/.festival */
 }
 
-/* dynamic circle colors */
+/* 
 .birthday {
-  background-color: #66b3ff; /* blue for birthday */
-  color: white; /* icon color */
+  background-color: #66b3ff; 
+  color: white; 
 }
 
 .festival {
-  background-color: #f5b85e; /* orange for festival */
-  color: black; /* icon color for contrast */
+  background-color: #f5b85e; 
+  color: black; 
+} */
+.birthday {
+  color: #e91e63; /* pink */
+  background-color: #fde4ec;
+}
+
+.function {
+  color: #fbc02d; /* yellow */
+  background-color: #fff8e1;
+}
+
+.anniversary {
+  color: #d32f2f; /* red */
+  background-color: #ffebee;
+}
+
+.meeting {
+  color: #1976d2; /* blue */
+  background-color: #e3f2fd;
 }
 
 .text {
