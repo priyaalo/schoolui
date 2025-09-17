@@ -493,7 +493,7 @@
   right: -10px;
 
   border-radius: 8px;
-   /* width: 280px; */
+   width: 280px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   z-index: 1000;
   padding: 10px;
@@ -749,8 +749,9 @@
   .dropdown {
     width: 95%;
     right: 2.5%;
-    top: 50%;
+    top: 80%;
     max-height: 320px;
+   
   }
 
   .dropdownHeader {
@@ -912,7 +913,7 @@
   .dropdown {
     width: calc(100vw - 16px); /* almost full width */
     right: 8px;                 /* small right padding */
-    top: 23%;                  /* below bell */
+    top: 30%;                  /* below bell */
     max-height: 250px;          /* scrollable */
   }
  
