@@ -68,11 +68,28 @@
 /* Smaller input fields */
 .inputBox input {
   width: 80%;
-  padding: 10px 12px;   /* smaller padding */
-  border-radius: 6px;   /* slightly less rounded */
+  padding: 10px 12px;
+  border-radius: 6px;
   border: 1px solid #ccc;
-  font-size: 0.85rem;   /* smaller text */
+  font-size: 0.85rem;
   background-color: #f8f8f8;
+  box-sizing: border-box;
+}
+
+.passwordWrapper {
+  position: relative;
+  width: 80%;
+  margin: 0 auto;
+}
+
+.passwordWrapper input {
+  width: 100%;
+  padding: 10px 40px 10px 12px; /* space for eye icon */
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 0.85rem;
+  background-color: #f8f8f8;
+  box-sizing: border-box;
 }
 
 
@@ -89,23 +106,20 @@
   color: red;
   margin-top: 4px;
 }
-
+/* 
 /* Password wrapper with eye icon */
-/* .passwordWrapper {
-  display: flex;
-  align-items: center;
-  position: relative;
-} */
-
 
 
 .eyeIcon {
   position: absolute;
-  right: 12px;
+  right: 12px;             /* stays inside input */
+  top: 50%;
+  transform: translateY(-50%);
   cursor: pointer;
   color: #666;
   font-size: 1.1rem;
 }
+
 
 /* Forgot password link */
 
@@ -145,13 +159,12 @@
 
 /* Responsive */
 @media (max-width: 480px) {
-  .card {
-    padding: 30px 20px;
+ 
+
+  .passwordWrapper {
+    width: 100%;  /* full width on small screens */
   }
 
-  .logoWrapper img {
-    width: 130px;
-  }
 
   .card h2 {
     font-size: 1.4rem;
@@ -159,5 +172,18 @@
 
   .subTitle {
     font-size: 0.85rem;
+  }
+   .inputBox input,
+  .passwordWrapper,
+  .loginBtn {
+    width: 100%;   /* all inputs/buttons full width */
+  }
+
+  .card {
+    padding: 25px 15px;
+  }
+
+  .logoWrapper img {
+    width: 120px;
   }
 }
