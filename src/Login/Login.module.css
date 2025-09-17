@@ -1,106 +1,87 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
-
 .loginPage {
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   height: 100vh;
   background: radial-gradient(circle at top, #0a1b64, #010314);
   background-image: url("../assets/AloLogo/backcolor.jpg");
   background-size: cover;
   background-position: center;
   overflow: hidden;
-  padding: 0;
-}
-
+  padding: 10px;
+ }
+.content{
+  margin-bottom:30px;
+  text-align: center;
+} 
 .card {
   background: #fff;
-  padding: 70px;
+  padding: 40px 40px;
   width: 100%;
-
-  max-width: 480px;
-  max-height:600px;
+  
+  max-width:500px;
   border-radius: 16px;
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25);
   text-align: center;
-  margin-bottom: 75px; /* ⬅ only move card slightly up */
 }
 
-/* Floating Logo */
+/* Make sure content stack flows nicely */
 .logoWrapper {
   display: flex;
+  flex-direction: column;   /* stack logo + text vertically */
   justify-content: center;
   align-items: center;
-  margin-bottom: 24px;
-  margin-top:10px;
-
-  /* Bigger size for the logo box */
-  width: 300px; 
-  height: 160px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.logoWrapper img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;   /* Keep proportions */
-   /* Optional: small rounded corners */
-
-  transition: none;      /* No flicker */
-}
-
-
-.card h2 {
-  font-size: 24px;
-}
-.logoWrapper h3 {
-  margin: 8px 0 0 0;
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: #fff;
-}
-
-.schoolTagline {
-  margin: 0;
-  font-size: 0.9rem;
-  color: #ddd;
-}
-
-/* Card */
-
-.card h2 {
-  margin: 0;
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: #222;
-  padding-bottom:5px;
-}
-
-.subTitle {
-  margin: 6px 0 20px 0;
-  font-size: 0.95rem;
-  color: #555;
-}
-
-/* Input fields */
-.inputBox {
-  margin-bottom: 18px;
-  text-align: left;
-  margin-top: 30px;
+  margin-right: 6px;
+;
   
 }
 
-.inputBox input {
-  width: 100%;
-  padding: 15px 15px;
-  height:auto;
-  border-radius: 8px;
-  border: 1px solid #c3c3c3;
+/* Center title + subtitle under logo */
+
+
+.subTitle {
   font-size: 0.95rem;
-  background-color: #c3c3c3;
+  color: #555;
+  /* space below subtitle before inputs */
+  text-align: center;
 }
+
+
+/* Big Logo */
+.logoWrapper img {
+  width: 270px;   /* keep big logo */
+  height: auto;
+  object-fit: contain;
+  
+}
+
+.card h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #222;
+  margin: 4px 0;   /* much smaller vertical margin */
+  text-align: center;
+}
+
+
+/* Smaller input fields */
+.inputBox input {
+  width: 80%;
+  padding: 10px 12px;   /* smaller padding */
+  border-radius: 6px;   /* slightly less rounded */
+  border: 1px solid #ccc;
+  font-size: 0.85rem;   /* smaller text */
+  background-color: #f8f8f8;
+}
+
+
+
+.inputBox {
+   margin-bottom: 27px; 
+  text-align: center;
+}
+
+
 
 .errorMsg {
   font-size: 0.8rem;
@@ -108,51 +89,37 @@
   margin-top: 4px;
 }
 
-/* Password field wrapper */
-.passwordWrapper {
+/* Password wrapper with eye icon */
+/* .passwordWrapper {
   display: flex;
   align-items: center;
   position: relative;
-}
+} */
 
-.passwordWrapper input {
-  flex: 1;
-}
+
 
 .eyeIcon {
   position: absolute;
   right: 12px;
   cursor: pointer;
-  color: #888;
+  color: #666;
+  font-size: 1.1rem;
 }
 
-/* Forgot password */
-.forgotPassword {
-  text-align: right;
-  margin-bottom: 18px;
-}
+/* Forgot password link */
 
-.forgotPassword a {
-  font-size: 0.85rem;
-  color: #0a1b64;
-  text-decoration: none;
-}
-
-.forgotPassword a:hover {
-  text-decoration: underline;
-}
-
-/* Button */
+/* Login button */
 .loginBtn {
-  width: 100%;
-  padding: 13px;
+  width: 80%;
+  padding: 10px;
   background: linear-gradient(to right, #0a1b64, #020c3a);
   border: none;
   border-radius: 8px;
   color: #fff;
   font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.3s;
+  transition: opacity 0.3s ease;
 }
 
 .loginBtn:disabled {
@@ -163,17 +130,26 @@
 .loginBtn:hover:not(:disabled) {
   opacity: 0.9;
 }
-/* ================= MOBILE RESPONSIVE ================= */
-@media (max-width: 768px) {
+
+/* Loader inside button */
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader svg path {
+  fill: #fff;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
   .card {
-    padding: 40px 25px;
-    margin-bottom: 40px;
-    max-height: none;
+    padding: 30px 20px;
   }
 
   .logoWrapper img {
-    width: 220px; /* smaller logo on tablet */
-    margin-top: 15px;
+    width: 130px;
   }
 
   .card h2 {
@@ -183,97 +159,4 @@
   .subTitle {
     font-size: 0.85rem;
   }
-
-  .inputBox input {
-    padding: 12px 12px;
-    font-size: 0.9rem;
-  }
-
-  .loginBtn {
-    padding: 12px;
-    font-size: 0.95rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .loginPage {
-    display: flex;
-    justify-content: center;  /* vertical center */
-    align-items: center;      /* horizontal center */
-    height: 100vh;
-    position: relative;       /* needed for absolute child */
-    padding: 0 10px;
-  }
-
-  /* Floating logo above card */
-  .logoWrapper {
-    position: absolute;
-    top: 5px;                 /* pushes logo down a bit from top */
-    left: 50%;
-    transform: translateX(-50%);
-    width: 220px;              /* bigger logo */
-    height: 120px;
-    z-index: 2;                /* sits above card */
-  }
-
-  .logoWrapper img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-
-  /* Card with spacing for logo */
-  .card {
-    width: 100%;
-    max-width: 380px;
-    padding: 60px 20px 30px;   /* extra top padding for logo space */
-    margin-top: 100px;         /* push card below logo */
-    border-radius: 12px;
-    background: #fff;
-    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25);
-    text-align: center;
-  }
-
-  .card h2 {
-    font-size: 1.3rem;
-  }
-
-  .subTitle {
-    font-size: 0.85rem;
-  }
-
-  .inputBox input {
-    padding: 12px;
-    font-size: 0.9rem;
-  }
-
-  .loginBtn {
-    padding: 12px;
-    font-size: 0.95rem;
-  }
-
-  .forgotPassword a {
-    font-size: 0.8rem;
-  }
-
-  .logoWrapper h3 {
-    font-size: 1.1rem;
-    color: #fff;
-  }
-
-  .schoolTagline {
-    font-size: 0.8rem;
-    color: #ddd;
-  }
-}
-
-/* loader svg*/
-.loader {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.loader svg path {
-  fill: #fff; /* make it white inside button */
 }

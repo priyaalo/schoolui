@@ -311,7 +311,7 @@ const handleModalSubmit = async (formData) => {
               <th>Type</th>
               <th>Requested On</th>
               <th>Period</th>
-              <th>Days</th>
+              <th>Duration</th>
               <th>Status</th>
               <th>Remarks</th>
               <th>Responded By</th>
