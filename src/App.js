@@ -46,17 +46,15 @@ function App() {
           path="/login"
           element={
             isAuthenticated ? (
-              <Navigate
-                to={`/dashboard/${localStorage.getItem("userId")}`}
-                replace
-              />
+              
+              <Navigate to={location.state?.from || `/dashboard/${localStorage.getItem("userId")}`} replace />
             ) : (
               <Login setLoginUser={setIsAuthenticated} />
             )
           }
         />
 
-        {/* Protected Routes */}
+       
         <Route
           path="/dashboard/:userId"
           element={

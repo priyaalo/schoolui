@@ -11,6 +11,7 @@ import CheckInModal from "./CheckInModal";
 import EventCard from "../EventCard/EventCard";
 import Loader from "../loader/Loader"
 import noDataImg from "../assets/AloLogo/nodatasearch.png"
+import BreakModal  from "./BreakModal";
 
 import {
   getUserId,
@@ -20,6 +21,7 @@ import {
   getEvent,
   attCardCalculation,
   updateAttendance,
+  startBreak
 } from "../api/serviceapi";
 
 const Dashboard = () => {
@@ -40,6 +42,9 @@ const Dashboard = () => {
   const [filter, setFilter] = useState("thisMonth");
   const [event, setEvent] = useState([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
+  const [isBreakModalOpen, setBreakModalOpen] = useState(false);
+  const [breakStatus, setBreakStatus] = useState(false);
+
 
   const [timeElapsed, setTimeElapsed] = useState("00:00:00");
   const [checkInTime, setCheckInTime] = useState(null);
@@ -65,6 +70,7 @@ const Dashboard = () => {
       const userData = res.data.data.data[0];
       setUser(userData);
       setCheckInStatus(userData.checkInStatus);
+       setBreakStatus(userData.breakStatus);
     } catch (err) {
       console.error("Error fetching user:", err.message);
     }
@@ -86,7 +92,7 @@ const Dashboard = () => {
       if(showLoader)setLoading(true)
       const monthFlag = filter === "pastMonth";
       const response = await getAttendance(userId, monthFlag);
-      const allData = response.data.data.data || [];
+      const allData = response.data.data .data|| [];
 
       const formattedData = allData.map((att) => {
         if (att.date) {
@@ -216,7 +222,7 @@ const Dashboard = () => {
         const apiDate = response.data.data.date; // "2025-09-17T06:15:49.897Z"
       const formattedDate = new Date(apiDate).toISOString().split("T")[0]; // "2025-09-17"
 
-      // Save to localStorage
+  
       localStorage.setItem("checkInDate", formattedDate);
         await fetchLateCount();
         await fetchAttendance(false);
@@ -234,6 +240,57 @@ const Dashboard = () => {
       setIsCheckingIn(false);
     }
   };
+  const handleStartBreak = async () => {
+  try {
+    if (!attendanceId) {
+      toast.error("No active attendance record found!", { autoClose: 1000 });
+      return;
+    }
+
+    const breakTime = new Date().toISOString();
+
+    await startBreak(attendanceId, breakTime); // same API for starting
+    toast.success("Break started successfully!", { autoClose: 1000 });
+
+    await fetchAttendance(false);
+    await fetchUser();
+    setBreakStatus(true); // ✅ mark break active
+    setBreakModalOpen(false);
+  } catch (err) {
+    console.error("Error starting break:", err);
+    toast.error(
+      err.response?.data?.message || "Failed to start break",
+      { autoClose: 1000 }
+    );
+  }
+};
+
+const handleEndBreak = async () => {
+  try {
+    if (!attendanceId) {
+      toast.error("No active attendance record found!", { autoClose: 1000 });
+      return;
+    }
+
+    const breakTime = new Date().toISOString(); // reuse field name
+
+    await startBreak(attendanceId, breakTime); // ✅ same API call
+    toast.success("Break ended successfully!", { autoClose: 1000 });
+
+    await fetchAttendance(false);
+    await fetchUser();
+    setBreakStatus(false); // ✅ mark break ended
+  } catch (err) {
+    console.error("Error ending break:", err);
+    toast.error(
+      err.response?.data?.message || "Failed to end break",
+      { autoClose: 1000 }
+    );
+  }
+};
+
+
+
 
   const handleCheckoutConfirm = async (remarks) => {
     if (isCheckingOut) return;
@@ -304,6 +361,7 @@ const Dashboard = () => {
       leaveText: "Leave",
     };
   }
+ 
 
   return {
     id: ele._id,
@@ -312,6 +370,7 @@ const Dashboard = () => {
     login: tableFormatTime(ele.inTime) || "N/A",
     logout: tableFormatTime(ele.outTime) || "N/A",
     remarks: ele.remarks || "-",
+    breakTime:ele.breakHours ||"N/A",
     classHours: ele.totalWorkHours || "-",
     permission: formatPermissionHours(ele.permissionHours) || "-",
   };
@@ -365,21 +424,48 @@ const Dashboard = () => {
             Your future starts with today’s attendance
           </p>
           <div className={styles.check}>
-            {checkInStatus === false && (
-              <button
-                onClick={() => setCheckInModalOpen(true)}
-                className={styles.checkIn}
-                disabled={hasTodayAttendance}
-              >
-                Check-in
-              </button>
-            )}
-            {checkInStatus === true && (
-              <button onClick={handleCheckOut} className={styles.checkOut}>
-                Check-out
-              </button>
-            )}
-          </div>
+  {/* ✅ Check-In Button */}
+  {checkInStatus === false && (
+    <button
+      onClick={() => setCheckInModalOpen(true)}
+      className={styles.checkIn}
+      disabled={hasTodayAttendance}
+    >
+      Check-in
+    </button>
+  )}
+
+  
+  {checkInStatus && !breakStatus && (
+    <button
+      className={styles.break}
+      onClick={() => setBreakModalOpen(true)}
+    >
+     Break
+    </button>
+  )}
+
+  {checkInStatus && breakStatus && (
+    <button
+      className={styles.break}
+      onClick={handleEndBreak}
+    >
+      End Break
+    </button>
+  )}
+
+
+  {checkInStatus === true && (
+    <button
+      onClick={handleCheckOut}
+      className={styles.checkOut}
+      disabled={breakStatus}
+    >
+      Check-out
+    </button>
+  )}
+</div>
+
         </div>
       </div>
 
@@ -453,6 +539,7 @@ const Dashboard = () => {
               <th>Login Time</th>
               <th>Logout Time</th>
               <th>Logout Remarks</th>
+              <th>Break Hours</th>
               <th>Class Hours</th>
               <th>Permission Hours</th>
             </tr>
@@ -514,6 +601,7 @@ const Dashboard = () => {
                     >
                       {row.remarks ? row.remarks.split(".")[0] : "-"}
                     </td>
+                    <td>{row.breakTime}</td>
                     <td>{row.classHours}</td>
                     <td>{row.permission}</td>
                   </tr>
@@ -595,7 +683,12 @@ const Dashboard = () => {
         onClose={() => setCheckoutOpen(false)}
         onCheckout={handleCheckoutConfirm}
       />
-
+<BreakModal
+        isOpen={isBreakModalOpen}
+        onClose={() => setBreakModalOpen(false)}
+          onConfirm={handleStartBreak}
+       
+      />
       {/* Check-in Modal */}
       <CheckInModal
         isOpen={isCheckInModalOpen}

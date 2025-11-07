@@ -1,8 +1,9 @@
 .headerContainer {
   display: flex;
-  align-items: center;
+  align-items: center;              /* ✅ vertical align everything */
   justify-content: space-between;
-  padding: 20px 20px;
+  align-content: center;   /* space between left + right */
+  padding: 0 20px;
   background: linear-gradient(to bottom, #144196, #061530);
   /* color: white; */
   flex-wrap: wrap;
@@ -17,6 +18,7 @@
   display:none;
 }
 
+/* ----------------- Left Section ----------------- */
 .logoWrapper {
   display: flex;
   align-items: center;
@@ -33,23 +35,19 @@
   margin-right: 20px;
 }
 
+
 .nav {
   display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-  gap: 70px;
+  align-items: center; /* ✅ center vertically */
+  gap: 40px;
   margin-left: 20px;
-  flex-wrap: wrap;
-  width: fit-content;
 }
-
 .links {
   display: flex;
   gap: 24px;
-  justify-content: center;
 }
 
-/* ✅ buttons instead of <a> */
+/* Buttons */
 .linkBtn {
   background: none;
   border: none;
@@ -57,23 +55,14 @@
   color: #FFFFFF;
   font-size: 16px;
   font-weight: 500;
-  padding: 5px 10px;
+  padding: 6px 12px;
   border-radius: 5px;
   transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-
-.linkBtn:active{
-    background-color: white;
-  color: black;
 }
 .linkBtn:hover {
   background-color: white;
   color: black;
 }
-
-
-/* Active state */
 .activeLink {
   background-color: white !important;
   color: black !important;
@@ -117,22 +106,18 @@
   gap: 10px;
   height: 50px;
 }
-
 .profilePic {
-  width: 50px;
-  height: 50px;
+  width: 45px;
+  height: 45px;
   border-radius: 50%;
   object-fit: cover;
-  color: #3C96C7;
 }
-
 .profileInfo h4 {
   margin: 0;
   font-size: 14px;
   font-weight: bold;
   color:white;
 }
-
 .profileInfo p {
   margin: 0;
   font-size: 12px;
@@ -452,28 +437,25 @@
 
 /* 🔔 Notification Dropdown */
 .notificationWrapper {
-  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.logoutIcon {
+  color: red;
+  font-size: 20px;
   cursor: pointer;
 }
-
-.blinkingDot {
-  position: absolute;
-  top: -2px;
-  right: -2px;
-  width: 10px;
-  height: 10px;
-  background: red;
-  border-radius: 50%;
-  animation: blink 1s infinite;
+.notificationIcon {
+  font-size: 20px;
+  cursor: pointer;
+  color: white;
 }
 
-@keyframes blink {
-  0% { opacity: 1; }
-  50% { opacity: 0; }
-  100% { opacity: 1; }
+/* ----------------- Notification Dropdown ----------------- */
+.notificationWrapper {
+  position: relative;
 }
-
-/* Dropdown container */
 .dropdown {
   position: absolute;
   top: 200%;

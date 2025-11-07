@@ -88,3 +88,9 @@ export const updateAttendance=(id,time,userId)=>{
   });
 }
 
+
+export const startBreak = (attendanceId, breakTime) =>{
+  return apiService.put(`/attendance/break/${attendanceId}`, { breakTime });
+}
+
+

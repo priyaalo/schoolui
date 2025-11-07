@@ -105,6 +105,8 @@
   font-size: 0.8rem;
   color: red;
   margin-top: 4px;
+  text-align: start;
+  margin-left: 39px;
 }
 /* 
 /* Password wrapper with eye icon */
@@ -185,5 +187,8 @@
 
   .logoWrapper img {
     width: 200px;
+  }
+  .errorMsg{
+    text-align: left;
   }
 }
