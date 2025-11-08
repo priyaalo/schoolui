@@ -9,9 +9,9 @@ import moment from "moment";
 import CheckoutModal from "./CheckoutModal";
 import CheckInModal from "./CheckInModal";
 import EventCard from "../EventCard/EventCard";
-import Loader from "../loader/Loader"
-import noDataImg from "../assets/AloLogo/nodatasearch.png"
-import BreakModal  from "./BreakModal";
+import Loader from "../loader/Loader";
+import noDataImg from "../assets/AloLogo/nodatasearch.png";
+import BreakModal from "./BreakModal";
 
 import {
   getUserId,
@@ -32,25 +32,28 @@ const Dashboard = () => {
   const [attendanceTable, setAttendanceTable] = useState([]);
   const [attendanceId, setAttendanceId] = useState("");
   const [checkInStatus, setCheckInStatus] = useState(null);
+  const [breakStatus, setBreakStatus] = useState(false);
 
   const [isCheckoutOpen, setCheckoutOpen] = useState(false);
   const [isCheckInModalOpen, setCheckInModalOpen] = useState(false);
+  const [isBreakModalOpen, setBreakModalOpen] = useState(false);
+  const [hasEndedBreak, setHasEndedBreak] = useState(false);
+
 
   const [isCheckingIn, setIsCheckingIn] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const [filter, setFilter] = useState("thisMonth");
   const [event, setEvent] = useState([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
-  const [isBreakModalOpen, setBreakModalOpen] = useState(false);
-  const [breakStatus, setBreakStatus] = useState(false);
-
 
   const [timeElapsed, setTimeElapsed] = useState("00:00:00");
   const [checkInTime, setCheckInTime] = useState(null);
 
   const [permissionHours, setPermissionHours] = useState(null);
   const [lateLogins, setLateLogins] = useState([]);
+
   const [onPermission, setOnPermission] = useState(false);
   const [onEarlyPermission, setOnEarlyPermission] = useState(false);
   const [per, setPer] = useState("");
@@ -59,7 +62,6 @@ const Dashboard = () => {
   const [selectedRemark, setSelectedRemark] = useState(null);
 
   const [page, setPage] = useState(1);
-  const [loading,setLoading]=useState(true)
   const rowsPerPage = 5;
 
   // ==================== API CALLS ====================
@@ -70,7 +72,7 @@ const Dashboard = () => {
       const userData = res.data.data.data[0];
       setUser(userData);
       setCheckInStatus(userData.checkInStatus);
-       setBreakStatus(userData.breakStatus);
+      setBreakStatus(userData.breakStatus); // ✅ set break status from backend
     } catch (err) {
       console.error("Error fetching user:", err.message);
     }
@@ -87,12 +89,12 @@ const Dashboard = () => {
     }
   };
 
-  const fetchAttendance = async (showLoader=true) => {
+  const fetchAttendance = async (showLoader = true) => {
     try {
-      if(showLoader)setLoading(true)
+      if (showLoader) setLoading(true);
       const monthFlag = filter === "pastMonth";
       const response = await getAttendance(userId, monthFlag);
-      const allData = response.data.data .data|| [];
+      const allData = response.data.data.data || [];
 
       const formattedData = allData.map((att) => {
         if (att.date) {
@@ -126,8 +128,8 @@ const Dashboard = () => {
       }
     } catch (err) {
       console.error("Error fetching attendance:", err.message);
-    }finally{
-       if(showLoader)setLoading(false)
+    } finally {
+      if (showLoader) setLoading(false);
     }
   };
 
@@ -145,19 +147,17 @@ const Dashboard = () => {
 
   // ==================== HOOKS ====================
   useEffect(() => {
-    if (!userId) {
-      navigate("/");
-    } else {
+    if (!userId) navigate("/");
+    else {
       fetchUser();
       fetchAttendance(true);
       fetchLateCount();
     }
   }, [navigate, userId]);
+
   useEffect(() => {
-  if (userId) {
-    fetchAttendance(false); // ✅ don’t show loader when changing filter
-  }
-}, [filter, userId]);
+    if (userId) fetchAttendance(false);
+  }, [filter, userId]);
 
   useEffect(() => {
     fetchEvents();
@@ -219,14 +219,15 @@ const Dashboard = () => {
         const response = await checkIn(userId);
         const newAttendanceId = response.data.data._id;
         setAttendanceId(newAttendanceId);
-        const apiDate = response.data.data.date; // "2025-09-17T06:15:49.897Z"
-      const formattedDate = new Date(apiDate).toISOString().split("T")[0]; // "2025-09-17"
 
-  
-      localStorage.setItem("checkInDate", formattedDate);
+        const apiDate = response.data.data.date;
+        const formattedDate = new Date(apiDate).toISOString().split("T")[0];
+        localStorage.setItem("checkInDate", formattedDate);
+
         await fetchLateCount();
         await fetchAttendance(false);
         await fetchUser();
+         setHasEndedBreak(false);
         toast.success("Check-in successful!", { autoClose: 1000 });
       }
     } catch (err) {
@@ -240,57 +241,51 @@ const Dashboard = () => {
       setIsCheckingIn(false);
     }
   };
+
   const handleStartBreak = async () => {
-  try {
     if (!attendanceId) {
       toast.error("No active attendance record found!", { autoClose: 1000 });
       return;
     }
 
-    const breakTime = new Date().toISOString();
+    try {
+      const breakTime = new Date().toISOString();
+      const response = await startBreak(attendanceId, breakTime); // start break API
 
-    await startBreak(attendanceId, breakTime); // same API for starting
-    toast.success("Break started successfully!", { autoClose: 1000 });
+      const updatedBreakStatus = response.data.data?.breakStatus || true;
+      setBreakStatus(updatedBreakStatus);
 
-    await fetchAttendance(false);
-    await fetchUser();
-    setBreakStatus(true); // ✅ mark break active
-    setBreakModalOpen(false);
-  } catch (err) {
-    console.error("Error starting break:", err);
-    toast.error(
-      err.response?.data?.message || "Failed to start break",
-      { autoClose: 1000 }
-    );
-  }
-};
+      await fetchAttendance(false);
+      await fetchUser();
+      toast.success("Break started successfully!", { autoClose: 1000 });
+      setBreakModalOpen(false);
+    } catch (err) {
+      console.error("Error starting break:", err);
+      toast.error("Failed to start break", { autoClose: 1000 });
+    }
+  };
 
-const handleEndBreak = async () => {
-  try {
+  const handleEndBreak = async () => {
     if (!attendanceId) {
       toast.error("No active attendance record found!", { autoClose: 1000 });
       return;
     }
 
-    const breakTime = new Date().toISOString(); // reuse field name
+    try {
+      const breakTime = new Date().toISOString();
+      const response = await startBreak(attendanceId, breakTime); // same API for ending break
+      const updatedBreakStatus = response.data.data?.breakStatus || false;
+      setBreakStatus(updatedBreakStatus);
+      setHasEndedBreak(true);
 
-    await startBreak(attendanceId, breakTime); // ✅ same API call
-    toast.success("Break ended successfully!", { autoClose: 1000 });
-
-    await fetchAttendance(false);
-    await fetchUser();
-    setBreakStatus(false); // ✅ mark break ended
-  } catch (err) {
-    console.error("Error ending break:", err);
-    toast.error(
-      err.response?.data?.message || "Failed to end break",
-      { autoClose: 1000 }
-    );
-  }
-};
-
-
-
+      await fetchAttendance(false);
+      await fetchUser();
+      toast.success("Break ended successfully!", { autoClose: 1000 });
+    } catch (error) {
+      console.error("Error ending break:", error);
+      toast.error("Failed to end break.", { autoClose: 1000 });
+    }
+  };
 
   const handleCheckoutConfirm = async (remarks) => {
     if (isCheckingOut) return;
@@ -314,7 +309,6 @@ const handleEndBreak = async () => {
       setCheckoutOpen(false);
     }
   };
-  
 
   const handleCheckOut = () => setCheckoutOpen(true);
 
@@ -333,48 +327,28 @@ const handleEndBreak = async () => {
     return `${hours} hr ${minutes} min`;
   };
 
-  // const rows = attendanceTable.map((ele) =>
-  //   ele.onLeave
-  //     ? {
-  //         id: ele._id,
-  //         isLeave: true,
-  //         date: ele.date || "N/A",
-  //         leaveText: "Leave",
-  //       }
-  //     : {
-  //         id: ele._id,
-  //         isLeave: false,
-  //         date: ele.date || "N/A",
-  //         login: tableFormatTime(ele.inTime),
-  //         logout: tableFormatTime(ele.outTime),
-  //         remarks: ele.remarks || "-",
-  //         classHours: ele.totalWorkHours || "-",
-  //         permission: formatPermissionHours(ele.permissionHours) || "-",
-  //       }
-  // );
   const rows = attendanceTable.map((ele) => {
-  if (ele.onLeave === true) {
+    if (ele.onLeave === true) {
+      return {
+        id: ele._id,
+        isLeave: true,
+        date: ele.date || "N/A",
+        leaveText: "Leave",
+      };
+    }
+
     return {
       id: ele._id,
-      isLeave: true, // custom flag
+      isLeave: false,
       date: ele.date || "N/A",
-      leaveText: "Leave",
+      login: tableFormatTime(ele.inTime) || "N/A",
+      logout: tableFormatTime(ele.outTime) || "N/A",
+      remarks: ele.remarks || "-",
+      breakTime: ele.breakHours || "N/A",
+      classHours: ele.totalWorkHours || "-",
+      permission: formatPermissionHours(ele.permissionHours) || "-",
     };
-  }
- 
-
-  return {
-    id: ele._id,
-    isLeave: false,
-    date: ele.date || "N/A",
-    login: tableFormatTime(ele.inTime) || "N/A",
-    logout: tableFormatTime(ele.outTime) || "N/A",
-    remarks: ele.remarks || "-",
-    breakTime:ele.breakHours ||"N/A",
-    classHours: ele.totalWorkHours || "-",
-    permission: formatPermissionHours(ele.permissionHours) || "-",
-  };
-});
+  });
 
   const events = event.map((ev) => {
     const d = new Date(ev.date);
@@ -386,32 +360,29 @@ const handleEndBreak = async () => {
       icon: ev.eventType,
     };
   });
+
   const loopedEvents = Array(20).fill(events).flat();
-    const duration = loopedEvents.length * 1;
+  const duration = loopedEvents.length * 1;
 
   const handlePageChange = (e, value) => setPage(value);
   const paginatedRows = rows.slice((page - 1) * rowsPerPage, page * rowsPerPage);
   const pageCount = Math.ceil(rows.length / rowsPerPage);
 
+  const getTodayDate = () => {
+    const today = new Date();
+    const day = String(today.getDate()).padStart(2, "0");
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const year = today.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
 
-    const getTodayDate = () => {
-      const today = new Date();
-      const day = String(today.getDate()).padStart(2, "0");
-      const month = String(today.getMonth() + 1).padStart(2, "0");
-      const year = today.getFullYear();
-      return `${day}-${month}-${year}`;
-    };
+  const todayDate = getTodayDate();
+  const hasTodayAttendance = attendanceTable.some((att) => att.date === todayDate);
 
-    const todayDate = getTodayDate();
-
-    const hasTodayAttendance = attendanceTable.some(
-      (att) => att.date === todayDate
-    );
   // ==================== RENDER ====================
-
   return (
     <div className={styles.container}>
-      {loading && <Loader/>}
+      {loading && <Loader />}
       <ToastContainer />
 
       {/* Top section */}
@@ -420,52 +391,53 @@ const handleEndBreak = async () => {
           <h1 className={styles.welcome}>Welcome Back, {user?.name}</h1>
         </div>
         <div className={styles.second}>
-          <p className={styles.subtitle}>
-            Your future starts with today’s attendance
-          </p>
+          <p className={styles.subtitle}>Your future starts with today’s attendance</p>
           <div className={styles.check}>
-  {/* ✅ Check-In Button */}
-  {checkInStatus === false && (
-    <button
-      onClick={() => setCheckInModalOpen(true)}
-      className={styles.checkIn}
-      disabled={hasTodayAttendance}
-    >
-      Check-in
-    </button>
-  )}
+            {/* Check-In Button */}
+       {/* ✅ Check-In / Break / Checkout Buttons */}
+{/* ✅ Check-In / Break / Checkout Buttons */}
+{/* ✅ Check-In / Break / Checkout Buttons */}
+{checkInStatus === false && (
+  <button
+    onClick={() => setCheckInModalOpen(true)}
+    className={styles.checkIn}
+    disabled={hasTodayAttendance}
+  >
+    Check-in
+  </button>
+)}
 
-  
-  {checkInStatus && !breakStatus && (
-    <button
-      className={styles.break}
-      onClick={() => setBreakModalOpen(true)}
-    >
-     Break
-    </button>
-  )}
+{checkInStatus === true && (
+  <>
+    {/* ✅ When on break → show only End Break */}
+    {breakStatus ? (
+      <button className={styles.break} onClick={handleEndBreak}>
+        End Break
+      </button>
+    ) : (
+      // ✅ When not on break → show Take Break (only once) + Checkout
+      <>
+        {!hasEndedBreak && (
+          <button
+            className={styles.break}
+            onClick={() => setBreakModalOpen(true)}
+          >
+            Take Break
+          </button>
+        )}
+        <button
+          className={styles.checkOut}
+          onClick={handleCheckOut}
+          disabled={breakStatus} // ensure disabled only when breakStatus true
+        >
+          Check-out
+        </button>
+      </>
+    )}
+  </>
+)}
 
-  {checkInStatus && breakStatus && (
-    <button
-      className={styles.break}
-      onClick={handleEndBreak}
-    >
-      End Break
-    </button>
-  )}
-
-
-  {checkInStatus === true && (
-    <button
-      onClick={handleCheckOut}
-      className={styles.checkOut}
-      disabled={breakStatus}
-    >
-      Check-out
-    </button>
-  )}
-</div>
-
+          </div>
         </div>
       </div>
 
@@ -678,18 +650,17 @@ const handleEndBreak = async () => {
       )}
 
       {/* Checkout Modal */}
-      <CheckoutModal
-        isOpen={isCheckoutOpen}
-        onClose={() => setCheckoutOpen(false)}
-        onCheckout={handleCheckoutConfirm}
-      />
-<BreakModal
+      <BreakModal
+        user={user}
+        setBreakStatus={setBreakStatus}
         isOpen={isBreakModalOpen}
         onClose={() => setBreakModalOpen(false)}
-          onConfirm={handleStartBreak}
-       
+        attendanceId={attendanceId}
+        refreshAttendance={fetchAttendance}
+        refreshUser={fetchUser}
+        handleStartBreak={handleStartBreak} // ✅ start break
       />
-      {/* Check-in Modal */}
+
       <CheckInModal
         isOpen={isCheckInModalOpen}
         onClose={() => setCheckInModalOpen(false)}
@@ -697,6 +668,12 @@ const handleEndBreak = async () => {
           await handleCheckIn();
           setCheckInModalOpen(false);
         }}
+      />
+
+      <CheckoutModal
+        isOpen={isCheckoutOpen}
+        onClose={() => setCheckoutOpen(false)}
+        onCheckout={handleCheckoutConfirm}
       />
     </div>
   );

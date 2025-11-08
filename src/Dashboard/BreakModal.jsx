@@ -1,9 +1,17 @@
-// BreakModal.js
 import React from "react";
-import styles from "./BreakModal.module.css"; // use same css file if you already have one
+import styles from "./BreakModal.module.css";
 
-const BreakModal = ({ isOpen, onClose, onConfirm }) => {
+const BreakModal = ({
+  isOpen,
+  onClose,
+  handleStartBreak, // use this to start break
+}) => {
   if (!isOpen) return null;
+
+  const handleConfirm = async () => {
+    await handleStartBreak(); // ✅ use parent’s logic
+    onClose(); // close modal after action
+  };
 
   return (
     <div className={styles.modalOverlay}>
@@ -11,8 +19,8 @@ const BreakModal = ({ isOpen, onClose, onConfirm }) => {
         <h2>Take a Break</h2>
         <p>Are you sure you want to take a break?</p>
         <div className={styles.modalButtons}>
-          <button onClick={onConfirm} className={styles.confirmBtn}>
-            Yes, Take Break
+          <button onClick={handleConfirm} className={styles.confirmBtn}>
+             Take Break
           </button>
           <button onClick={onClose} className={styles.cancelBtn}>
             Cancel

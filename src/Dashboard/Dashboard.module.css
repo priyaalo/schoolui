@@ -410,8 +410,8 @@ td {
 .checkIn:disabled {
   cursor: not-allowed;      /* red circle with slash 🚫 */
 }
-.break{
-   color: white;
+.break {
+  color: white;
   border: none;
   border-radius: 4px;
   padding: 14px 14px;
@@ -421,7 +421,19 @@ td {
   transition: 0.3s;
   background: #2d8011;
   display: flex;
-  height:fit-content;
-  width:auto;
+  align-items: center;   /* ✅ vertically center text */
+  justify-content: center; /* ✅ horizontally center text */
+  height: fit-content;
+  width: auto;
+}
 
+/* ✅ Mobile responsive adjustment */
+@media (max-width: 768px) {
+  .break {
+    width: 100%;              /* full width on mobile */
+    justify-content: center;  /* ensure text stays centered */
+    text-align: center;
+    padding: 14px 0;          /* balanced spacing */
+    font-size: 15px;          /* slightly smaller text for mobile */
+  }
 }
