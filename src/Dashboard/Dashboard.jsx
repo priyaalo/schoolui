@@ -46,7 +46,7 @@ const Dashboard = () => {
 
   const [filter, setFilter] = useState("thisMonth");
   const [event, setEvent] = useState([]);
-  const [loadingEvents, setLoadingEvents] = useState(true);
+   const [loadingEvents, setLoadingEvents] = useState(false);
 
   const [timeElapsed, setTimeElapsed] = useState("00:00:00");
   const [checkInTime, setCheckInTime] = useState(null);
@@ -362,7 +362,7 @@ const Dashboard = () => {
   });
 
   const loopedEvents = Array(20).fill(events).flat();
-  const duration = loopedEvents.length * 1;
+  // const duration = loopedEvents.length * 1;
 
   const handlePageChange = (e, value) => setPage(value);
   const paginatedRows = rows.slice((page - 1) * rowsPerPage, page * rowsPerPage);
@@ -442,7 +442,7 @@ const Dashboard = () => {
       </div>
 
       {/* Events Marquee */}
-      {events.length === 0 ? (
+      {/* {events.length === 0 ? (
         <div className={styles.noEventsWrapper}>
           <span className={styles.noEvents}>No events found</span>
         </div>
@@ -464,7 +464,32 @@ const Dashboard = () => {
             )}
           </div>
         </div>
+      )} */}
+{loadingEvents ? (
+  <div className={styles.loadingText}>Loading events...</div>
+) : events.length === 0 ? (
+  <div className={styles.noEventsWrapper}>
+    <span className={styles.noEvents}>No events found</span>
+  </div>
+) : (
+  <div className={styles.marqueeWrapper}>
+    <div className={styles.marqueeTrack}>
+      {[...Array(5)].flatMap(() =>
+        events.map((ev, index) => (
+          <EventCard
+            key={`${ev.id}-${index}`}
+            title={ev.title.charAt(0).toUpperCase() + ev.title.slice(1)}
+            subtitle={
+              ev.subtitle.charAt(0).toUpperCase() + ev.subtitle.slice(1)
+            }
+            date={ev.date}
+            type={ev.icon}
+          />
+        ))
       )}
+    </div>
+  </div>
+)}
 
       {/* Permission + Late Login Cards */}
       <div className={styles.cardRow}>
