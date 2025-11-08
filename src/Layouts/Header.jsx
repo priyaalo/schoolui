@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+
 import { useNavigate, useLocation } from "react-router-dom";
 import styles from "./Header.module.css";
 import logo from "../assets/AloLogo/alo-logo.png";
@@ -20,7 +21,7 @@ const Header = ({ handleLogout }) => {
   const notifyIconRef = useRef(null);
 
   // Fetch notifications
-  const fetchNotification = async () => {
+  const fetchNotification = useCallback (async () => {
     if (!userId) return;
     try {
       const response = await getNotification(userId);
@@ -29,10 +30,10 @@ const Header = ({ handleLogout }) => {
     } catch (err) {
       console.error(err.message);
     }
-  };
+  });
 
   // Fetch user profile
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async () => {
     if (!userId) return;
     try {
       const res = await getUserId(userId);
@@ -41,14 +42,14 @@ const Header = ({ handleLogout }) => {
     } catch (err) {
       console.error(err.message);
     }
-  };
+  });
 
   useEffect(() => {
     fetchUser();
     fetchNotification();
     const interval = setInterval(fetchNotification, 2000); 
     return () => clearInterval(interval);
-  }, [userId]);
+  }, [userId, fetchUser, fetchNotification]);
 
   // Close dropdown if clicked outside
   useEffect(() => {
