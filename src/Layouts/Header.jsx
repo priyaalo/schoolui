@@ -47,9 +47,9 @@ const Header = ({ handleLogout }) => {
   useEffect(() => {
     fetchUser();
     fetchNotification();
-    const interval = setInterval(fetchNotification, 2000); 
+    const interval = setInterval(fetchNotification, 1000); 
     return () => clearInterval(interval);
-  }, [userId, fetchUser, fetchNotification]);
+  }, [userId]);
 
   // Close dropdown if clicked outside
   useEffect(() => {
