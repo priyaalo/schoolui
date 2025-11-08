@@ -47,7 +47,7 @@ function App() {
           element={
             isAuthenticated ? (
               
-              <Navigate to={location.state?.from || `/dashboard/${localStorage.getItem("userId")}`} replace />
+              <Navigate to={ `/dashboard/${localStorage.getItem("userId")}`} replace />
             ) : (
               <Login setLoginUser={setIsAuthenticated} />
             )

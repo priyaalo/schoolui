@@ -175,7 +175,7 @@ const Dashboard = () => {
       if (!startTime) return;
 
       const currentTime = new Date(
-        new Date().getTime() + (5 * 60 + 30) * 60000 // IST offset
+        new Date().getTime() + (5 * 60 + 30) * 60000 
       );
       let timeDifference = currentTime - startTime;
 
