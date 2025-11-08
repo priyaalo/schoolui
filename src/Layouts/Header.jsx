@@ -47,7 +47,7 @@ const Header = ({ handleLogout }) => {
   useEffect(() => {
     fetchUser();
     fetchNotification();
-    const interval = setInterval(fetchNotification, 1000); 
+    const interval = setInterval(fetchNotification, 3000); 
     return () => clearInterval(interval);
   }, [userId]);
 
