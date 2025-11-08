@@ -5,6 +5,8 @@ import styles from "./LeaveRequest.module.css";
 
 const LeaveRequestModal = ({ isOpen, onClose, onSubmit }) => {
   const checkInDate = localStorage.getItem("checkInDate"); 
+  const [successMessage, setSuccessMessage] = useState("");
+
   const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     studentId: localStorage.getItem("studentId") || "",
@@ -18,7 +20,7 @@ const LeaveRequestModal = ({ isOpen, onClose, onSubmit }) => {
   });
    
 const [loading, setLoading] = useState(false); // loader state
-  // const [successMessage, setSuccessMessage] = useState("");
+  
 
   // Reset form when modal opens
   useEffect(() => {
