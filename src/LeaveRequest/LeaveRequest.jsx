@@ -18,7 +18,7 @@ const LeaveRequestModal = ({ isOpen, onClose, onSubmit }) => {
   });
    
 const [loading, setLoading] = useState(false); // loader state
-  const [successMessage, setSuccessMessage] = useState("");
+  // const [successMessage, setSuccessMessage] = useState("");
 
   // Reset form when modal opens
   useEffect(() => {
