@@ -1,0 +1,194 @@
+.loginPage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: radial-gradient(circle at top, #0a1b64, #010314);
+  background-image: url("../assets/AloLogo/backcolor.jpg");
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+  padding: 10px;
+ }
+.content{
+  margin-bottom:40px;
+  text-align: center;
+} 
+.card {
+  background: #fff;
+  padding: 40px 40px;
+  width: 100%;
+  margin-top:10px;
+  padding-top: 10px;
+  max-width:500px;
+  border-radius: 16px;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25);
+  text-align: center;
+}
+
+/* Make sure content stack flows nicely */
+.logoWrapper {
+  display: flex;
+  flex-direction: column;   /* stack logo + text vertically */
+  justify-content: center;
+  align-items: center;
+  margin-right: 10px;
+;
+  
+}
+
+/* Center title + subtitle under logo */
+
+
+.subTitle {
+  font-size: 0.95rem;
+  color: #555;
+  /* space below subtitle before inputs */
+  text-align: center;
+}
+
+
+/* Big Logo */
+.logoWrapper img {
+  width: 270px;   /* keep big logo */
+  height: auto;
+  object-fit: contain;
+  
+}
+
+.card h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #222;
+  margin: 4px 0;   /* much smaller vertical margin */
+  text-align: center;
+}
+
+
+/* Smaller input fields */
+.inputBox input {
+  width: 80%;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 0.85rem;
+  background-color: #f8f8f8;
+  box-sizing: border-box;
+}
+
+.passwordWrapper {
+  position: relative;
+  width: 80%;
+  margin: 0 auto;
+}
+
+.passwordWrapper input {
+  width: 100%;
+  padding: 10px 40px 10px 12px; /* space for eye icon */
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 0.85rem;
+  background-color: #f8f8f8;
+  box-sizing: border-box;
+}
+
+
+
+.inputBox {
+   margin-bottom: 27px; 
+  text-align: center;
+}
+
+
+
+.errorMsg {
+  font-size: 0.8rem;
+  color: red;
+  margin-top: 4px;
+  text-align: start;
+  margin-left: 39px;
+}
+/* 
+/* Password wrapper with eye icon */
+
+
+.eyeIcon {
+  position: absolute;
+  right: 12px;             /* stays inside input */
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+
+/* Forgot password link */
+
+/* Login button */
+.loginBtn {
+  width: 80%;
+  padding: 10px;
+  background: linear-gradient(to right, #0a1b64, #020c3a);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.loginBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.loginBtn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+/* Loader inside button */
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader svg path {
+  fill: #fff;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+ 
+
+  .passwordWrapper {
+    width: 100%;  /* full width on small screens */
+  }
+
+
+  .card h2 {
+    font-size: 1.4rem;
+  }
+
+  .subTitle {
+    font-size: 0.85rem;
+  }
+   .inputBox input,
+  .passwordWrapper,
+  .loginBtn {
+    width: 100%;   /* all inputs/buttons full width */
+  }
+
+  .card {
+    padding: 25px 15px;
+  }
+
+  .logoWrapper img {
+    width: 200px;
+  }
+  .errorMsg{
+    text-align: left;
+  }
+}

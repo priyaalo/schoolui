@@ -1,0 +1,1115 @@
+.headerContainer {
+  display: flex;
+  align-items: center;              /* ✅ vertical align everything */
+  justify-content: space-between;
+  align-content: center;   /* space between left + right */
+  padding: 0 20px;
+  background: linear-gradient(to bottom, #144196, #061530);
+  /* color: white; */
+  flex-wrap: wrap;
+  font-family: 'Poppins', sans-serif;
+  position: fixed;
+  width: 100%;
+  z-index: 1000;
+  height:80px;
+  align-content: center;
+}
+.rightSectionMobile{
+  display:none;
+}
+
+/* ----------------- Left Section ----------------- */
+.logoWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+  /* height: 110px; */
+}
+
+/* Logo image */
+.logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  margin-right: 20px;
+}
+
+
+.nav {
+  display: flex;
+  align-items: center; /* ✅ center vertically */
+  gap: 40px;
+  margin-left: 20px;
+}
+.links {
+  display: flex;
+  gap: 24px;
+}
+
+/* Buttons */
+.linkBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+.linkBtn:hover {
+  background-color: white;
+  color: black;
+}
+.activeLink {
+  background-color: white !important;
+  color: black !important;
+  font-weight: 600;
+  border-radius: 5px;
+  padding: 5px 10px;
+}
+
+/* 
+/* Right section always visible */
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-right:20px;
+}
+
+/* Hamburger menu hidden on desktop */
+.hamburger {
+  display: none;
+}
+.logoutWrapper {
+  padding: 1px 10px;
+}
+
+.logoutIcon {
+  color: red;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.notificationIcon {
+  font-size: 20px;
+  cursor: pointer;
+  color: white;
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 50px;
+}
+.profilePic {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.profileInfo h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: bold;
+  color:white;
+}
+.profileInfo p {
+  margin: 0;
+  font-size: 12px;
+  color: #d1d1d1;
+}
+.dayMonth {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+}
+.notificationItem {
+  padding: 10px 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.textBlock {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* Vertically center items */
+  width: 100%;
+}
+
+.messageWrapper {
+  display: flex;
+  flex-direction: column; /* Stack message and subMessage vertically */
+}
+
+.message {
+  font-weight: 500;
+  color: #333;
+}
+
+.subMessage {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 2px;
+}
+
+.dateBlock {
+  text-align: right;
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.inlineDate {
+  font-size: 12px;
+  color: #999;
+  white-space: nowrap;
+}
+.notificationWrapper {
+  position: relative;
+}
+
+.notificationIcon {
+  font-size: 20px;
+  cursor: pointer;
+  position: relative;
+}
+
+.redDot {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 8px;
+  height: 8px;
+  background-color: red;
+  border-radius: 50%;
+  border: 1px solid #fff;
+}
+
+.dropdownHeaderWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #eee;
+}
+
+.dropdownHeader {
+  font-size: 16px;
+  font-weight: 600;
+ 
+
+  
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #555;
+  transition: color 0.2s;
+}
+
+.closeBtn:hover {
+  color: #d32f2f;
+}
+
+/* Notification item */
+.notificationItem {
+  padding: 8px 5px;
+  cursor: pointer;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.notificationItem:last-child {
+  border-bottom: none;
+}
+
+/* Text block: flex layout for content + date */
+.textBlock {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.textBlock h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.textBlock p {
+  margin: 2px 0 0 0;
+  font-size: 12px;
+  color: #666;
+}
+
+/* Date block */
+.dateBlock {
+  text-align: right;
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.day {
+  display: block;
+  font-weight: 600;
+}
+
+.monthYear {
+  display: block;
+  font-size: 11px;
+  color: #aaa;
+}
+
+/* No notifications */
+.noNotifications {
+  text-align: center;
+  padding: 15px 0;
+  font-size: 14px;
+  color: #777;
+}
+
+
+/* 📱 Responsive */
+/* 📱 Tablet (≤ 1024px) */
+@media (max-width: 1024px) {
+  .nav {
+    gap: 40px;
+  }
+
+  .linkBtn {
+    font-size: 14px;
+  }
+
+  .profileInfo h4 {
+    font-size: 13px;
+  }
+
+  .profileInfo p {
+    font-size: 11px;
+  }
+
+  .dropdown {
+    width: 320px;
+  }
+}
+
+/* Mobile ≤ 768px */
+@media (max-width: 768px) {
+  .headerContainer {
+    flex-direction: row; /* logo left + right section in same line */
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    height: 60px;
+  }
+
+  .logoWrapper {
+    width: 120px;
+    height: auto;
+  }
+
+  .rightMobileWrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+.hideOnMobile {
+    display: none;
+  }
+
+  .rightSection {
+    width: auto;
+    justify-content: flex-end;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .notificationIcon,
+  .logoutIcon {
+    font-size: 20px;
+  }
+  .hamburger {
+    display: flex;
+  }
+
+  .nav {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .nav.mobileOpen {
+    display: flex;
+  }
+
+  .links {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .linkBtn {
+    width: 100%;
+    text-align: left;
+    padding: 8px 12px;
+  }
+}
+
+/* 📱 Small Mobile (≤ 480px) */
+@media (max-width: 480px) {
+  .headerContainer {
+    padding: 10px;
+  }
+ 
+
+  .logoWrapper {
+    width: 150px;
+    height: auto;
+  }
+
+  .nav {
+    gap: 10px;
+    width: 100%;
+  }
+
+  .linkBtn {
+    font-size: 13px;
+    padding: 6px 10px;
+  }
+
+  .rightSection {
+    width: 100%;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .logoutIcon,
+  .notificationIcon {
+    font-size: 18px;
+  }
+
+  .profilePic {
+    width: 36px;
+    height: 36px;
+  }
+
+  .profileInfo h4 {
+    font-size: 12px;
+  }
+
+  .profileInfo p {
+    font-size: 10px;
+  }
+
+  .dropdown {
+    width: 90vw;
+    right: 5%;
+  }
+
+  .textBlock {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dateBlock {
+    text-align: left;
+    margin-top: 5px;
+  }
+
+  .dropdownHeader {
+    font-size: 16px;
+  }
+
+  .notificationItem h4 {
+    font-size: 11px;
+    width: 150px;
+  }
+}
+
+/* 🔔 Notification Dropdown */
+.notificationWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.logoutIcon {
+  color: red;
+  font-size: 20px;
+  cursor: pointer;
+}
+.notificationIcon {
+  font-size: 20px;
+  cursor: pointer;
+  color: white;
+}
+
+/* ----------------- Notification Dropdown ----------------- */
+.notificationWrapper {
+  position: relative;
+}
+.dropdown {
+  position: absolute;
+  top: 200%;
+  right: -10px;
+ background-color: white;
+  border-radius: 8px;
+   width: 400px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 1000;
+  padding: 10px;
+}
+
+.dropdownHeader {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  /* border-bottom: 1px solid #eee; */
+  padding-bottom: 6px;
+  display:flex;
+  align-items:center;
+}
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 25px;
+  display:flex;
+  align-items:center;
+  font-weight: bold;
+  cursor: pointer;
+  color: rgb(14, 14, 94);
+  transition: color 0.2s;
+  margin-bottom:7px;
+}
+.dropdownHeaderWrapper{
+  display:flex;
+  justify-content: space-between;
+  align-items:center;
+
+}
+
+.closeBtn:hover {
+  color: #d32f2f; /* red on hover */
+}
+
+
+/* Notification row */
+.notificationItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  gap: 4px;
+  border-bottom: 1px solid #f8f1f1;
+}
+
+.notificationItem h4 {
+  font-size: 12px;
+  width: 200px;
+  color: #332F2F;
+}
+
+.notificationItem:last-child {
+  border-bottom: none;
+}
+
+/* Left circle (BD or SL) */
+.circleBlue,
+.circleOrange {
+  border-radius: 50%;
+  height: 36px;
+  width: 36px;
+  border: none;
+  font-weight: 600;
+  font-size: 13px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.circleBlue {
+  background-color: #66b3ff;
+}
+
+.circleOrange {
+  background-color: #f5b85e;
+}
+
+/* Middle text */
+.textBlock {
+  flex: 1;
+  margin-left: 10px;
+  text-align: left;
+}
+
+.textBlock h4 {
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0 0 2px 0;
+  color: #000;
+}
+
+.textBlock p {
+  font-size: 12px;
+  color: #999;
+  margin: 0;
+}
+
+/* Right date block */
+/* Right date block for dropdown notifications */
+.dateBlock {
+  text-align: center;
+  min-width: 50px;
+  line-height: 1.2;
+}
+
+.day {
+  font-size: 14px;
+  font-weight: 700;
+  display: block;
+  color: #0b2d73;
+}
+
+.monthYear {
+  font-size: 10px;
+  color: #999;
+  text-transform: uppercase;
+}
+
+/* ================= Header Responsive ================= */
+/* Tablet (≤1024px) */
+@media (max-width: 1024px) {
+  .nav {
+    gap: 40px;
+  }
+
+  .linkBtn {
+    font-size: 14px;
+  }
+
+  .profileInfo h4 {
+    font-size: 13px;
+  }
+
+  .profileInfo p {
+    font-size: 11px;
+  }
+
+  .dropdown {
+    width: 320px;
+  }
+}
+
+/* Mobile (≤768px) */
+@media (max-width: 768px) {
+  .headerContainer {
+    flex-direction: column;
+    align-items: flex-start;
+    height: auto;
+    padding: 12px 16px;
+  }
+
+  .logoWrapper {
+    width: 180px;
+    height: auto;
+    /* margin-bottom: 10px; */
+  }
+
+  .logo {
+    width: 100%;
+    height: auto;
+  }
+
+  .nav {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    gap: 12px;
+    margin: 10px 0;
+  }
+
+  .links {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .linkBtn {
+    width: 100%;
+    text-align: left;
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+
+  .rightSection {
+    width: 100%;
+    justify-content: flex-end;
+    margin-top: 8px;
+    gap: 12px;
+  }
+
+  .profilePic {
+    width: 40px;
+    height: 40px;
+  }
+
+  .dropdown {
+    top: 50px; /* slightly lower for mobile */
+    right: 10px; /* keep some distance from screen edge */
+    width: 280px;
+  }
+}
+
+/* Small Mobile (≤480px) */
+@media (max-width: 480px) {
+  .headerContainer {
+    padding: 10px;
+  }
+
+  .logoWrapper {
+    width: 150px;
+    height: auto;
+  }
+
+  .nav {
+    gap: 10px;
+    width: 100%;
+  }
+
+
+  .linkBtn {
+    font-size: 13px;
+    padding: 6px 10px;
+  }
+
+  .rightSection {
+    width: 100%;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .logoutIcon,
+  .notificationIcon {
+    font-size: 18px;
+  }
+
+  .profilePic {
+    width: 36px;
+    height: 36px;
+  }
+
+  .profileInfo h4 {
+    font-size: 12px;
+  }
+
+  .profileInfo p {
+    font-size: 10px;
+  }
+
+  .dropdown {
+    width: 95%;
+    right: 2.5%;
+    top: 80%;
+    max-height: 320px;
+   
+  }
+
+  .dropdownHeader {
+    font-size: 16px;
+  }
+
+  .notificationItem h4 {
+    font-size: 11px;
+    width: 150px;
+  }
+}
+.redDot {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: red;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+
+.noNotifications {
+  text-align: center;
+  padding: 1rem;
+  color: gray;
+  font-style: italic;
+}
+/* Hamburger Button */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  z-index: 1001;
+}
+
+.bar {
+  width: 25px;
+  height: 3px;
+  background-color: white;
+  transition: 0.3s;
+}
+
+.bar.open:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+.bar.open:nth-child(2) {
+  opacity: 0;
+}
+.bar.open:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* Mobile nav toggling */
+
+@media (max-width: 768px) {
+  .headerContainer {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    height: auto;
+    padding: 12px 16px;
+  }
+
+  .logoWrapper {
+    width: 150px;
+    height: auto;
+  }
+
+  .rightSectionMobile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .hamburger {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    z-index: 1001;
+  }
+
+  .bar {
+    width: 25px;
+    height: 3px;
+    background-color: white;
+    transition: 0.3s;
+  }
+
+  .bar.open:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+  }
+  .bar.open:nth-child(2) {
+    opacity: 0;
+  }
+  .bar.open:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+  }
+
+  .nav {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .nav.mobileOpen {
+    display: flex;
+  }
+
+  .links {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .linkBtn {
+    width: 100%;
+    text-align: left;
+    padding: 8px 12px;
+  }
+
+ .dropdown {
+    position: fixed;          /* overlay on entire screen */
+    top: 50%;                 /* center vertically */
+    left: 50%;                /* center horizontally */
+    transform: translate(-50%, -50%); /* shift to exact center */
+    width: 90%;               /* responsive width */
+    max-width: 350px;         /* optional max width */
+    max-height: 80vh;         /* scrollable if many notifications */
+    overflow-y: auto;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    z-index: 10000;           /* above everything */
+    padding: 15px;
+  }
+  .logoWrapper {
+    width: 200px; /* keep big but not too big */
+    height: 60px;
+  }
+   .notificationWrapper {
+    display: flex;
+    position: relative;
+  }
+
+  
+
+  }
+
+
+ @media (max-width: 480px) {
+  .dropdown {
+    width: calc(100vw - 16px); /* almost full width */
+    right: 8px;                 /* small right padding */
+    top: 30%;                  /* below bell */
+    max-height: 250px;          /* scrollable */
+  }
+ 
+}
+
+
+
+.notificationItem {
+   display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+/* unread = highlight */
+.unread {
+  background-color: #f0f8ff; /* light blue */
+}
+
+/* read = normal */
+.read {
+  background-color: #fff;
+}
+
+.notificationItem:hover {
+  background-color: #f9f9f9;
+}
+
+.dateBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 50px;
+  text-align: center;
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.day {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+}
+
+.monthYear {
+  font-size: 12px;
+  color: #777;
+}
+@media (max-width: 860px) {
+
+  .headerContainer{
+    display:flex;
+    justify-content: space-between;
+  }
+  
+  
+}
+/* ================= iPad Portrait (768px–820px) ================= */
+/* ================= iPad Portrait (768px–820px inclusive) ================= */
+/* ================= iPad Portrait (768px–820px) ================= */
+/* ================= iPad Portrait (768px–820px) ================= */
+@media (min-width: 768px) and (max-width: 820px) {
+  .headerContainer {
+    height: 70px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logoWrapper {
+    width: 160px;
+  }
+
+  /* NAV hidden by default; opens when .mobileOpen is applied */
+  .nav {
+    display: none;
+    position: absolute;
+    top: 70px;
+    left: 0;
+    width: 100%;
+    background: #061530;
+    padding: 14px 18px;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 10005;
+  }
+  .nav.mobileOpen {
+    display: flex;
+  }
+
+  .linkBtn {
+    font-size: 15px;
+    padding: 8px 12px;
+    text-align: center;
+    width: 100%;
+    color: white;
+  }
+
+  /* show the mobile-right section (hamburger + bell + logout) */
+  .rightSectionMobile {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  /* hide desktop right-section (profile) */
+  .hideOnMobile {
+    display: none !important;
+  }
+
+  /* Hamburger styles */
+  .hamburger {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 6px;
+    z-index: 10007;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .bar {
+    width: 24px;
+    height: 3px;
+    background-color: white;
+    border-radius: 2px;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+  .bar.open:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+  .bar.open:nth-child(2) { opacity: 0; }
+  .bar.open:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+
+  .dropdown {
+    width: 340px;
+    top: 70px;
+    right: 15px;
+  }
+}
+
+/* ================= iPad Landscape (821px–1024px) ================= */
+@media (min-width: 821px) and (max-width: 1024px) {
+  .headerContainer {
+    height: 75px;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logoWrapper {
+    width: 180px;
+  }
+
+  /* NAV hidden by default; opens when .mobileOpen is applied */
+  .nav {
+    display: none;
+    position: absolute;
+    top: 75px;
+    left: 0;
+    width: 100%;
+    background: #061530;
+    padding: 16px 20px;
+    flex-direction: column;
+    gap: 14px;
+    z-index: 10005;
+  }
+  .nav.mobileOpen {
+    display: flex;
+  }
+
+  .linkBtn {
+    font-size: 16px;
+    padding: 8px 12px;
+    text-align: center;
+    width: 100%;
+    color: white;
+  }
+
+  /* show the mobile-right section (hamburger + bell + logout) */
+  .rightSectionMobile {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  /* hide desktop right-section (profile) */
+  .hideOnMobile {
+    display: none !important;
+  }
+
+  /* Hamburger styles (same as portrait) */
+  .hamburger {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 6px;
+    z-index: 10007;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .bar {
+    width: 26px;
+    height: 3px;
+    background-color: white;
+    border-radius: 2px;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+  .bar.open:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+  .bar.open:nth-child(2) { opacity: 0; }
+  .bar.open:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+  .profilePic {
+    display: none;
+  }
+
+  .dropdown {
+    width: 400px;
+    top: 75px;
+    right: 20px;
+  }
+}

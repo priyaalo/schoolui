@@ -37,8 +37,17 @@ const Dashboard = () => {
   const [isCheckoutOpen, setCheckoutOpen] = useState(false);
   const [isCheckInModalOpen, setCheckInModalOpen] = useState(false);
   const [isBreakModalOpen, setBreakModalOpen] = useState(false);
-  const [hasEndedBreak, setHasEndedBreak] = useState(false);
-
+const [hasEndedBreak, setHasEndedBreak] = useState(() => {
+  const saved = localStorage.getItem("hasEndedBreak");
+  return saved ? JSON.parse(saved) : false;
+});useEffect(() => {
+  // ✅ Sync hasEndedBreak with localStorage when user or break status changes
+  const savedBreak = localStorage.getItem("hasEndedBreak");
+  const parsedBreak = savedBreak ? JSON.parse(savedBreak) : false;
+  if (parsedBreak !== hasEndedBreak) {
+    setHasEndedBreak(parsedBreak);
+  }
+}, [user?.checkInStatus, breakStatus]);
 
   const [isCheckingIn, setIsCheckingIn] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
@@ -152,6 +161,7 @@ const Dashboard = () => {
       fetchUser();
       fetchAttendance(true);
       fetchLateCount();
+      
     }
   }, [navigate, userId]);
 
@@ -228,6 +238,8 @@ const Dashboard = () => {
         await fetchAttendance(false);
         await fetchUser();
          setHasEndedBreak(false);
+          
+      localStorage.setItem("hasEndedBreak", false);
         toast.success("Check-in successful!", { autoClose: 1000 });
       }
     } catch (err) {
@@ -254,6 +266,8 @@ const Dashboard = () => {
 
       const updatedBreakStatus = response.data.data?.breakStatus || true;
       setBreakStatus(updatedBreakStatus);
+      setHasEndedBreak(false);
+    localStorage.setItem("hasEndedBreak", false);
 
       await fetchAttendance(false);
       await fetchUser();
@@ -277,6 +291,7 @@ const Dashboard = () => {
       const updatedBreakStatus = response.data.data?.breakStatus || false;
       setBreakStatus(updatedBreakStatus);
       setHasEndedBreak(true);
+       localStorage.setItem("hasEndedBreak", true);
 
       await fetchAttendance(false);
       await fetchUser();
@@ -294,6 +309,7 @@ const Dashboard = () => {
     try {
       const checkoutTime = new Date().toISOString();
       await checkOut(attendanceId, remarks, userId, checkoutTime);
+       localStorage.removeItem("hasEndedBreak"); 
       await fetchAttendance();
       await fetchUser();
       toast.success("Checkout successful!", { autoClose: 1000 });
@@ -397,6 +413,7 @@ const Dashboard = () => {
        {/* ✅ Check-In / Break / Checkout Buttons */}
 {/* ✅ Check-In / Break / Checkout Buttons */}
 {/* ✅ Check-In / Break / Checkout Buttons */}
+{/* ✅ Check-In / Break / Checkout Buttons */}
 {checkInStatus === false && (
   <button
     onClick={() => setCheckInModalOpen(true)}
@@ -409,14 +426,13 @@ const Dashboard = () => {
 
 {checkInStatus === true && (
   <>
-    {/* ✅ When on break → show only End Break */}
-    {breakStatus ? (
+    {breakStatus && !hasEndedBreak ? (
       <button className={styles.break} onClick={handleEndBreak}>
         End Break
       </button>
     ) : (
-      // ✅ When not on break → show Take Break (only once) + Checkout
       <>
+        {/* ✅ Hidden after refresh too */}
         {!hasEndedBreak && (
           <button
             className={styles.break}
@@ -425,10 +441,11 @@ const Dashboard = () => {
             Take Break
           </button>
         )}
+
         <button
           className={styles.checkOut}
-          onClick={handleCheckOut}
-          disabled={breakStatus} // ensure disabled only when breakStatus true
+          onClick={() => setCheckoutOpen(true)}
+          disabled={breakStatus}
         >
           Check-out
         </button>
@@ -436,6 +453,7 @@ const Dashboard = () => {
     )}
   </>
 )}
+
 
           </div>
         </div>

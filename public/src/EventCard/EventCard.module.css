@@ -1,0 +1,176 @@
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 50px;
+  margin: 10px;
+  gap: 15px;
+  width:300px;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.iconWrapper {
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px; /* adjust icon size */
+  color: white; /* default icon color */
+  background-color: #99cafa; /* default background, overridden by .birthday/.festival */
+}
+
+/* 
+.birthday {
+  background-color: #66b3ff; 
+  color: white; 
+}
+
+.festival {
+  background-color: #f5b85e; 
+  color: black; 
+} */
+.birthday {
+  color: #e91e63; /* pink */
+  background-color: #fde4ec;
+}
+
+.function {
+  color: #fbc02d; /* yellow */
+  background-color: #fff8e1;
+}
+
+.anniversary {
+  color: #d32f2f; /* red */
+  background-color: #ffebee;
+}
+
+.meeting {
+  color: #1976d2; /* blue */
+  background-color: #e3f2fd;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.subtitle {
+  font-size: 12px;
+  color: #555;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+.right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: bold;
+}
+
+.day {
+  font-size: 11.57px;
+  line-height: 1.2;
+  font-weight: 500;
+  color: #144196;
+}
+
+.monthYear {
+  font-size: 5.79px;
+  font-weight: 500;
+}
+/* ================= Responsive Cards ================= */
+
+/* Tablet and small desktop (≤1024px) */
+@media (max-width: 1024px) {
+  .cardRow {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .card {
+    width: 300px; /* keep original card width */
+  }
+}
+
+/* Tablet and mobile (≤768px) */
+@media (max-width: 768px) {
+  .cardRow {
+    justify-content: center;
+  }
+
+  .card {
+    width: 280px; /* slightly smaller for tablet */
+    margin: 8px;
+  }
+
+  .subtitle {
+    max-width: 120px; /* reduce text width */
+  }
+}
+
+/* Mobile (≤480px) */
+@media (max-width: 480px) {
+  .cardRow {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .card {
+    width: 90%;      /* fit small screens */
+    max-width: 300px; /* maintain original style */
+    margin: 6px 0;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .subtitle {
+    max-width: 100px; /* shorter width for mobile */
+    font-size: 11px;
+  }
+
+  .title {
+    font-size: 11px;
+  }
+
+  .iconWrapper {
+    height: 28px;
+    width: 28px;
+    font-size: 16px;
+  }
+
+  .day {
+    font-size: 10px;
+  }
+
+  .monthYear {
+    font-size: 5px;
+  }
+
+  .right {
+    gap: 2px;
+  }
+}

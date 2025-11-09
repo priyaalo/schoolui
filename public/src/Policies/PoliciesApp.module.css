@@ -1,0 +1,142 @@
+/* PoliciesApp.module.css */
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+  font-family: poppins,sans-serif;
+  
+}
+
+/* Content should have space for the sidebar */
+.content {
+  flex: 3;
+  padding: 20px;
+  margin-right: 280px; /* add space for sidebar width */
+}
+
+.content h1 {
+  color: #0d2c54;
+}
+
+.content h2 {
+  margin-top: 20px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.content p {
+  margin: 10px 0;
+  line-height: 1.6;
+  color: #333;
+}
+
+/* Sidebar fixed to the right */
+.sidebar {
+  position: fixed;
+  top: 130px;       /* adjust depending on your header height */
+  right: 20px;      /* stick to right */
+  width: 250px;     /* fixed width */
+  border-left: 2px solid #ddd;  
+  padding-left: 20px;
+  height: fit-content;
+  transition: border-color 0.3s;
+  background: #fff; /* optional: to prevent text overlap */
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar li {
+  margin: 15px 0;
+  position: relative; 
+  padding-left: 10px; 
+}
+
+.sidebar button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #0d2c54;
+  cursor: pointer;
+  text-align: left;
+  padding: 0;
+  border-radius:8px;
+}
+
+.sidebar li::before {
+  content: "";
+  position: absolute;
+  left: -22px;  
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: transparent;
+  transition: background 0.4s ease;
+}
+
+.sidebar li.active::before {
+  background: #0d2c54;
+}
+
+.sidebar li.active button {
+  color: #0d2c54;
+}
+/* ========= Responsive ========= */
+
+/* Tablet and below */
+@media (max-width: 992px) {
+  .container {
+    flex-direction: column; /* stack content and sidebar */
+  }
+
+  .content {
+    margin-right: 0;  /* remove space reserved for sidebar */
+    padding: 15px;
+  }
+
+  .sidebar {
+    position: relative; /* no fixed position */
+    top: auto;
+    right: auto;
+    width: 100%;       /* take full width */
+    border-left: none; /* remove left border */
+    border-top: 2px solid #ddd; /* optional: add top border */
+    padding: 15px 0;
+    margin-top: 20px;
+  }
+
+  .sidebar ul {
+    display: flex;          /* horizontal nav for better UX */
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .sidebar li {
+    margin: 10px 0;
+    padding-left: 0;
+  }
+
+  .sidebar li::before {
+    display: none; /* hide vertical indicator */
+  }
+}
+
+/* Mobile (small screens) */
+@media (max-width: 576px) {
+  .content {
+    padding: 10px;
+  }
+
+  .sidebar ul {
+    flex-direction: column; /* stack again on very small screens */
+    align-items: flex-start;
+  }
+
+  .sidebar button {
+    font-size: 14px;
+  }
+}

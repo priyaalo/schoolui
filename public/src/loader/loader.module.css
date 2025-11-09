@@ -1,0 +1,31 @@
+.overlay {
+  position: fixed; /* full screen */
+  top: 79px;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: white; /* keep background white */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* always on top */
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 6px solid transparent; /* base transparent */
+  border-top: 6px solid #144196; /* gradient start */
+  border-right: 6px solid #061530; /* gradient end */
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
