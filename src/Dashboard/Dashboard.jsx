@@ -63,23 +63,31 @@ const Dashboard = () => {
   const rowsPerPage = 5;
 
   // ==================== API CALLS ====================
-  const fetchUser = async () => {
-    try {
-      const res = await getUserId(userId);
-      const userData = res.data.data.data[0];
-      setUser(userData);
-      setCheckInStatus(userData.checkInStatus);
-      setBreakStatus(userData.breakStatus);
+ const fetchUser = async () => {
+  try {
+    const res = await getUserId(userId);
+    const userData = res.data.data.data[0];
+    setUser(userData);
+    setCheckInStatus(userData.checkInStatus);
+    setBreakStatus(userData.breakStatus);
 
-      // ✅ Check if break already taken today
-      const today = new Date().toISOString().split("T")[0];
-      const savedBreakDate = localStorage.getItem("breakTakenDate");
-      if (savedBreakDate === today) setIsBreakTaken(true);
-      else setIsBreakTaken(false);
-    } catch (err) {
-      console.error("Error fetching user:", err.message);
+    // ✅ Check if break already taken today
+    const today = new Date().toISOString().split("T")[0];
+    const savedBreakDate = localStorage.getItem("breakTakenDate");
+
+    if (userData.breakStatus) {
+      // currently on break
+      setIsBreakTaken(false);
+    } else if (savedBreakDate === today) {
+      // break already ended today
+      setIsBreakTaken(true);
+    } else {
+      setIsBreakTaken(false);
     }
-  };
+  } catch (err) {
+    console.error("Error fetching user:", err.message);
+  }
+};
 
   const fetchLateCount = async () => {
     try {
@@ -401,42 +409,38 @@ const Dashboard = () => {
           <p className={styles.subtitle}>
             Your future starts with today’s attendance
           </p>
-          <div className={styles.check}>
-            {!checkInStatus ? (
-              <button
-                onClick={() => setCheckInModalOpen(true)}
-                className={styles.checkIn}
-              >
-                Check-in
-              </button>
-            ) : breakStatus ? (
-              <button className={styles.break} onClick={handleEndBreak}>
-                End Break
-              </button>
-            ) : isBreakTaken ? (
-              <button
-                className={styles.checkOut}
-                onClick={() => setCheckoutOpen(true)}
-              >
-                Check-out
-              </button>
-            ) : (
-              <>
-                <button
-                  className={styles.break}
-                  onClick={() => setBreakModalOpen(true)}
-                >
-                  Take Break
-                </button>
-                <button
-                  className={styles.checkOut}
-                  onClick={() => setCheckoutOpen(true)}
-                >
-                  Check-out
-                </button>
-              </>
-            )}
-          </div>
+        <div className={styles.check}>
+  {!checkInStatus ? (
+    <button
+      onClick={() => setCheckInModalOpen(true)}
+      className={styles.checkIn}
+    >
+      Check-in
+    </button>
+  ) : breakStatus ? (
+    <button className={styles.break} onClick={handleEndBreak}>
+      End Break
+    </button>
+  ) : (
+    <>
+      {!isBreakTaken && (
+        <button
+          className={styles.break}
+          onClick={() => setBreakModalOpen(true)}
+        >
+          Take Break
+        </button>
+      )}
+      <button
+        className={styles.checkOut}
+        onClick={() => setCheckoutOpen(true)}
+      >
+        Check-out
+      </button>
+    </>
+  )}
+</div>
+
         </div>
       </div>
 
