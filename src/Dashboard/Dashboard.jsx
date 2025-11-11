@@ -99,28 +99,16 @@ useEffect(() => {
   // ==================== API CALLS ====================
 
   const fetchUser = async () => {
-  try {
-    const res = await getUserId(userId);
-    const userData = res.data.data.data[0];
-
-    setUser(userData);
-    setCheckInStatus(userData.checkInStatus);
-    setBreakStatus(userData.breakStatus); // ✅ set break status from backend
-
-    // ✅ Sync localStorage based on backend's breakStatus
-    if (userData.breakStatus === true) {
-      localStorage.setItem("hasEndedBreak", false);
-      setHasEndedBreak(false);
-    } else {
-      localStorage.setItem("hasEndedBreak", true);
-      setHasEndedBreak(true);
+    try {
+      const res = await getUserId(userId);
+      const userData = res.data.data.data[0];
+      setUser(userData);
+      setCheckInStatus(userData.checkInStatus);
+      setBreakStatus(userData.breakStatus); // ✅ set break status from backend
+    } catch (err) {
+      console.error("Error fetching user:", err.message);
     }
-
-  } catch (err) {
-    console.error("Error fetching user:", err.message);
-  }
-};
-
+  };
 
   const fetchLateCount = async () => {
     try {
