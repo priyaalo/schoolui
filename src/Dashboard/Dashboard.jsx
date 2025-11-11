@@ -99,16 +99,24 @@ useEffect(() => {
   // ==================== API CALLS ====================
 
   const fetchUser = async () => {
-    try {
-      const res = await getUserId(userId);
-      const userData = res.data.data.data[0];
-      setUser(userData);
-      setCheckInStatus(userData.checkInStatus);
-      setBreakStatus(userData.breakStatus); // ✅ set break status from backend
-    } catch (err) {
-      console.error("Error fetching user:", err.message);
-    }
-  };
+  try {
+    const res = await getUserId(userId);
+    const userData = res.data.data.data[0];
+    setUser(userData);
+    setCheckInStatus(userData.checkInStatus);
+    setBreakStatus(userData.breakStatus);
+
+    // ✅ Check if break already taken today
+    const today = new Date().toISOString().split("T")[0];
+    const savedBreakDate = localStorage.getItem("breakTakenDate");
+
+    if (savedBreakDate === today) setIsBreakTaken(true);
+    else setIsBreakTaken(false);
+  } catch (err) {
+    console.error("Error fetching user:", err.message);
+  }
+};
+
 
   const fetchLateCount = async () => {
     try {
@@ -313,32 +321,25 @@ const handleStartBreak = async () => {
 };
 const handleEndBreak = async () => {
   if (!attendanceId) {
-    toast.error("No active attendance record found!", { autoClose: 1000 });
+    toast.error("No active attendance found!", { autoClose: 1000 });
     return;
   }
 
   try {
-    const breakTime = new Date().toISOString();
-    const response = await startBreak(attendanceId, breakTime); // same API for end break
-
+    const response = await startBreak(attendanceId, new Date().toISOString());
     const updatedBreakStatus = response.data.data?.breakStatus;
-
-    // ✅ Backend sets breakStatus=false after end break
     setBreakStatus(updatedBreakStatus);
 
-    // ✅ Mark break as ended for today
+    // ✅ Mark today's date as break taken
     const today = new Date().toISOString().split("T")[0];
     localStorage.setItem("breakTakenDate", today);
     setIsBreakTaken(true);
-    setHasEndedBreak(true);
 
-    await fetchAttendance(false);
     await fetchUser();
-
     toast.success("Break ended successfully!", { autoClose: 1000 });
-  } catch (error) {
-    console.error("Error ending break:", error);
-    toast.error("Failed to end break.", { autoClose: 1000 });
+  } catch (err) {
+    console.error("Error ending break:", err);
+    toast.error("Failed to end break", { autoClose: 1000 });
   }
 };
 
@@ -466,34 +467,25 @@ const handleEndBreak = async () => {
   <button onClick={() => setCheckInModalOpen(true)} className={styles.checkIn}>
     Check-in
   </button>
+) : breakStatus ? (
+  <button className={styles.break} onClick={handleEndBreak}>
+    End Break
+  </button>
+) : isBreakTaken ? (
+  <button className={styles.checkOut} onClick={() => setCheckoutOpen(true)}>
+    Check-out
+  </button>
 ) : (
   <>
-    {breakStatus ? (
-      <button className={styles.break} onClick={handleEndBreak}>
-        End Break
-      </button>
-    ) : isBreakTaken ? (
-      <button className={styles.checkOut} onClick={() => setCheckoutOpen(true)}>
-        Check-out
-      </button>
-    ) : (
-      <>
-        <button
-          className={styles.break}
-          onClick={() => setBreakModalOpen(true)}
-        >
-          Take Break
-        </button>
-        <button
-          className={styles.checkOut}
-          onClick={() => setCheckoutOpen(true)}
-        >
-          Check-out
-        </button>
-      </>
-    )}
+    <button className={styles.break} onClick={() => setBreakModalOpen(true)}>
+      Take Break
+    </button>
+    <button className={styles.checkOut} onClick={() => setCheckoutOpen(true)}>
+      Check-out
+    </button>
   </>
 )}
+
 
           </div>
         </div>
