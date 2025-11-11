@@ -71,6 +71,9 @@ const Login = ({ setLoginUser }) => {
           localStorage.setItem("authToken", token);
           localStorage.setItem("userId", userId);
           localStorage.setItem("studentId", studentId);
+          sessionStorage.setItem("authToken", token);
+          sessionStorage.setItem("userId", userId);
+          sessionStorage.setItem("studentId", studentId);
 
           setLoginUser(true);
           navigate(`/dashboard/${userId}`, { replace: true });
