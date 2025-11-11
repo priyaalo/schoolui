@@ -37,17 +37,40 @@ const Dashboard = () => {
   const [isCheckoutOpen, setCheckoutOpen] = useState(false);
   const [isCheckInModalOpen, setCheckInModalOpen] = useState(false);
   const [isBreakModalOpen, setBreakModalOpen] = useState(false);
-const [hasEndedBreak, setHasEndedBreak] = useState(() => {
-  const saved = localStorage.getItem("hasEndedBreak");
-  return saved ? JSON.parse(saved) : false;
-});useEffect(() => {
-  // ✅ Sync hasEndedBreak with localStorage when user or break status changes
-  const savedBreak = localStorage.getItem("hasEndedBreak");
-  const parsedBreak = savedBreak ? JSON.parse(savedBreak) : false;
-  if (parsedBreak !== hasEndedBreak) {
-    setHasEndedBreak(parsedBreak);
+// const [hasEndedBreak, setHasEndedBreak] = useState(() => {
+//   const saved = localStorage.getItem("hasEndedBreak");
+//   return saved ? JSON.parse(saved) : false;
+// });
+const [hasEndedBreak, setHasEndedBreak] = useState(
+  JSON.parse(localStorage.getItem("hasEndedBreak") || "false")
+);
+const [isBreakTaken, setIsBreakTaken] = useState(false);
+
+// useEffect(() => {
+//   // ✅ Sync hasEndedBreak with localStorage when user or break status changes
+//   const savedBreak = localStorage.getItem("hasEndedBreak");
+//   const parsedBreak = savedBreak ? JSON.parse(savedBreak) : false;
+//   if (parsedBreak !== hasEndedBreak) {
+//     setHasEndedBreak(parsedBreak);
+//   }
+// }, [user?.checkInStatus, breakStatus]);
+useEffect(() => {
+  if (user) {
+    setCheckInStatus(user.checkInStatus);
+    setBreakStatus(user.breakStatus);
+
+    // ✅ Check if break was already taken today
+    const today = new Date().toISOString().split("T")[0];
+    const savedBreakDate = localStorage.getItem("breakTakenDate");
+
+    if (savedBreakDate === today) {
+      setIsBreakTaken(true); // break already taken today
+    } else {
+      setIsBreakTaken(false); // new day
+    }
   }
-}, [user?.checkInStatus, breakStatus]);
+}, [user]);
+
 
   const [isCheckingIn, setIsCheckingIn] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
@@ -76,16 +99,28 @@ const [hasEndedBreak, setHasEndedBreak] = useState(() => {
   // ==================== API CALLS ====================
 
   const fetchUser = async () => {
-    try {
-      const res = await getUserId(userId);
-      const userData = res.data.data.data[0];
-      setUser(userData);
-      setCheckInStatus(userData.checkInStatus);
-      setBreakStatus(userData.breakStatus); // ✅ set break status from backend
-    } catch (err) {
-      console.error("Error fetching user:", err.message);
+  try {
+    const res = await getUserId(userId);
+    const userData = res.data.data.data[0];
+
+    setUser(userData);
+    setCheckInStatus(userData.checkInStatus);
+    setBreakStatus(userData.breakStatus); // ✅ set break status from backend
+
+    // ✅ Sync localStorage based on backend's breakStatus
+    if (userData.breakStatus === true) {
+      localStorage.setItem("hasEndedBreak", false);
+      setHasEndedBreak(false);
+    } else {
+      localStorage.setItem("hasEndedBreak", true);
+      setHasEndedBreak(true);
     }
-  };
+
+  } catch (err) {
+    console.error("Error fetching user:", err.message);
+  }
+};
+
 
   const fetchLateCount = async () => {
     try {
@@ -207,52 +242,61 @@ const [hasEndedBreak, setHasEndedBreak] = useState(() => {
 
     return () => clearInterval(timer);
   }, [user?.checkInStatus, attendanceTable]);
+   useEffect(() => {
+    const savedBreak = JSON.parse(localStorage.getItem("hasEndedBreak") || "false");
+    if (savedBreak !== !breakStatus) {
+      localStorage.setItem("hasEndedBreak", JSON.stringify(!breakStatus));
+    }
+  }, [breakStatus]);
 
   // ==================== ACTIONS ====================
+const handleCheckIn = async () => {
+  if (isCheckingIn) return;
+  setIsCheckingIn(true);
 
-  const handleCheckIn = async () => {
-    if (isCheckingIn) return;
-    setIsCheckingIn(true);
+  try {
+    if (onPermission && per) {
+      await updateAttendance(per, new Date().toISOString(), userId);
+      await fetchAttendance(false);
+      await fetchUser();
+      toast.success("Permission check-in Updated!", { autoClose: 1000 });
+    } else if (onEarlyPermission && earlyPer) {
+      await updateAttendance(earlyPer, new Date().toISOString(), userId);
+      await fetchAttendance(false);
+      await fetchUser();
+      toast.success("Permission check-in Updated!", { autoClose: 1000 });
+    } else {
+      const response = await checkIn(userId);
+      const newAttendanceId = response.data.data._id;
+      setAttendanceId(newAttendanceId);
 
-    try {
-      if (onPermission && per) {
-        await updateAttendance(per, new Date().toISOString(), userId);
-        await fetchAttendance(false);
-        await fetchUser();
-        toast.success("Permission check-in Updated!", { autoClose: 1000 });
-      } else if (onEarlyPermission && earlyPer) {
-        await updateAttendance(earlyPer, new Date().toISOString(), userId);
-        await fetchAttendance(false);
-        await fetchUser();
-        toast.success("Permission check-in Updated!", { autoClose: 1000 });
-      } else {
-        const response = await checkIn(userId);
-        const newAttendanceId = response.data.data._id;
-        setAttendanceId(newAttendanceId);
+      const apiDate = response.data.data.date;
+      const formattedDate = new Date(apiDate).toISOString().split("T")[0];
+      localStorage.setItem("checkInDate", formattedDate);
 
-        const apiDate = response.data.data.date;
-        const formattedDate = new Date(apiDate).toISOString().split("T")[0];
-        localStorage.setItem("checkInDate", formattedDate);
+      await fetchLateCount();
+      await fetchAttendance(false);
+      await fetchUser();
 
-        await fetchLateCount();
-        await fetchAttendance(false);
-        await fetchUser();
-         setHasEndedBreak(false);
-          
-      localStorage.setItem("hasEndedBreak", false);
-        toast.success("Check-in successful!", { autoClose: 1000 });
-      }
-    } catch (err) {
-      let errMsg =
-        err.response?.data?.message ||
-        err.response?.data ||
-        err.message ||
-        "Something went wrong, please try again.";
-      toast.error(errMsg, { autoClose: 1000 });
-    } finally {
-      setIsCheckingIn(false);
+      // ✅ Important fix:
+      // Reset break flags so "Take Break" shows after check-in
+      setHasEndedBreak(false);
+      localStorage.setItem("hasEndedBreak", JSON.stringify(false)); // ✅ Correct way
+
+      toast.success("Check-in successful!", { autoClose: 1000 });
     }
-  };
+  } catch (err) {
+    let errMsg =
+      err.response?.data?.message ||
+      err.response?.data ||
+      err.message ||
+      "Something went wrong, please try again.";
+    toast.error(errMsg, { autoClose: 1000 });
+  } finally {
+    setIsCheckingIn(false);
+  }
+};
+
 const handleStartBreak = async () => {
   if (!attendanceId) {
     toast.error("No active attendance record found!", { autoClose: 1000 });
@@ -279,8 +323,7 @@ const handleStartBreak = async () => {
     toast.error("Failed to start break", { autoClose: 1000 });
   }
 };
-
- const handleEndBreak = async () => {
+const handleEndBreak = async () => {
   if (!attendanceId) {
     toast.error("No active attendance record found!", { autoClose: 1000 });
     return;
@@ -288,19 +331,22 @@ const handleStartBreak = async () => {
 
   try {
     const breakTime = new Date().toISOString();
-    const response = await startBreak(attendanceId, breakTime); // same API for ending break
+    const response = await startBreak(attendanceId, breakTime); // same API for end break
 
-    // ✅ Always use backend value
     const updatedBreakStatus = response.data.data?.breakStatus;
+
+    // ✅ Backend sets breakStatus=false after end break
     setBreakStatus(updatedBreakStatus);
 
-    // ✅ Update local storage
-    localStorage.setItem("isBreakDisabled", "true");
-    localStorage.setItem("hasEndedBreak", !updatedBreakStatus);
-    
+    // ✅ Mark break as ended for today
+    const today = new Date().toISOString().split("T")[0];
+    localStorage.setItem("breakTakenDate", today);
+    setIsBreakTaken(true);
+    setHasEndedBreak(true);
 
     await fetchAttendance(false);
     await fetchUser();
+
     toast.success("Break ended successfully!", { autoClose: 1000 });
   } catch (error) {
     console.error("Error ending break:", error);
@@ -309,29 +355,34 @@ const handleStartBreak = async () => {
 };
 
 
-  const handleCheckoutConfirm = async (remarks) => {
-    if (isCheckingOut) return;
-    setIsCheckingOut(true);
+ const handleCheckoutConfirm = async (remarks) => {
+  if (isCheckingOut) return;
+  setIsCheckingOut(true);
 
-    try {
-      const checkoutTime = new Date().toISOString();
-      await checkOut(attendanceId, remarks, userId, checkoutTime);
-       localStorage.removeItem("hasEndedBreak"); 
-      await fetchAttendance();
-      await fetchUser();
-      toast.success("Checkout successful!", { autoClose: 1000 });
-    } catch (err) {
-      let errMsg =
-        err.response?.data?.message ||
-        err.response?.data ||
-        err.message ||
-        "Something went wrong, please try again.";
-      toast.error(errMsg, { autoClose: 1000 });
-    } finally {
-      setIsCheckingOut(false);
-      setCheckoutOpen(false);
-    }
-  };
+  try {
+    const checkoutTime = new Date().toISOString();
+    await checkOut(attendanceId, remarks, userId, checkoutTime);
+
+    // ✅ Reset flags at end of day
+    localStorage.removeItem("breakTakenDate");
+    localStorage.removeItem("hasEndedBreak");
+
+    await fetchAttendance();
+    await fetchUser();
+    toast.success("Checkout successful!", { autoClose: 1000 });
+  } catch (err) {
+    let errMsg =
+      err.response?.data?.message ||
+      err.response?.data ||
+      err.message ||
+      "Something went wrong, please try again.";
+    toast.error(errMsg, { autoClose: 1000 });
+  } finally {
+    setIsCheckingOut(false);
+    setCheckoutOpen(false);
+  }
+};
+
 
   const handleCheckOut = () => setCheckoutOpen(true);
 
@@ -424,35 +475,27 @@ const handleStartBreak = async () => {
 {/* ✅ Check-In Button */}
 {/* ✅ Attendance Action Buttons */}
 {!checkInStatus ? (
-  // ✅ Not Checked-in yet → show Check-in
-  <button
-    onClick={() => setCheckInModalOpen(true)}
-    className={styles.checkIn}
-  >
+  <button onClick={() => setCheckInModalOpen(true)} className={styles.checkIn}>
     Check-in
   </button>
 ) : (
   <>
-    {/* ✅ Checked-in */}
     {breakStatus ? (
-      // ✅ Currently on break → show End Break
-      <button
-        className={styles.break}
-        onClick={handleEndBreak}
-      >
+      <button className={styles.break} onClick={handleEndBreak}>
         End Break
       </button>
+    ) : isBreakTaken ? (
+      <button className={styles.checkOut} onClick={() => setCheckoutOpen(true)}>
+        Check-out
+      </button>
     ) : (
-      // ✅ Not on break → show Take Break + Check-out
       <>
         <button
           className={styles.break}
           onClick={() => setBreakModalOpen(true)}
-          
         >
           Take Break
         </button>
-
         <button
           className={styles.checkOut}
           onClick={() => setCheckoutOpen(true)}
@@ -463,7 +506,6 @@ const handleStartBreak = async () => {
     )}
   </>
 )}
-
 
           </div>
         </div>
