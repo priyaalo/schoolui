@@ -8,10 +8,10 @@ import moment from "moment";
 
 import CheckoutModal from "./CheckoutModal";
 import CheckInModal from "./CheckInModal";
+import BreakModal from "./BreakModal";
 import EventCard from "../EventCard/EventCard";
 import Loader from "../loader/Loader";
 import noDataImg from "../assets/AloLogo/nodatasearch.png";
-import BreakModal from "./BreakModal";
 
 import {
   getUserId,
@@ -21,7 +21,7 @@ import {
   getEvent,
   attCardCalculation,
   updateAttendance,
-  startBreak
+  startBreak,
 } from "../api/serviceapi";
 
 const Dashboard = () => {
@@ -33,44 +33,11 @@ const Dashboard = () => {
   const [attendanceId, setAttendanceId] = useState("");
   const [checkInStatus, setCheckInStatus] = useState(null);
   const [breakStatus, setBreakStatus] = useState(false);
+  const [isBreakTaken, setIsBreakTaken] = useState(false);
 
   const [isCheckoutOpen, setCheckoutOpen] = useState(false);
   const [isCheckInModalOpen, setCheckInModalOpen] = useState(false);
   const [isBreakModalOpen, setBreakModalOpen] = useState(false);
-// const [hasEndedBreak, setHasEndedBreak] = useState(() => {
-//   const saved = localStorage.getItem("hasEndedBreak");
-//   return saved ? JSON.parse(saved) : false;
-// });
-// const [hasEndedBreak, setHasEndedBreak] = useState(
-//   JSON.parse(localStorage.getItem("hasEndedBreak") || "false")
-// );
-const [isBreakTaken, setIsBreakTaken] = useState(false);
-
-// useEffect(() => {
-//   // ✅ Sync hasEndedBreak with localStorage when user or break status changes
-//   const savedBreak = localStorage.getItem("hasEndedBreak");
-//   const parsedBreak = savedBreak ? JSON.parse(savedBreak) : false;
-//   if (parsedBreak !== hasEndedBreak) {
-//     setHasEndedBreak(parsedBreak);
-//   }
-// }, [user?.checkInStatus, breakStatus]);
-useEffect(() => {
-  if (user) {
-    setCheckInStatus(user.checkInStatus);
-    setBreakStatus(user.breakStatus);
-
-    // ✅ Check if break was already taken today
-    const today = new Date().toISOString().split("T")[0];
-    const savedBreakDate = localStorage.getItem("breakTakenDate");
-
-    if (savedBreakDate === today) {
-      setIsBreakTaken(true); // break already taken today
-    } else {
-      setIsBreakTaken(false); // new day
-    }
-  }
-}, [user]);
-
 
   const [isCheckingIn, setIsCheckingIn] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
@@ -78,14 +45,13 @@ useEffect(() => {
 
   const [filter, setFilter] = useState("thisMonth");
   const [event, setEvent] = useState([]);
-   const [loadingEvents, setLoadingEvents] = useState(false);
+  const [loadingEvents, setLoadingEvents] = useState(false);
 
   const [timeElapsed, setTimeElapsed] = useState("00:00:00");
   const [checkInTime, setCheckInTime] = useState(null);
 
   const [permissionHours, setPermissionHours] = useState(null);
   const [lateLogins, setLateLogins] = useState([]);
-
   const [onPermission, setOnPermission] = useState(false);
   const [onEarlyPermission, setOnEarlyPermission] = useState(false);
   const [per, setPer] = useState("");
@@ -97,26 +63,23 @@ useEffect(() => {
   const rowsPerPage = 5;
 
   // ==================== API CALLS ====================
-
   const fetchUser = async () => {
-  try {
-    const res = await getUserId(userId);
-    const userData = res.data.data.data[0];
-    setUser(userData);
-    setCheckInStatus(userData.checkInStatus);
-    setBreakStatus(userData.breakStatus);
+    try {
+      const res = await getUserId(userId);
+      const userData = res.data.data.data[0];
+      setUser(userData);
+      setCheckInStatus(userData.checkInStatus);
+      setBreakStatus(userData.breakStatus);
 
-    // ✅ Check if break already taken today
-    const today = new Date().toISOString().split("T")[0];
-    const savedBreakDate = localStorage.getItem("breakTakenDate");
-
-    if (savedBreakDate === today) setIsBreakTaken(true);
-    else setIsBreakTaken(false);
-  } catch (err) {
-    console.error("Error fetching user:", err.message);
-  }
-};
-
+      // ✅ Check if break already taken today
+      const today = new Date().toISOString().split("T")[0];
+      const savedBreakDate = localStorage.getItem("breakTakenDate");
+      if (savedBreakDate === today) setIsBreakTaken(true);
+      else setIsBreakTaken(false);
+    } catch (err) {
+      console.error("Error fetching user:", err.message);
+    }
+  };
 
   const fetchLateCount = async () => {
     try {
@@ -192,7 +155,6 @@ useEffect(() => {
       fetchUser();
       fetchAttendance(true);
       fetchLateCount();
-      
     }
   }, [navigate, userId]);
 
@@ -214,9 +176,8 @@ useEffect(() => {
 
     const timer = setInterval(() => {
       if (!startTime) return;
-
       const currentTime = new Date(
-        new Date().getTime() + (5 * 60 + 30) * 60000 
+        new Date().getTime() + (5 * 60 + 30) * 60000 // IST offset
       );
       let timeDifference = currentTime - startTime;
 
@@ -226,7 +187,9 @@ useEffect(() => {
       }
 
       const hours = Math.floor(timeDifference / (1000 * 60 * 60));
-      const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+      const minutes = Math.floor(
+        (timeDifference % (1000 * 60 * 60)) / (1000 * 60)
+      );
       const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
 
       setTimeElapsed(
@@ -238,145 +201,128 @@ useEffect(() => {
 
     return () => clearInterval(timer);
   }, [user?.checkInStatus, attendanceTable]);
-  //  useEffect(() => {
-  //   const savedBreak = JSON.parse(localStorage.getItem("hasEndedBreak") || "false");
-  //   if (savedBreak !== !breakStatus) {
-  //     localStorage.setItem("hasEndedBreak", JSON.stringify(!breakStatus));
-  //   }
-  // }, [breakStatus]);
 
   // ==================== ACTIONS ====================
-const handleCheckIn = async () => {
-  if (isCheckingIn) return;
-  setIsCheckingIn(true);
+  const handleCheckIn = async () => {
+    if (isCheckingIn) return;
+    setIsCheckingIn(true);
 
-  try {
-    if (onPermission && per) {
-      await updateAttendance(per, new Date().toISOString(), userId);
-      await fetchAttendance(false);
-      await fetchUser();
-      toast.success("Permission check-in Updated!", { autoClose: 1000 });
-    } else if (onEarlyPermission && earlyPer) {
-      await updateAttendance(earlyPer, new Date().toISOString(), userId);
-      await fetchAttendance(false);
-      await fetchUser();
-      toast.success("Permission check-in Updated!", { autoClose: 1000 });
-    } else {
-      const response = await checkIn(userId);
-      const newAttendanceId = response.data.data._id;
-      setAttendanceId(newAttendanceId);
+    try {
+      if (onPermission && per) {
+        await updateAttendance(per, new Date().toISOString(), userId);
+        await fetchAttendance(false);
+        await fetchUser();
+        toast.success("Permission check-in Updated!", { autoClose: 1000 });
+      } else if (onEarlyPermission && earlyPer) {
+        await updateAttendance(earlyPer, new Date().toISOString(), userId);
+        await fetchAttendance(false);
+        await fetchUser();
+        toast.success("Permission check-in Updated!", { autoClose: 1000 });
+      } else {
+        const response = await checkIn(userId);
+        const newAttendanceId = response.data.data._id;
+        setAttendanceId(newAttendanceId);
 
-      const apiDate = response.data.data.date;
-      const formattedDate = new Date(apiDate).toISOString().split("T")[0];
-      localStorage.setItem("checkInDate", formattedDate);
+        const apiDate = response.data.data.date;
+        const formattedDate = new Date(apiDate).toISOString().split("T")[0];
+        localStorage.setItem("checkInDate", formattedDate);
 
-      await fetchLateCount();
-      await fetchAttendance(false);
-      await fetchUser();
+        await fetchLateCount();
+        await fetchAttendance(false);
+        await fetchUser();
 
-      // ✅ Important fix:
-      // Reset break flags so "Take Break" shows after check-in
-      // setHasEndedBreak(false);
-      // localStorage.setItem("hasEndedBreak", JSON.stringify(false)); // ✅ Correct way
-
-      toast.success("Check-in successful!", { autoClose: 1000 });
+        toast.success("Check-in successful!", { autoClose: 1000 });
+      }
+    } catch (err) {
+      let errMsg =
+        err.response?.data?.message ||
+        err.response?.data ||
+        err.message ||
+        "Something went wrong, please try again.";
+      toast.error(errMsg, { autoClose: 1000 });
+    } finally {
+      setIsCheckingIn(false);
     }
-  } catch (err) {
-    let errMsg =
-      err.response?.data?.message ||
-      err.response?.data ||
-      err.message ||
-      "Something went wrong, please try again.";
-    toast.error(errMsg, { autoClose: 1000 });
-  } finally {
-    setIsCheckingIn(false);
-  }
-};
+  };
 
-const handleStartBreak = async () => {
-  if (!attendanceId) {
-    toast.error("No active attendance record found!", { autoClose: 1000 });
-    return;
-  }
+  const handleStartBreak = async () => {
+    if (!attendanceId) {
+      toast.error("No active attendance record found!", { autoClose: 1000 });
+      return;
+    }
 
-  try {
-    const breakTime = new Date().toISOString();
-    const response = await startBreak(attendanceId, breakTime); // start break API
+    try {
+      const breakTime = new Date().toISOString();
+      const response = await startBreak(attendanceId, breakTime); // start break API
 
-    // ✅ Always rely on backend for truth
-    const updatedBreakStatus = response.data.data?.breakStatus;
-    setBreakStatus(updatedBreakStatus);
+      const updatedBreakStatus = response.data.data?.breakStatus;
+      setBreakStatus(updatedBreakStatus);
+      localStorage.setItem("hasEndedBreak", !updatedBreakStatus);
 
-    // ✅ Update local storage
-    localStorage.setItem("hasEndedBreak", !updatedBreakStatus);
+      await fetchAttendance(false);
+      await fetchUser();
+      toast.success("Break started successfully!", { autoClose: 1000 });
+      setBreakModalOpen(false);
+    } catch (err) {
+      console.error("Error starting break:", err);
+      toast.error("Failed to start break", { autoClose: 1000 });
+    }
+  };
 
-    await fetchAttendance(false);
-    await fetchUser();
-    toast.success("Break started successfully!", { autoClose: 1000 });
-    setBreakModalOpen(false);
-  } catch (err) {
-    console.error("Error starting break:", err);
-    toast.error("Failed to start break", { autoClose: 1000 });
-  }
-};
-const handleEndBreak = async () => {
-  if (!attendanceId) {
-    toast.error("No active attendance found!", { autoClose: 1000 });
-    return;
-  }
+  const handleEndBreak = async () => {
+    if (!attendanceId) {
+      toast.error("No active attendance found!", { autoClose: 1000 });
+      return;
+    }
 
-  try {
-    const response = await startBreak(attendanceId, new Date().toISOString());
-    const updatedBreakStatus = response.data.data?.breakStatus;
-    setBreakStatus(updatedBreakStatus);
+    try {
+      const response = await startBreak(attendanceId, new Date().toISOString());
+      const updatedBreakStatus = response.data.data?.breakStatus;
+      setBreakStatus(updatedBreakStatus);
 
-    // ✅ Mark today's date as break taken
-    const today = new Date().toISOString().split("T")[0];
-    localStorage.setItem("breakTakenDate", today);
-    setIsBreakTaken(true);
+      const today = new Date().toISOString().split("T")[0];
+      localStorage.setItem("breakTakenDate", today);
+      setIsBreakTaken(true);
 
-    await fetchUser();
-    toast.success("Break ended successfully!", { autoClose: 1000 });
-  } catch (err) {
-    console.error("Error ending break:", err);
-    toast.error("Failed to end break", { autoClose: 1000 });
-  }
-};
+      await fetchUser();
+      toast.success("Break ended successfully!", { autoClose: 1000 });
+    } catch (err) {
+      console.error("Error ending break:", err);
+      toast.error("Failed to end break", { autoClose: 1000 });
+    }
+  };
 
+  const handleCheckoutConfirm = async (remarks) => {
+    if (isCheckingOut) return;
+    setIsCheckingOut(true);
 
- const handleCheckoutConfirm = async (remarks) => {
-  if (isCheckingOut) return;
-  setIsCheckingOut(true);
+    try {
+      const checkoutTime = new Date().toISOString();
+      await checkOut(attendanceId, remarks, userId, checkoutTime);
 
-  try {
-    const checkoutTime = new Date().toISOString();
-    await checkOut(attendanceId, remarks, userId, checkoutTime);
+      // ✅ Reset flags at end of day
+      localStorage.removeItem("breakTakenDate");
+      localStorage.removeItem("hasEndedBreak");
 
-    // ✅ Reset flags at end of day
-    localStorage.removeItem("breakTakenDate");
-    localStorage.removeItem("hasEndedBreak");
-
-    await fetchAttendance();
-    await fetchUser();
-    toast.success("Checkout successful!", { autoClose: 1000 });
-  } catch (err) {
-    let errMsg =
-      err.response?.data?.message ||
-      err.response?.data ||
-      err.message ||
-      "Something went wrong, please try again.";
-    toast.error(errMsg, { autoClose: 1000 });
-  } finally {
-    setIsCheckingOut(false);
-    setCheckoutOpen(false);
-  }
-};
-
+      await fetchAttendance();
+      await fetchUser();
+      toast.success("Checkout successful!", { autoClose: 1000 });
+    } catch (err) {
+      let errMsg =
+        err.response?.data?.message ||
+        err.response?.data ||
+        err.message ||
+        "Something went wrong, please try again.";
+      toast.error(errMsg, { autoClose: 1000 });
+    } finally {
+      setIsCheckingOut(false);
+      setCheckoutOpen(false);
+    }
+  };
 
   const handleCheckOut = () => setCheckoutOpen(true);
 
   // ==================== HELPERS ====================
-
   const tableFormatTime = (timestamp) => {
     if (!timestamp) return "-";
     const adjustedTime = moment.utc(timestamp);
@@ -425,8 +371,6 @@ const handleEndBreak = async () => {
   });
 
   const loopedEvents = Array(20).fill(events).flat();
-  // const duration = loopedEvents.length * 1;
-
   const handlePageChange = (e, value) => setPage(value);
   const paginatedRows = rows.slice((page - 1) * rowsPerPage, page * rowsPerPage);
   const pageCount = Math.ceil(rows.length / rowsPerPage);
@@ -454,39 +398,52 @@ const handleEndBreak = async () => {
           <h1 className={styles.welcome}>Welcome Back, {user?.name}</h1>
         </div>
         <div className={styles.second}>
-          <p className={styles.subtitle}>Your future starts with today’s attendance</p>
+          <p className={styles.subtitle}>
+            Your future starts with today’s attendance
+          </p>
           <div className={styles.check}>
-           
-{!checkInStatus ? (
-  <button onClick={() => setCheckInModalOpen(true)} className={styles.checkIn}>
-    Check-in
-  </button>
-) : breakStatus ? (
-  <button className={styles.break} onClick={handleEndBreak}>
-    End Break
-  </button>
-) : isBreakTaken ? (
-  <button className={styles.checkOut} onClick={() => setCheckoutOpen(true)}>
-    Check-out
-  </button>
-) : (
-  <>
-    <button className={styles.break} onClick={() => setBreakModalOpen(true)}>
-      Take Break
-    </button>
-    <button className={styles.checkOut} onClick={() => setCheckoutOpen(true)}>
-      Check-out
-    </button>
-  </>
-)}
-
-
+            {!checkInStatus ? (
+              <button
+                onClick={() => setCheckInModalOpen(true)}
+                className={styles.checkIn}
+              >
+                Check-in
+              </button>
+            ) : breakStatus ? (
+              <button className={styles.break} onClick={handleEndBreak}>
+                End Break
+              </button>
+            ) : isBreakTaken ? (
+              <button
+                className={styles.checkOut}
+                onClick={() => setCheckoutOpen(true)}
+              >
+                Check-out
+              </button>
+            ) : (
+              <>
+                <button
+                  className={styles.break}
+                  onClick={() => setBreakModalOpen(true)}
+                >
+                  Take Break
+                </button>
+                <button
+                  className={styles.checkOut}
+                  onClick={() => setCheckoutOpen(true)}
+                >
+                  Check-out
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
 
       {/* Events Marquee */}
-      {/* {events.length === 0 ? (
+      {loadingEvents ? (
+        <div className={styles.loadingText}>Loading events...</div>
+      ) : events.length === 0 ? (
         <div className={styles.noEventsWrapper}>
           <span className={styles.noEvents}>No events found</span>
         </div>
@@ -498,9 +455,7 @@ const handleEndBreak = async () => {
                 <EventCard
                   key={`${ev.id}-${index}`}
                   title={ev.title.charAt(0).toUpperCase() + ev.title.slice(1)}
-                  subtitle={
-                    ev.subtitle.charAt(0).toUpperCase() + ev.subtitle.slice(1)
-                  }
+                  subtitle={ev.subtitle.charAt(0).toUpperCase() + ev.subtitle.slice(1)}
                   date={ev.date}
                   type={ev.icon}
                 />
@@ -508,32 +463,7 @@ const handleEndBreak = async () => {
             )}
           </div>
         </div>
-      )} */}
-{loadingEvents ? (
-  <div className={styles.loadingText}>Loading events...</div>
-) : events.length === 0 ? (
-  <div className={styles.noEventsWrapper}>
-    <span className={styles.noEvents}>No events found</span>
-  </div>
-) : (
-  <div className={styles.marqueeWrapper}>
-    <div className={styles.marqueeTrack}>
-      {[...Array(5)].flatMap(() =>
-        events.map((ev, index) => (
-          <EventCard
-            key={`${ev.id}-${index}`}
-            title={ev.title.charAt(0).toUpperCase() + ev.title.slice(1)}
-            subtitle={
-              ev.subtitle.charAt(0).toUpperCase() + ev.subtitle.slice(1)
-            }
-            date={ev.date}
-            type={ev.icon}
-          />
-        ))
       )}
-    </div>
-  </div>
-)}
 
       {/* Permission + Late Login Cards */}
       <div className={styles.cardRow}>
@@ -551,10 +481,7 @@ const handleEndBreak = async () => {
           <div className={styles.card}>
             <button className={styles.circle1}>L</button>
             <h4>Late Logins</h4>
-            <p>
-              Total Late Logins:{" "}
-              {lateLogins !== null ? lateLogins : "Loading..."}
-            </p>
+            <p>Total Late Logins: {lateLogins !== null ? lateLogins : "Loading..."}</p>
           </div>
         </div>
       </div>
@@ -588,19 +515,15 @@ const handleEndBreak = async () => {
           <tbody>
             {paginatedRows.length === 0 ? (
               <tr>
-                <td colSpan={6} style={{ textAlign: "center", padding: "15px" }}>
+                <td colSpan={7} style={{ textAlign: "center", padding: "15px" }}>
                   <img
                     src={noDataImg}
                     alt="No Data Found"
-                    style={{
-                      width: "120px",
-                      height: "120px",
-                      objectFit: "contain",
-                    }}
+                    style={{ width: "120px", height: "120px", objectFit: "contain" }}
                   />
                 </td>
               </tr>
-            ) :(
+            ) : (
               paginatedRows.map((row) =>
                 row.isLeave ? (
                   <tr
@@ -614,12 +537,12 @@ const handleEndBreak = async () => {
                     <td>{row.date}</td>
                     <td></td>
                     <td></td>
-                    <td style={{ textAlign: "center" }}>Leave</td>{" "}
-                    {/* ✅ Only Remarks */}
+                    <td style={{ textAlign: "center" }}>Leave</td>
+                    <td></td>
                     <td></td>
                     <td></td>
                   </tr>
-                ) :  (
+                ) : (
                   <tr key={row.id}>
                     <td>{row.date}</td>
                     <td>{row.login}</td>
@@ -654,13 +577,7 @@ const handleEndBreak = async () => {
 
         {/* Pagination */}
         {paginatedRows.length > 0 && (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              marginTop: "15px",
-            }}
-          >
+          <div style={{ display: "flex", justifyContent: "center", marginTop: "15px" }}>
             <Pagination
               count={pageCount}
               page={page}
@@ -693,19 +610,12 @@ const handleEndBreak = async () => {
 
       {/* Remark Popup */}
       {selectedRemark && (
-        <div
-          className={styles.popupOverlay}
-          onClick={() => setSelectedRemark(null)}
-        >
-          <div
-            className={styles.popupContent}
-            onClick={(e) => e.stopPropagation()}
-          >
+        <div className={styles.popupOverlay} onClick={() => setSelectedRemark(null)}>
+          <div className={styles.popupContent} onClick={(e) => e.stopPropagation()}>
             <h3 className={styles.popupHeader}>Remark</h3>
             <p className={styles.popupText}>
               {selectedRemark
-                ? selectedRemark.charAt(0).toUpperCase() +
-                  selectedRemark.slice(1)
+                ? selectedRemark.charAt(0).toUpperCase() + selectedRemark.slice(1)
                 : "-"}
             </p>
             <button
@@ -718,7 +628,7 @@ const handleEndBreak = async () => {
         </div>
       )}
 
-      {/* Checkout Modal */}
+      {/* Modals */}
       <BreakModal
         user={user}
         setBreakStatus={setBreakStatus}
@@ -727,7 +637,7 @@ const handleEndBreak = async () => {
         attendanceId={attendanceId}
         refreshAttendance={fetchAttendance}
         refreshUser={fetchUser}
-        handleStartBreak={handleStartBreak} // ✅ start break
+        handleStartBreak={handleStartBreak}
       />
 
       <CheckInModal
