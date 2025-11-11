@@ -41,9 +41,9 @@ const Dashboard = () => {
 //   const saved = localStorage.getItem("hasEndedBreak");
 //   return saved ? JSON.parse(saved) : false;
 // });
-const [hasEndedBreak, setHasEndedBreak] = useState(
-  JSON.parse(localStorage.getItem("hasEndedBreak") || "false")
-);
+// const [hasEndedBreak, setHasEndedBreak] = useState(
+//   JSON.parse(localStorage.getItem("hasEndedBreak") || "false")
+// );
 const [isBreakTaken, setIsBreakTaken] = useState(false);
 
 // useEffect(() => {
@@ -238,12 +238,12 @@ useEffect(() => {
 
     return () => clearInterval(timer);
   }, [user?.checkInStatus, attendanceTable]);
-   useEffect(() => {
-    const savedBreak = JSON.parse(localStorage.getItem("hasEndedBreak") || "false");
-    if (savedBreak !== !breakStatus) {
-      localStorage.setItem("hasEndedBreak", JSON.stringify(!breakStatus));
-    }
-  }, [breakStatus]);
+  //  useEffect(() => {
+  //   const savedBreak = JSON.parse(localStorage.getItem("hasEndedBreak") || "false");
+  //   if (savedBreak !== !breakStatus) {
+  //     localStorage.setItem("hasEndedBreak", JSON.stringify(!breakStatus));
+  //   }
+  // }, [breakStatus]);
 
   // ==================== ACTIONS ====================
 const handleCheckIn = async () => {
@@ -276,8 +276,8 @@ const handleCheckIn = async () => {
 
       // ✅ Important fix:
       // Reset break flags so "Take Break" shows after check-in
-      setHasEndedBreak(false);
-      localStorage.setItem("hasEndedBreak", JSON.stringify(false)); // ✅ Correct way
+      // setHasEndedBreak(false);
+      // localStorage.setItem("hasEndedBreak", JSON.stringify(false)); // ✅ Correct way
 
       toast.success("Check-in successful!", { autoClose: 1000 });
     }
@@ -456,13 +456,7 @@ const handleEndBreak = async () => {
         <div className={styles.second}>
           <p className={styles.subtitle}>Your future starts with today’s attendance</p>
           <div className={styles.check}>
-            {/* Check-In Button */}
-       {/* ✅ Check-In / Break / Checkout Buttons */}
-{/* ✅ Check-In / Break / Checkout Buttons */}
-{/* ✅ Check-In / Break / Checkout Buttons */}
-{/* ✅ Check-In / Break / Checkout Buttons */}
-{/* ✅ Check-In Button */}
-{/* ✅ Attendance Action Buttons */}
+           
 {!checkInStatus ? (
   <button onClick={() => setCheckInModalOpen(true)} className={styles.checkIn}>
     Check-in
