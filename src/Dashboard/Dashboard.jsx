@@ -26,12 +26,12 @@ import {
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const userId = localStorage.getItem("userId");
+  const userId = localStorage.getItem("userId"); // You may still keep userId in storage
 
   const [user, setUser] = useState(null);
   const [attendanceTable, setAttendanceTable] = useState([]);
   const [attendanceId, setAttendanceId] = useState("");
-  const [checkInStatus, setCheckInStatus] = useState(null);
+  const [checkInStatus, setCheckInStatus] = useState(false);
   const [breakStatus, setBreakStatus] = useState(false);
   const [isBreakTaken, setIsBreakTaken] = useState(false);
 
@@ -63,31 +63,18 @@ const Dashboard = () => {
   const rowsPerPage = 5;
 
   // ==================== API CALLS ====================
- const fetchUser = async () => {
-  try {
-    const res = await getUserId(userId);
-    const userData = res.data.data.data[0];
-    setUser(userData);
-    setCheckInStatus(userData.checkInStatus);
-    setBreakStatus(userData.breakStatus);
-
-    // ✅ Check if break already taken today
-    const today = new Date().toISOString().split("T")[0];
-    const savedBreakDate = localStorage.getItem("breakTakenDate");
-
-    if (userData.breakStatus) {
-      // currently on break
-      setIsBreakTaken(false);
-    } else if (savedBreakDate === today) {
-      // break already ended today
-      setIsBreakTaken(true);
-    } else {
-      setIsBreakTaken(false);
+  const fetchUser = async () => {
+    try {
+      const res = await getUserId(userId);
+      const userData = res.data.data.data[0];
+      setUser(userData);
+      setCheckInStatus(userData.checkInStatus);
+      setBreakStatus(userData.breakStatus);
+      setIsBreakTaken(userData.breakTakenToday || false); // backend should return if break already taken today
+    } catch (err) {
+      console.error("Error fetching user:", err.message);
     }
-  } catch (err) {
-    console.error("Error fetching user:", err.message);
-  }
-};
+  };
 
   const fetchLateCount = async () => {
     try {
@@ -231,10 +218,6 @@ const Dashboard = () => {
         const newAttendanceId = response.data.data._id;
         setAttendanceId(newAttendanceId);
 
-        const apiDate = response.data.data.date;
-        const formattedDate = new Date(apiDate).toISOString().split("T")[0];
-        localStorage.setItem("checkInDate", formattedDate);
-
         await fetchLateCount();
         await fetchAttendance(false);
         await fetchUser();
@@ -261,11 +244,10 @@ const Dashboard = () => {
 
     try {
       const breakTime = new Date().toISOString();
-      const response = await startBreak(attendanceId, breakTime); // start break API
+      const response = await startBreak(attendanceId, breakTime);
 
       const updatedBreakStatus = response.data.data?.breakStatus;
       setBreakStatus(updatedBreakStatus);
-      localStorage.setItem("hasEndedBreak", !updatedBreakStatus);
 
       await fetchAttendance(false);
       await fetchUser();
@@ -288,9 +270,7 @@ const Dashboard = () => {
       const updatedBreakStatus = response.data.data?.breakStatus;
       setBreakStatus(updatedBreakStatus);
 
-      const today = new Date().toISOString().split("T")[0];
-      localStorage.setItem("breakTakenDate", today);
-      setIsBreakTaken(true);
+      setIsBreakTaken(true); // backend confirms break ended today
 
       await fetchUser();
       toast.success("Break ended successfully!", { autoClose: 1000 });
@@ -308,10 +288,7 @@ const Dashboard = () => {
       const checkoutTime = new Date().toISOString();
       await checkOut(attendanceId, remarks, userId, checkoutTime);
 
-      // ✅ Reset flags at end of day
-      localStorage.removeItem("breakTakenDate");
-      localStorage.removeItem("hasEndedBreak");
-
+      // reset flags via backend
       await fetchAttendance();
       await fetchUser();
       toast.success("Checkout successful!", { autoClose: 1000 });
@@ -383,17 +360,6 @@ const Dashboard = () => {
   const paginatedRows = rows.slice((page - 1) * rowsPerPage, page * rowsPerPage);
   const pageCount = Math.ceil(rows.length / rowsPerPage);
 
-  const getTodayDate = () => {
-    const today = new Date();
-    const day = String(today.getDate()).padStart(2, "0");
-    const month = String(today.getMonth() + 1).padStart(2, "0");
-    const year = today.getFullYear();
-    return `${day}-${month}-${year}`;
-  };
-
-  const todayDate = getTodayDate();
-  const hasTodayAttendance = attendanceTable.some((att) => att.date === todayDate);
-
   // ==================== RENDER ====================
   return (
     <div className={styles.container}>
@@ -409,38 +375,37 @@ const Dashboard = () => {
           <p className={styles.subtitle}>
             Your future starts with today’s attendance
           </p>
-        <div className={styles.check}>
-  {!checkInStatus ? (
-    <button
-      onClick={() => setCheckInModalOpen(true)}
-      className={styles.checkIn}
-    >
-      Check-in
-    </button>
-  ) : breakStatus ? (
-    <button className={styles.break} onClick={handleEndBreak}>
-      End Break
-    </button>
-  ) : (
-    <>
-      {!isBreakTaken && (
-        <button
-          className={styles.break}
-          onClick={() => setBreakModalOpen(true)}
-        >
-          Take Break
-        </button>
-      )}
-      <button
-        className={styles.checkOut}
-        onClick={() => setCheckoutOpen(true)}
-      >
-        Check-out
-      </button>
-    </>
-  )}
-</div>
-
+          <div className={styles.check}>
+            {!checkInStatus ? (
+              <button
+                onClick={() => setCheckInModalOpen(true)}
+                className={styles.checkIn}
+              >
+                Check-in
+              </button>
+            ) : breakStatus ? (
+              <button className={styles.break} onClick={handleEndBreak}>
+                End Break
+              </button>
+            ) : (
+              <>
+                {!isBreakTaken && (
+                  <button
+                    className={styles.break}
+                    onClick={() => setBreakModalOpen(true)}
+                  >
+                    Take Break
+                  </button>
+                )}
+                <button
+                  className={styles.checkOut}
+                  onClick={() => setCheckoutOpen(true)}
+                >
+                  Check-out
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
