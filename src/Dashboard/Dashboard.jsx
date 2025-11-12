@@ -33,7 +33,7 @@ const Dashboard = () => {
   const [attendanceId, setAttendanceId] = useState("");
   const [checkInStatus, setCheckInStatus] = useState(false);
   const [breakStatus, setBreakStatus] = useState(false);
-  const [isBreakTaken, setIsBreakTaken] = useState(false);
+  // const [isBreakTaken, setIsBreakTaken] = useState(false);
 
   const [isCheckoutOpen, setCheckoutOpen] = useState(false);
   const [isCheckInModalOpen, setCheckInModalOpen] = useState(false);
@@ -64,17 +64,17 @@ const Dashboard = () => {
 
   // ==================== API CALLS ====================
   const fetchUser = async () => {
-    try {
-      const res = await getUserId(userId);
-      const userData = res.data.data.data[0];
-      setUser(userData);
-      setCheckInStatus(userData.checkInStatus);
-      setBreakStatus(userData.breakStatus);
-      setIsBreakTaken(userData.breakTakenToday || false); // backend should return if break already taken today
-    } catch (err) {
-      console.error("Error fetching user:", err.message);
-    }
-  };
+  try {
+    const res = await getUserId(userId);
+    const userData = res.data.data.data[0];
+    setUser(userData);
+    setCheckInStatus(userData.checkInStatus);
+    setBreakStatus(userData.breakStatus);
+    // ❌ remove setIsBreakTaken line
+  } catch (err) {
+    console.error("Error fetching user:", err.message);
+  }
+};
 
   const fetchLateCount = async () => {
     try {
@@ -236,49 +236,57 @@ const Dashboard = () => {
     }
   };
 
-  const handleStartBreak = async () => {
-    if (!attendanceId) {
-      toast.error("No active attendance record found!", { autoClose: 1000 });
+ const handleStartBreak = async () => {
+  if (!attendanceId) {
+    toast.error("No active attendance record found!", { autoClose: 1000 });
+    return;
+  }
+
+  try {
+    const todayAttendance = attendanceTable.find((att) => !att.outTime);
+    const breakCount = todayAttendance?.breakTime?.length || 0;
+
+    // ✅ Allow break only if less than 2 timestamps (not yet fully taken)
+    if (breakCount >= 2) {
+      toast.error("You have already taken a break today!", { autoClose: 1000 });
       return;
     }
 
-    try {
-      const breakTime = new Date().toISOString();
-      const response = await startBreak(attendanceId, breakTime);
+    const response = await startBreak(attendanceId, new Date().toISOString());
+    const updatedBreakStatus = response.data.data?.breakStatus;
+    setBreakStatus(updatedBreakStatus);
 
-      const updatedBreakStatus = response.data.data?.breakStatus;
-      setBreakStatus(updatedBreakStatus);
+    await fetchAttendance(false);
+    await fetchUser();
 
-      await fetchAttendance(false);
-      await fetchUser();
-      toast.success("Break started successfully!", { autoClose: 1000 });
-      setBreakModalOpen(false);
-    } catch (err) {
-      console.error("Error starting break:", err);
-      toast.error("Failed to start break", { autoClose: 1000 });
-    }
-  };
+    toast.success("Break started successfully!", { autoClose: 1000 });
+    setBreakModalOpen(false);
+  } catch (err) {
+    console.error("Error starting break:", err);
+    toast.error("Failed to start break", { autoClose: 1000 });
+  }
+};
 
-  const handleEndBreak = async () => {
-    if (!attendanceId) {
-      toast.error("No active attendance found!", { autoClose: 1000 });
-      return;
-    }
+const handleEndBreak = async () => {
+  if (!attendanceId) {
+    toast.error("No active attendance record found!", { autoClose: 1000 });
+    return;
+  }
 
-    try {
-      const response = await startBreak(attendanceId, new Date().toISOString());
-      const updatedBreakStatus = response.data.data?.breakStatus;
-      setBreakStatus(updatedBreakStatus);
+  try {
+    const response = await startBreak(attendanceId, new Date().toISOString());
+    const updatedBreakStatus = response.data.data?.breakStatus;
+    setBreakStatus(updatedBreakStatus);
 
-      setIsBreakTaken(true); // backend confirms break ended today
+    await fetchAttendance(false);
+    await fetchUser();
 
-      await fetchUser();
-      toast.success("Break ended successfully!", { autoClose: 1000 });
-    } catch (err) {
-      console.error("Error ending break:", err);
-      toast.error("Failed to end break", { autoClose: 1000 });
-    }
-  };
+    toast.success("Break ended successfully!", { autoClose: 1000 });
+  } catch (err) {
+    console.error("Error ending break:", err);
+    toast.error("Failed to end break", { autoClose: 1000 });
+  }
+};
 
   const handleCheckoutConfirm = async (remarks) => {
     if (isCheckingOut) return;
@@ -375,41 +383,64 @@ const Dashboard = () => {
           <p className={styles.subtitle}>
             Your future starts with today’s attendance
           </p>
-          <div className={styles.check}>
-            {!checkInStatus ? (
+     <div className={styles.check}>
+  {!checkInStatus ? (
+    // Not checked in → show Check-in button
+    <button
+      onClick={() => setCheckInModalOpen(true)}
+      className={styles.checkIn}
+    >
+      Check-in
+    </button>
+  ) : breakStatus ? (
+    // Currently on break → show End Break
+    <button className={styles.break} onClick={handleEndBreak}>
+      End Break
+    </button>
+  ) : (
+    <>
+      {(() => {
+        const todayAttendance = attendanceTable.find(
+          (att) => !att.outTime // today’s active record
+        );
+
+        if (todayAttendance) {
+          const breakTimeCount = todayAttendance.breakTime
+            ? todayAttendance.breakTime.length
+            : 0;
+
+          // ✅ Allow Take Break only if < 2
+          if (breakTimeCount < 2) {
+            return (
               <button
-                onClick={() => setCheckInModalOpen(true)}
-                className={styles.checkIn}
+                className={styles.break}
+                onClick={() => setBreakModalOpen(true)}
               >
-                Check-in
+                Take Break
               </button>
-            ) : breakStatus ? (
-              <button className={styles.break} onClick={handleEndBreak}>
-                End Break
-              </button>
-            ) : (
-              <>
-                {!isBreakTaken && (
-                  <button
-                    className={styles.break}
-                    onClick={() => setBreakModalOpen(true)}
-                  >
-                    Take Break
-                  </button>
-                )}
-                <button
-                  className={styles.checkOut}
-                  onClick={() => setCheckoutOpen(true)}
-                >
-                  Check-out
-                </button>
-              </>
-            )}
-          </div>
+            );
+          }
+        }
+
+        return null;
+      })()}
+
+      <button
+        className={styles.checkOut}
+        onClick={() => setCheckoutOpen(true)}
+      >
+        Check-out
+      </button>
+    </>
+  )}
+</div>
+
+
+
         </div>
       </div>
 
-      {/* Events Marquee */}
+  
       {loadingEvents ? (
         <div className={styles.loadingText}>Loading events...</div>
       ) : events.length === 0 ? (
@@ -434,7 +465,7 @@ const Dashboard = () => {
         </div>
       )}
 
-      {/* Permission + Late Login Cards */}
+     
       <div className={styles.cardRow}>
         <div className={styles.col}>
           <div className={styles.card}>
@@ -455,7 +486,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Attendance Table */}
       <div className={styles.tableContainer}>
         <div className={styles.topBar}>
           <div>Class Hours: {timeElapsed}</div>
@@ -544,7 +574,7 @@ const Dashboard = () => {
           </tbody>
         </table>
 
-        {/* Pagination */}
+       
         {paginatedRows.length > 0 && (
           <div style={{ display: "flex", justifyContent: "center", marginTop: "15px" }}>
             <Pagination
@@ -577,7 +607,7 @@ const Dashboard = () => {
         )}
       </div>
 
-      {/* Remark Popup */}
+  
       {selectedRemark && (
         <div className={styles.popupOverlay} onClick={() => setSelectedRemark(null)}>
           <div className={styles.popupContent} onClick={(e) => e.stopPropagation()}>
