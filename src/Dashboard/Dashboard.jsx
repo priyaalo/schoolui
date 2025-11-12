@@ -12,6 +12,8 @@ import BreakModal from "./BreakModal";
 import EventCard from "../EventCard/EventCard";
 import Loader from "../loader/Loader";
 import noDataImg from "../assets/AloLogo/nodatasearch.png";
+import EndBreakModal from "./EndBreakModal";
+
 
 import {
   getUserId,
@@ -38,6 +40,8 @@ const Dashboard = () => {
   const [isCheckoutOpen, setCheckoutOpen] = useState(false);
   const [isCheckInModalOpen, setCheckInModalOpen] = useState(false);
   const [isBreakModalOpen, setBreakModalOpen] = useState(false);
+  const [isEndBreakModalOpen, setEndBreakModalOpen] = useState(false);
+
 
   const [isCheckingIn, setIsCheckingIn] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
@@ -394,9 +398,13 @@ const handleEndBreak = async () => {
     </button>
   ) : breakStatus ? (
     // Currently on break → show End Break
-    <button className={styles.break} onClick={handleEndBreak}>
-      End Break
-    </button>
+    <button
+  className={styles.break}
+  onClick={() => setEndBreakModalOpen(true)}
+>
+  End Break
+</button>
+
   ) : (
     <>
       {(() => {
@@ -638,6 +646,12 @@ const handleEndBreak = async () => {
         refreshUser={fetchUser}
         handleStartBreak={handleStartBreak}
       />
+      <EndBreakModal
+  isOpen={isEndBreakModalOpen}
+  onClose={() => setEndBreakModalOpen(false)}
+  handleEndBreak={handleEndBreak}  // ✅ correct prop name
+/>
+
 
       <CheckInModal
         isOpen={isCheckInModalOpen}
