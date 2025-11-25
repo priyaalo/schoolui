@@ -93,4 +93,7 @@ export const startBreak = (attendanceId, breakTime) =>{
   return apiService.put(`/attendance/break/${attendanceId}`, { breakTime });
 }
 
-
+export const getAttendanceRate = (userId, fromDate, toDate) =>{
+  return apiService.get( `/attendance/studentrate?userId=${userId}&fromDate=${fromDate}&toDate=${toDate}`
+  );
+}

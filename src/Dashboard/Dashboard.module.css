@@ -92,7 +92,7 @@
 .cardRow {
         flex: 0 0 auto;
         display: grid;
-        grid-template-columns: 300px 300px;
+        grid-template-columns: 300px 300px 300px;
         gap: 20px;
         margin: 20px 0;
         padding:10px;
@@ -108,7 +108,7 @@
 
 
 .col {
-  flex: 1 1 200px; /* all columns take equal width, min 200px */
+  flex: 1 1 200px; 
 }
 
 
