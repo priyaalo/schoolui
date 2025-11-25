@@ -221,14 +221,16 @@
 
 /* Notification item */
 .notificationItem {
-  padding: 8px 5px;
-  cursor: pointer;
-  border-bottom: 1px solid #f1f1f1;
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
 }
 
 .notificationItem:last-child {
   border-bottom: none;
 }
+
 
 /* Text block: flex layout for content + date */
 .textBlock {
@@ -410,10 +412,10 @@
     font-size: 10px;
   }
 
-  .dropdown {
+  /* .dropdown {
     width: 90vw;
     right: 5%;
-  }
+  } */
 
   .textBlock {
     flex-direction: column;
@@ -456,17 +458,44 @@
 .notificationWrapper {
   position: relative;
 }
+/* === FINAL NOTIFICATION DROPDOWN FIX (WORKS 100%) === */
+
 .dropdown {
   position: absolute;
-  top: 200%;
+  top: 120%;                     /* fix vertical position */
   right: -10px;
- background-color: white;
+  background: #fff;
   border-radius: 8px;
-   width: 400px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  z-index: 1000;
+  width: 400px;
   padding: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 1000;
+
+  /* 🔥 Make scroll work */
+  max-height: 300px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
 }
+
+/* Scrollbar styling (Chrome/Edge) */
+.dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dropdown::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.dropdown::-webkit-scrollbar-thumb:hover {
+  background: #a0a0a0;
+}
+
+/* Firefox thin scrollbar */
+.dropdown {
+  scrollbar-width: thin;
+}
+
 
 .dropdownHeader {
   font-size: 16px;
@@ -717,9 +746,10 @@
 
   .dropdown {
     width: 95%;
-    right: 2.5%;
-    top: 80%;
-    max-height: 320px;
+    right: 2%;
+    top: 95%;
+    max-width: 300px;
+   
    
   }
 
@@ -849,21 +879,7 @@
     padding: 8px 12px;
   }
 
- .dropdown {
-    position: fixed;          /* overlay on entire screen */
-    top: 50%;                 /* center vertically */
-    left: 50%;                /* center horizontally */
-    transform: translate(-50%, -50%); /* shift to exact center */
-    width: 90%;               /* responsive width */
-    max-width: 350px;         /* optional max width */
-    max-height: 80vh;         /* scrollable if many notifications */
-    overflow-y: auto;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    z-index: 10000;           /* above everything */
-    padding: 15px;
-  }
+
   .logoWrapper {
     width: 200px; /* keep big but not too big */
     height: 60px;
@@ -1111,5 +1127,6 @@
     width: 400px;
     top: 75px;
     right: 20px;
+   
   }
 }
