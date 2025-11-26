@@ -20,7 +20,7 @@ const LeaveManagement = () => {
   const [loading, setLoading] = useState(true);
   const { userId } = useParams();
   const [page, setPage] = useState(1);
-  const rowsPerPage = 5;
+  const rowsPerPage = 10;
 
   const [leaveStats, setLeaveStats] = useState({
     sickLeaveTaken: 0,
