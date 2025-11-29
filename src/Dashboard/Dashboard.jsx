@@ -97,19 +97,24 @@ const Dashboard = () => {
       const monthFlag = filter === "pastMonth";
       const response = await getAttendance(userId, monthFlag);
       const allData = response.data.data.data || [];
+const formattedData = allData.map((att) => {
+  let formatted = att;
+  if (att.date) {
+    const d = new Date(att.date);
+    if (!isNaN(d)) {
+      const day = String(d.getDate()).padStart(2, "0");
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const year = d.getFullYear();
 
-      const formattedData = allData.map((att) => {
-        if (att.date) {
-          const d = new Date(att.date);
-          if (!isNaN(d)) {
-            const day = String(d.getDate()).padStart(2, "0");
-            const month = String(d.getMonth() + 1).padStart(2, "0");
-            const year = d.getFullYear();
-            return { ...att, date: `${day}-${month}-${year}` };
-          }
-        }
-        return att;
-      });
+      formatted = {
+        ...att,
+        date: `${day}-${month}-${year}`,
+        rawDate: att.date   // ← SAVE ORIGINAL DATE
+      };
+    }
+  }
+  return formatted;
+});
 
       setAttendanceTable(formattedData);
 
@@ -151,6 +156,7 @@ const Dashboard = () => {
 
         const rateRes = await getAttendanceRate(userId, fromDate, toDate);
         const rate = rateRes.data.data?.attendanceRate || 0;
+        console.log(rate)
 
         setAttendanceRate(rate);
       } catch (error) {
@@ -348,6 +354,14 @@ const Dashboard = () => {
   };
 
   const handleCheckOut = () => setCheckoutOpen(true);
+const hasCheckedInToday = attendanceTable.some((att) => {
+  if (!att.inTime || !att.rawDate) return false;
+  
+  const attDate = new Date(att.rawDate).toDateString();
+  const today = new Date().toDateString();
+
+  return attDate === today && !att.deleted;
+});
 
 
   const tableFormatTime = (timestamp) => {
@@ -424,11 +438,15 @@ const Dashboard = () => {
             {!checkInStatus ? (
               // Not checked in → show Check-in button
               <button
-                onClick={() => setCheckInModalOpen(true)}
-                className={styles.checkIn}
-              >
-                Check-in
-              </button>
+  disabled={hasCheckedInToday}
+  onClick={() => {
+    if (!hasCheckedInToday) setCheckInModalOpen(true);
+  }}
+  className={hasCheckedInToday ? styles.disabledCheckIn : styles.checkIn}
+>
+  {hasCheckedInToday ? "" : "Check-in"}
+</button>
+
             ) : breakStatus ? (
               // Currently on break → show End Break
               <button

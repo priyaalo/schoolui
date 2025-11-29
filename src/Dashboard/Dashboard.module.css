@@ -437,3 +437,8 @@ td {
     font-size: 15px;          /* slightly smaller text for mobile */
   }
 }
+/* .disabledCheckIn {
+  background: grey !important;
+  cursor: not-allowed !important;
+  opacity: 0.6;
+} */

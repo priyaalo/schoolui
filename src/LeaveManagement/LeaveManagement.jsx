@@ -112,7 +112,7 @@ const LeaveManagement = () => {
       days = formattedHrs;
     }
     if (data.leaveType === "earlyPermission") {
-      leaveType = "Early Permission"; // fixed spacing
+      leaveType = "Early Permission"; 
       const permissionDate = data.permissionDate
         ? new Date(data.permissionDate).toLocaleDateString("en-GB", {
             day: "2-digit",
