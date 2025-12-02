@@ -32,13 +32,13 @@ const Dashboard = () => {
 
   const [user, setUser] = useState(null);
 
-  // fullAttendance = ALL records fetched from server (formatted)
+ 
   const [fullAttendance, setFullAttendance] = useState([]);
 
-  // attendanceTable = filtered list shown in table (thisMonth / pastMonth)
+
   const [attendanceTable, setAttendanceTable] = useState([]);
 
-  // attendanceId used for actions (we keep it pointing to today's attendance when exists)
+  
   const [attendanceId, setAttendanceId] = useState(null);
 
   const [checkInStatus, setCheckInStatus] = useState(false);
@@ -73,15 +73,13 @@ const [isEndingBreak, setIsEndingBreak] = useState(false);
 
   const [selectedRemark, setSelectedRemark] = useState(null);
 
-  // Today record (single source of truth for button state)
+ 
   const [todayRecord, setTodayRecord] = useState(null);
 
   const [page, setPage] = useState(1);
   const rowsPerPage = 10;
 
-  /* -------------------------
-     Fetch user
-  ------------------------- */
+ 
   const fetchUser = async () => {
     try {
       const res = await getUserId(userId);
@@ -94,9 +92,7 @@ const [isEndingBreak, setIsEndingBreak] = useState(false);
     }
   };
 
-  /* -------------------------
-     Late / Permission counts
-  ------------------------- */
+
   const fetchLateCount = async () => {
     try {
       const response = await attCardCalculation(userId);
@@ -108,22 +104,15 @@ const [isEndingBreak, setIsEndingBreak] = useState(false);
     }
   };
 
-  /* -------------------------
-     Fetch attendance (IMPORTANT)
-     - Always fetch ALL attendance (no server-side month filter)
-     - Format, set fullAttendance
-     - Client-side filter to set attendanceTable (thisMonth / pastMonth)
-     - Find today's record and set todayRecord
-  ------------------------- */
+  
   const fetchAttendance = async (showLoader = true) => {
     try {
       if (showLoader) setLoading(true);
 
-      // Always fetch all months from server (pass false for monthFlag)
+     
       const response = await getAttendance(userId, false);
       const allData = response.data.data.data || [];
 
-      // 1) Format data and keep rawDate
       const formattedAll = allData.map((att) => {
         let formatted = { ...att };
         if (att.date) {
@@ -138,11 +127,8 @@ const [isEndingBreak, setIsEndingBreak] = useState(false);
         }
         return formatted;
       });
-
-      // store full attendance (formatted) - used to compute today/others
       setFullAttendance(formattedAll);
 
-      // 2) Client-side filter for table view based on `filter`
       const now = new Date();
       const filtered = formattedAll.filter((att) => {
         if (!att.rawDate) return false;
@@ -150,7 +136,7 @@ const [isEndingBreak, setIsEndingBreak] = useState(false);
         if (filter === "thisMonth") {
           return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
         } else {
-          // pastMonth -> last month
+          
           const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
           return d.getMonth() === lastMonth.getMonth() && d.getFullYear() === lastMonth.getFullYear();
         }
@@ -158,7 +144,6 @@ const [isEndingBreak, setIsEndingBreak] = useState(false);
 
       setAttendanceTable(filtered);
 
-      // 3) Find today's record from full data (raw)
       const todayStr = new Date().toISOString().split("T")[0];
       const todayRec = formattedAll.find((a) => {
         if (!a.rawDate) return false;
@@ -168,7 +153,6 @@ const [isEndingBreak, setIsEndingBreak] = useState(false);
 
       setTodayRecord(todayRec);
 
-      // set attendanceId to today's record id (if exists) so actions act on today's record
       if (todayRec && todayRec._id) {
         setAttendanceId(todayRec._id);
         setOnPermission(todayRec.onPermission === true);
@@ -179,13 +163,13 @@ const [isEndingBreak, setIsEndingBreak] = useState(false);
         setOnEarlyPermission(false);
       }
 
-      // 4) Keep your per/earlyPer logic (first formatted row if any)
+    
       if (formattedAll.length > 0) {
         setPer(formattedAll[0]._id);
         setEarlyPer(formattedAll[0]._id);
       }
 
-      // 5) Attendance rate (unchanged)
+     
       try {
         function formatDate(date) {
           const yyyy = date.getFullYear();
@@ -215,9 +199,6 @@ const [isEndingBreak, setIsEndingBreak] = useState(false);
     }
   };
 
-  /* -------------------------
-     Events
-  ------------------------- */
   const fetchEvents = async () => {
     try {
       setLoadingEvents(true);
@@ -230,9 +211,7 @@ const [isEndingBreak, setIsEndingBreak] = useState(false);
     }
   };
 
-  /* -------------------------
-     Effects
-  ------------------------- */
+ 
   useEffect(() => {
     if (!userId) navigate("/");
     else {
@@ -240,42 +219,40 @@ const [isEndingBreak, setIsEndingBreak] = useState(false);
       fetchAttendance(true);
       fetchLateCount();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, [navigate, userId]);
 
-  // When filter changes, we already fetch all attendance on mount,
-  // but fetchAttendance will re-run and apply client-side filter again.
+  
   useEffect(() => {
     if (userId) fetchAttendance(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, [filter, userId]);
 
   useEffect(() => {
     fetchEvents();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, []);
 
-  // Use todayRecord for timer instead of attendanceTable[0]
+
  useEffect(() => {
-  // No check-in today → reset
+  
   if (!todayRecord?.inTime) {
     setTimeElapsed("00:00:00");
     setCheckInTime(null);
     return;
   }
 
-  // If the user already checked out → STOP TIMER & show final work hours
   if (todayRecord?.outTime) {
     setTimeElapsed(todayRecord.totalWorkHours || "00:00:00");
     return;
   }
 
-  // Timer runs only when checked-in and NOT checked-out
+ 
   const startTime = new Date(todayRecord.inTime);
   setCheckInTime(startTime);
 
   const timer = setInterval(() => {
-    // IST adjustment (+5:30)
+    
     const currentTime = new Date(new Date().getTime() + (5 * 60 + 30) * 60000);
     let diff = currentTime - startTime;
 
@@ -298,9 +275,6 @@ const [isEndingBreak, setIsEndingBreak] = useState(false);
   return () => clearInterval(timer);
 }, [todayRecord]);
 
-  /* -------------------------
-     Actions
-  ------------------------- */
   const handleCheckIn = async () => {
     if (isCheckingIn) return;
     setIsCheckingIn(true);
@@ -339,9 +313,9 @@ const [isEndingBreak, setIsEndingBreak] = useState(false);
     }
   };
 
-  // Start break — now allow only one break per day
+
  const handleStartBreak = async () => {
-  // ⛔ double-click protection
+
   if (isTakingBreak) return;
   setIsTakingBreak(true);
 
@@ -352,7 +326,7 @@ const [isEndingBreak, setIsEndingBreak] = useState(false);
   }
 
   try {
-    // compute break count from todayRecord
+   
     const breakCount = todayRecord?.breakTime?.length || 0;
 
     if (breakCount >= 1) {
@@ -378,10 +352,10 @@ const [isEndingBreak, setIsEndingBreak] = useState(false);
   setIsTakingBreak(false);
 };
 
-  // End break — using same API (your code used startBreak for end as well)
+  
   const handleEndBreak = async () => {
 
-  // ⛔ Prevent double click
+  
   if (isEndingBreak) return;
   setIsEndingBreak(true);
 
@@ -392,7 +366,7 @@ const [isEndingBreak, setIsEndingBreak] = useState(false);
   }
 
   try {
-    // call same startBreak function (server toggles break status)
+   
     const response = await startBreak(attendanceId, new Date().toISOString());
     const updatedBreakStatus = response.data.data?.breakStatus;
     setBreakStatus(updatedBreakStatus);
@@ -435,28 +409,17 @@ const [isEndingBreak, setIsEndingBreak] = useState(false);
 
   const handleCheckOut = () => setCheckoutOpen(true);
 
-  /* -------------------------
-     Derived booleans from todayRecord (SINGLE SOURCE OF TRUTH)
-     - isCheckedIn: true when todayRecord has inTime
-     - isOnBreak: true when todayRecord.breakStatus === true (or breakTime active)
-     - isCheckedOut: true when todayRecord.outTime present
-     - breakCount: todayRecord.breakTime?.length
-  ------------------------- */
+  
   const isCheckedIn = Boolean(todayRecord?.inTime);
   const isCheckedOut = Boolean(todayRecord?.outTime);
-  // breakStatus may also come from user... prefer today's record value if available
+ 
   const isOnBreak = Boolean(todayRecord?.breakStatus) || breakStatus === true;
   const breakCount = todayRecord?.breakTime?.length || 0;
 
-  /* -------------------------
-     hasCheckedInToday - used to disable the check-in button when user already checked in today
-     (checks todayRecord)
-  ------------------------- */
+  
   const hasCheckedInToday = !!(todayRecord && todayRecord.inTime && !todayRecord.deleted);
 
-  /* -------------------------
-     Helpers for table formatting
-  ------------------------- */
+  
   const tableFormatTime = (timestamp) => {
     if (!timestamp) return "-";
     const adjustedTime = moment.utc(timestamp);
@@ -509,9 +472,6 @@ const [isEndingBreak, setIsEndingBreak] = useState(false);
   const paginatedRows = rows.slice((page - 1) * rowsPerPage, page * rowsPerPage);
   const pageCount = Math.ceil(rows.length / rowsPerPage);
 
-  /* -------------------------
-     Render
-  ------------------------- */
   return (
     <div className={styles.container}>
       {loading && <Loader />}
@@ -524,9 +484,9 @@ const [isEndingBreak, setIsEndingBreak] = useState(false);
         <div className={styles.second}>
           <p className={styles.subtitle}>Your future starts with today’s attendance</p>
           <div className={styles.check}>
-            {/* ---------- BUTTON AREA using todayRecord ONLY ---------- */}
+   
             {!isCheckedIn && !isCheckedOut ? (
-              // Not checked in → show Check-in button
+              
               <button
   disabled={hasCheckedInToday || isCheckingIn}
   onClick={() => {
@@ -538,33 +498,33 @@ const [isEndingBreak, setIsEndingBreak] = useState(false);
 </button>
 
             ) : isOnBreak && !isCheckedOut ? (
-              // Currently on break → show End Break
+              
               <button
   className={styles.break}
-  disabled={isEndingBreak}          // 🛑 disable during API
+  disabled={isEndingBreak}          
   onClick={() => setEndBreakModalOpen(true)}
 >
-  {isEndingBreak ? "Processing..." : "End Break"}   {/* 🔄 loader */}
+  {isEndingBreak ? "Processing..." : "End Break"}   
 </button>
 
             ) : (
               <>
-                {/* Take Break (only if checked in, not on break, not checked out, and haven't taken break today) */}
+               
                {isCheckedIn && !isOnBreak && !isCheckedOut && breakCount < 1 && (
     <button
       className={styles.break}
-      disabled={isTakingBreak}     // 🛑 disables button during API
+      disabled={isTakingBreak}    
       onClick={() => setBreakModalOpen(true)}
     >
-      {isTakingBreak ? "Processing..." : "Take Break"}   {/* 🔄 loader */}
+      {isTakingBreak ? "Processing..." : "Take Break"}   
     </button>
   )}
 
-                {/* Checkout (show when checked in and not checked out) */}
+                
                 {isCheckedIn && !isCheckedOut && (
   <button
     className={styles.checkOut}
-    disabled={isCheckingOut}           // ⛔ block double click
+    disabled={isCheckingOut}           
     onClick={() => {
       if (!isCheckingOut) setCheckoutOpen(true);
     }}
@@ -765,11 +725,11 @@ const [isEndingBreak, setIsEndingBreak] = useState(false);
         isOpen={isCheckInModalOpen}
         onClose={() => setCheckInModalOpen(false)}
        onConfirm={async () => {
-  if (isCheckingIn) return;   // ⛔ prevents double click
+  if (isCheckingIn) return; 
 
   setIsCheckingIn(true);
 
-  await handleCheckIn();      // API call
+  await handleCheckIn();      
   setIsCheckingIn(false);
   setCheckInModalOpen(false);
 }}
@@ -781,16 +741,16 @@ const [isEndingBreak, setIsEndingBreak] = useState(false);
   onClose={() => setCheckoutOpen(false)}
   onCheckout={async (selectedRemark) => {
 
-    if (isCheckingOut) return;   // ⛔ prevent double click
+    if (isCheckingOut) return;  
 
-    setIsCheckingOut(true);      // show loader
+    setIsCheckingOut(true);   
 
     await handleCheckoutConfirm(selectedRemark);
 
     setIsCheckingOut(false);
     setCheckoutOpen(false);
   }}
-  isCheckingOut={isCheckingOut}  // pass loader state
+  isCheckingOut={isCheckingOut}  
 />
 
     </div>
