@@ -256,37 +256,47 @@ const [isEndingBreak, setIsEndingBreak] = useState(false);
   }, []);
 
   // Use todayRecord for timer instead of attendanceTable[0]
-  useEffect(() => {
-    if (!todayRecord?.inTime) {
+ useEffect(() => {
+  // No check-in today → reset
+  if (!todayRecord?.inTime) {
+    setTimeElapsed("00:00:00");
+    setCheckInTime(null);
+    return;
+  }
+
+  // If the user already checked out → STOP TIMER & show final work hours
+  if (todayRecord?.outTime) {
+    setTimeElapsed(todayRecord.totalWorkHours || "00:00:00");
+    return;
+  }
+
+  // Timer runs only when checked-in and NOT checked-out
+  const startTime = new Date(todayRecord.inTime);
+  setCheckInTime(startTime);
+
+  const timer = setInterval(() => {
+    // IST adjustment (+5:30)
+    const currentTime = new Date(new Date().getTime() + (5 * 60 + 30) * 60000);
+    let diff = currentTime - startTime;
+
+    if (diff < 0) {
       setTimeElapsed("00:00:00");
-      setCheckInTime(null);
       return;
     }
 
-    const inTime = todayRecord.inTime;
-    const startTime = inTime ? new Date(inTime) : null;
-    setCheckInTime(startTime);
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-    const timer = setInterval(() => {
-      if (!startTime) return;
-      // convert to IST offset handling - original used +5:30
-      const currentTime = new Date(new Date().getTime() + (5 * 60 + 30) * 60000);
-      let timeDifference = currentTime - startTime;
+    setTimeElapsed(
+      `${hours.toString().padStart(2, "0")}:${minutes
+        .toString()
+        .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+    );
+  }, 1000);
 
-      if (timeDifference < 0) {
-        setTimeElapsed("00:00:00");
-        return;
-      }
-
-      const hours = Math.floor(timeDifference / (1000 * 60 * 60));
-      const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
-
-      setTimeElapsed(`${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`);
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [todayRecord]);
+  return () => clearInterval(timer);
+}, [todayRecord]);
 
   /* -------------------------
      Actions
@@ -406,7 +416,7 @@ const [isEndingBreak, setIsEndingBreak] = useState(false);
     try {
       const checkoutTime = new Date().toISOString();
       await checkOut(attendanceId, remarks, userId, checkoutTime);
-
+     
       await fetchAttendance(false);
       await fetchUser();
       toast.success("Checkout successful!", { autoClose: 1000 });
