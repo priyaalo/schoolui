@@ -53,6 +53,9 @@ const Dashboard = () => {
   const [isCheckingIn, setIsCheckingIn] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isTakingBreak, setIsTakingBreak] = useState(false);
+const [isEndingBreak, setIsEndingBreak] = useState(false);
+
 
   const [filter, setFilter] = useState("thisMonth");
   const [event, setEvent] = useState([]);
@@ -327,58 +330,74 @@ const Dashboard = () => {
   };
 
   // Start break — now allow only one break per day
-  const handleStartBreak = async () => {
-    if (!attendanceId) {
-      toast.error("No active attendance record found!", { autoClose: 1000 });
+ const handleStartBreak = async () => {
+  // ⛔ double-click protection
+  if (isTakingBreak) return;
+  setIsTakingBreak(true);
+
+  if (!attendanceId) {
+    toast.error("No active attendance record found!", { autoClose: 1000 });
+    setIsTakingBreak(false);
+    return;
+  }
+
+  try {
+    // compute break count from todayRecord
+    const breakCount = todayRecord?.breakTime?.length || 0;
+
+    if (breakCount >= 1) {
+      toast.error("You have already taken a break today!", { autoClose: 1000 });
+      setIsTakingBreak(false);
       return;
     }
 
-    try {
-      // compute break count from todayRecord
-      const breakCount = todayRecord?.breakTime?.length || 0;
+    const response = await startBreak(attendanceId, new Date().toISOString());
+    const updatedBreakStatus = response.data.data?.breakStatus;
+    setBreakStatus(updatedBreakStatus);
 
-      if (breakCount >= 1) {
-        toast.error("You have already taken a break today!", { autoClose: 1000 });
-        return;
-      }
+    await fetchAttendance(false);
+    await fetchUser();
 
-      const response = await startBreak(attendanceId, new Date().toISOString());
-      const updatedBreakStatus = response.data.data?.breakStatus;
-      setBreakStatus(updatedBreakStatus);
+    toast.success("Break started successfully!", { autoClose: 1000 });
+    setBreakModalOpen(false);
+  } catch (err) {
+    console.error("Error starting break:", err);
+    toast.error("Failed to start break", { autoClose: 1000 });
+  }
 
-      await fetchAttendance(false);
-      await fetchUser();
-
-      toast.success("Break started successfully!", { autoClose: 1000 });
-      setBreakModalOpen(false);
-    } catch (err) {
-      console.error("Error starting break:", err);
-      toast.error("Failed to start break", { autoClose: 1000 });
-    }
-  };
+  setIsTakingBreak(false);
+};
 
   // End break — using same API (your code used startBreak for end as well)
   const handleEndBreak = async () => {
-    if (!attendanceId) {
-      toast.error("No active attendance record found!", { autoClose: 1000 });
-      return;
-    }
 
-    try {
-      // call same startBreak function (server toggles break status)
-      const response = await startBreak(attendanceId, new Date().toISOString());
-      const updatedBreakStatus = response.data.data?.breakStatus;
-      setBreakStatus(updatedBreakStatus);
+  // ⛔ Prevent double click
+  if (isEndingBreak) return;
+  setIsEndingBreak(true);
 
-      await fetchAttendance(false);
-      await fetchUser();
+  if (!attendanceId) {
+    toast.error("No active attendance record found!", { autoClose: 1000 });
+    setIsEndingBreak(false);
+    return;
+  }
 
-      toast.success("Break ended successfully!", { autoClose: 1000 });
-    } catch (err) {
-      console.error("Error ending break:", err);
-      toast.error("Failed to end break", { autoClose: 1000 });
-    }
-  };
+  try {
+    // call same startBreak function (server toggles break status)
+    const response = await startBreak(attendanceId, new Date().toISOString());
+    const updatedBreakStatus = response.data.data?.breakStatus;
+    setBreakStatus(updatedBreakStatus);
+
+    await fetchAttendance(false);
+    await fetchUser();
+
+    toast.success("Break ended successfully!", { autoClose: 1000 });
+  } catch (err) {
+    console.error("Error ending break:", err);
+    toast.error("Failed to end break", { autoClose: 1000 });
+  }
+
+  setIsEndingBreak(false);
+};
 
   const handleCheckoutConfirm = async (remarks) => {
     if (isCheckingOut) return;
@@ -499,34 +518,51 @@ const Dashboard = () => {
             {!isCheckedIn && !isCheckedOut ? (
               // Not checked in → show Check-in button
               <button
-                disabled={hasCheckedInToday}
-                onClick={() => {
-                  if (!hasCheckedInToday) setCheckInModalOpen(true);
-                }}
-                className={hasCheckedInToday ? styles.disabledCheckIn : styles.checkIn}
-              >
-                {hasCheckedInToday ? "" : "Check-in"}
-              </button>
+  disabled={hasCheckedInToday || isCheckingIn}
+  onClick={() => {
+    if (!hasCheckedInToday && !isCheckingIn) setCheckInModalOpen(true);
+  }}
+  className={hasCheckedInToday || isCheckingIn ? styles.disabledCheckIn : styles.checkIn}
+>
+  {isCheckingIn ? "Processing..." : "Check-in"}
+</button>
+
             ) : isOnBreak && !isCheckedOut ? (
               // Currently on break → show End Break
-              <button className={styles.break} onClick={() => setEndBreakModalOpen(true)}>
-                End Break
-              </button>
+              <button
+  className={styles.break}
+  disabled={isEndingBreak}          // 🛑 disable during API
+  onClick={() => setEndBreakModalOpen(true)}
+>
+  {isEndingBreak ? "Processing..." : "End Break"}   {/* 🔄 loader */}
+</button>
+
             ) : (
               <>
                 {/* Take Break (only if checked in, not on break, not checked out, and haven't taken break today) */}
-                {isCheckedIn && !isOnBreak && !isCheckedOut && breakCount < 1 && (
-                  <button className={styles.break} onClick={() => setBreakModalOpen(true)}>
-                    Take Break
-                  </button>
-                )}
+               {isCheckedIn && !isOnBreak && !isCheckedOut && breakCount < 1 && (
+    <button
+      className={styles.break}
+      disabled={isTakingBreak}     // 🛑 disables button during API
+      onClick={() => setBreakModalOpen(true)}
+    >
+      {isTakingBreak ? "Processing..." : "Take Break"}   {/* 🔄 loader */}
+    </button>
+  )}
 
                 {/* Checkout (show when checked in and not checked out) */}
                 {isCheckedIn && !isCheckedOut && (
-                  <button className={styles.checkOut} onClick={() => setCheckoutOpen(true)}>
-                    Check-out
-                  </button>
-                )}
+  <button
+    className={styles.checkOut}
+    disabled={isCheckingOut}           // ⛔ block double click
+    onClick={() => {
+      if (!isCheckingOut) setCheckoutOpen(true);
+    }}
+  >
+    {isCheckingOut ? "Processing..." : "Check-out"}
+  </button>
+)}
+
               </>
             )}
           </div>
@@ -650,7 +686,7 @@ const Dashboard = () => {
                     <td>{row.breakTime}</td>
                     <td>{row.classHours}</td>
                     <td>{row.permission}</td>
-                    <td></td>
+                    {/* <td></td> */}
                   </tr>
                 )
               )
@@ -718,13 +754,35 @@ const Dashboard = () => {
       <CheckInModal
         isOpen={isCheckInModalOpen}
         onClose={() => setCheckInModalOpen(false)}
-        onConfirm={async () => {
-          await handleCheckIn();
-          setCheckInModalOpen(false);
-        }}
+       onConfirm={async () => {
+  if (isCheckingIn) return;   // ⛔ prevents double click
+
+  setIsCheckingIn(true);
+
+  await handleCheckIn();      // API call
+  setIsCheckingIn(false);
+  setCheckInModalOpen(false);
+}}
+
       />
 
-      <CheckoutModal isOpen={isCheckoutOpen} onClose={() => setCheckoutOpen(false)} onCheckout={handleCheckoutConfirm} />
+      <CheckoutModal
+  isOpen={isCheckoutOpen}
+  onClose={() => setCheckoutOpen(false)}
+  onCheckout={async (selectedRemark) => {
+
+    if (isCheckingOut) return;   // ⛔ prevent double click
+
+    setIsCheckingOut(true);      // show loader
+
+    await handleCheckoutConfirm(selectedRemark);
+
+    setIsCheckingOut(false);
+    setCheckoutOpen(false);
+  }}
+  isCheckingOut={isCheckingOut}  // pass loader state
+/>
+
     </div>
   );
 };
