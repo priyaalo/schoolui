@@ -31,8 +31,14 @@ const Dashboard = () => {
   const userId = localStorage.getItem("userId");
 
   const [user, setUser] = useState(null);
+
+ 
   const [fullAttendance, setFullAttendance] = useState([]);
+
+
   const [attendanceTable, setAttendanceTable] = useState([]);
+
+  
   const [attendanceId, setAttendanceId] = useState(null);
 
   const [checkInStatus, setCheckInStatus] = useState(false);
@@ -48,7 +54,8 @@ const Dashboard = () => {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isTakingBreak, setIsTakingBreak] = useState(false);
-  const [isEndingBreak, setIsEndingBreak] = useState(false);
+const [isEndingBreak, setIsEndingBreak] = useState(false);
+
 
   const [filter, setFilter] = useState("thisMonth");
   const [event, setEvent] = useState([]);
@@ -65,12 +72,14 @@ const Dashboard = () => {
   const [earlyPer, setEarlyPer] = useState("");
 
   const [selectedRemark, setSelectedRemark] = useState(null);
+
+ 
   const [todayRecord, setTodayRecord] = useState(null);
 
   const [page, setPage] = useState(1);
   const rowsPerPage = 10;
 
-  // Fetch user basic info
+ 
   const fetchUser = async () => {
     try {
       const res = await getUserId(userId);
@@ -79,9 +88,10 @@ const Dashboard = () => {
       setCheckInStatus(userData.checkInStatus);
       setBreakStatus(userData.breakStatus);
     } catch (err) {
-      console.error("Error fetching user:", err?.message || err);
+      console.error("Error fetching user:", err.message);
     }
   };
+
 
   const fetchLateCount = async () => {
     try {
@@ -94,15 +104,15 @@ const Dashboard = () => {
     }
   };
 
-  // Fetch attendance rows for table only (applies month filter)
-  const fetchAttendanceTable = async (showLoader = true) => {
+  
+  const fetchAttendance = async (showLoader = true) => {
     try {
       if (showLoader) setLoading(true);
 
+     
       const response = await getAttendance(userId, false);
       const allData = response.data.data.data || [];
 
-      // Format date fields
       const formattedAll = allData.map((att) => {
         let formatted = { ...att };
         if (att.date) {
@@ -117,10 +127,8 @@ const Dashboard = () => {
         }
         return formatted;
       });
-
       setFullAttendance(formattedAll);
 
-      // Apply filter for table only
       const now = new Date();
       const filtered = formattedAll.filter((att) => {
         if (!att.rawDate) return false;
@@ -128,6 +136,7 @@ const Dashboard = () => {
         if (filter === "thisMonth") {
           return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
         } else {
+          
           const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
           return d.getMonth() === lastMonth.getMonth() && d.getFullYear() === lastMonth.getFullYear();
         }
@@ -135,13 +144,32 @@ const Dashboard = () => {
 
       setAttendanceTable(filtered);
 
-      // set per/earlyPer based on the full list (if needed)
+      const todayStr = new Date().toISOString().split("T")[0];
+      const todayRec = formattedAll.find((a) => {
+        if (!a.rawDate) return false;
+        const recDateStr = new Date(a.rawDate).toISOString().split("T")[0];
+        return recDateStr === todayStr;
+      }) || null;
+
+      setTodayRecord(todayRec);
+
+      if (todayRec && todayRec._id) {
+        setAttendanceId(todayRec._id);
+        setOnPermission(todayRec.onPermission === true);
+        setOnEarlyPermission(todayRec.onEarlyPermission === true);
+      } else {
+        setAttendanceId(null);
+        setOnPermission(false);
+        setOnEarlyPermission(false);
+      }
+
+    
       if (formattedAll.length > 0) {
         setPer(formattedAll[0]._id);
         setEarlyPer(formattedAll[0]._id);
       }
 
-      // attendance rate (keeps existing logic)
+     
       try {
         function formatDate(date) {
           const yyyy = date.getFullYear();
@@ -151,6 +179,7 @@ const Dashboard = () => {
         }
 
         const nowDate = new Date();
+
         const startOfMonth = formatDate(new Date(nowDate.getFullYear(), nowDate.getMonth(), 1));
         const endOfMonth = formatDate(new Date(nowDate.getFullYear(), nowDate.getMonth() + 1, 0));
 
@@ -164,38 +193,9 @@ const Dashboard = () => {
         console.error("Error fetching attendance rate:", error);
       }
     } catch (err) {
-      console.error("Error fetching attendance table:", err?.message || err);
+      console.error("Error fetching attendance:", err.message);
     } finally {
       if (showLoader) setLoading(false);
-    }
-  };
-
-  // Fetch today's record separately (single source of truth for today's UI)
-  const fetchTodayRecord = async () => {
-    try {
-      const response = await getAttendance(userId, false);
-      const allData = response.data.data.data || [];
-
-      const todayStr = new Date().toISOString().split("T")[0];
-      const todayRec = allData.find((a) => {
-        if (!a.date) return false;
-        const recDateStr = new Date(a.date).toISOString().split("T")[0];
-        return recDateStr === todayStr;
-      }) || null;
-
-      setTodayRecord(todayRec);
-
-      if (todayRec && todayRec._id) {
-        setAttendanceId(todayRec._id);
-        setOnPermission(!!todayRec.onPermission);
-        setOnEarlyPermission(!!todayRec.onEarlyPermission);
-      } else {
-        setAttendanceId(null);
-        setOnPermission(false);
-        setOnEarlyPermission(false);
-      }
-    } catch (err) {
-      console.error("Error fetching today's record:", err?.message || err);
     }
   };
 
@@ -211,66 +211,69 @@ const Dashboard = () => {
     }
   };
 
-  // Initial load: user, today's record, table, late count
+ 
   useEffect(() => {
-    if (!userId) {
-      navigate("/");
-      return;
+    if (!userId) navigate("/");
+    else {
+      fetchUser();
+      fetchAttendance(true);
+      fetchLateCount();
     }
-
-    fetchUser();
-    fetchTodayRecord();
-    fetchAttendanceTable(true);
-    fetchLateCount();
+    
   }, [navigate, userId]);
 
-  // Re-fetch table ONLY when filter changes
+  
   useEffect(() => {
-    if (userId) fetchAttendanceTable(false);
+    if (userId) fetchAttendance(false);
+    
   }, [filter, userId]);
 
   useEffect(() => {
     fetchEvents();
+
   }, []);
 
-  // Timer logic — depend only on todayRecord
-  useEffect(() => {
-    if (!todayRecord?.inTime) {
+
+ useEffect(() => {
+  
+  if (!todayRecord?.inTime) {
+    setTimeElapsed("00:00:00");
+    setCheckInTime(null);
+    return;
+  }
+
+  if (todayRecord?.outTime) {
+    setTimeElapsed(todayRecord.totalWorkHours || "00:00:00");
+    return;
+  }
+
+ 
+  const startTime = new Date(todayRecord.inTime);
+  setCheckInTime(startTime);
+
+  const timer = setInterval(() => {
+    
+    const currentTime = new Date(new Date().getTime() + (5 * 60 + 30) * 60000);
+    let diff = currentTime - startTime;
+
+    if (diff < 0) {
       setTimeElapsed("00:00:00");
-      setCheckInTime(null);
       return;
     }
 
-    if (todayRecord?.outTime) {
-      setTimeElapsed(todayRecord.totalWorkHours || "00:00:00");
-      return;
-    }
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-    const startMs = new Date(todayRecord.inTime).getTime();
-    setCheckInTime(new Date(startMs));
+    setTimeElapsed(
+      `${hours.toString().padStart(2, "0")}:${minutes
+        .toString()
+        .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+    );
+  }, 1000);
 
-    const timer = setInterval(() => {
-      const nowMs = Date.now();
-      let diff = nowMs - startMs;
-
-      if (diff < 0) {
-        setTimeElapsed("00:00:00");
-        return;
-      }
-
-      const hours = Math.floor(diff / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-      setTimeElapsed(
-        `${hours.toString().padStart(2, "0")}:${minutes
-          .toString()
-          .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
-      );
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [todayRecord]);
+  return () => clearInterval(timer);
+}, [todayRecord]);
 
   const handleCheckIn = async () => {
     if (isCheckingIn) return;
@@ -279,14 +282,12 @@ const Dashboard = () => {
     try {
       if (onPermission && per) {
         await updateAttendance(per, new Date().toISOString(), userId);
-        await fetchTodayRecord();
-        await fetchAttendanceTable(false);
+        await fetchAttendance(false);
         await fetchUser();
         toast.success("Permission check-in Updated!", { autoClose: 1000 });
       } else if (onEarlyPermission && earlyPer) {
         await updateAttendance(earlyPer, new Date().toISOString(), userId);
-        await fetchTodayRecord();
-        await fetchAttendanceTable(false);
+        await fetchAttendance(false);
         await fetchUser();
         toast.success("Permission check-in Updated!", { autoClose: 1000 });
       } else {
@@ -295,85 +296,92 @@ const Dashboard = () => {
         setAttendanceId(newAttendanceId);
 
         await fetchLateCount();
-        await fetchTodayRecord();
-        await fetchAttendanceTable(false);
+        await fetchAttendance(false);
         await fetchUser();
 
         toast.success("Check-in successful!", { autoClose: 1000 });
       }
     } catch (err) {
       let errMsg =
-        err.response?.data?.message || err.response?.data || err.message || "Something went wrong, please try again.";
+        err.response?.data?.message ||
+        err.response?.data ||
+        err.message ||
+        "Something went wrong, please try again.";
       toast.error(errMsg, { autoClose: 1000 });
     } finally {
       setIsCheckingIn(false);
     }
   };
 
-  const handleStartBreak = async () => {
-    if (isTakingBreak) return;
-    setIsTakingBreak(true);
 
-    if (!attendanceId) {
-      toast.error("No active attendance record found!", { autoClose: 1000 });
+ const handleStartBreak = async () => {
+
+  if (isTakingBreak) return;
+  setIsTakingBreak(true);
+
+  if (!attendanceId) {
+    toast.error("No active attendance record found!", { autoClose: 1000 });
+    setIsTakingBreak(false);
+    return;
+  }
+
+  try {
+   
+    const breakCount = todayRecord?.breakTime?.length || 0;
+
+    if (breakCount >= 1) {
+      toast.error("You have already taken a break today!", { autoClose: 1000 });
       setIsTakingBreak(false);
       return;
     }
 
-    try {
-      const breakCount = todayRecord?.breakTime?.length || 0;
+    const response = await startBreak(attendanceId, new Date().toISOString());
+    const updatedBreakStatus = response.data.data?.breakStatus;
+    setBreakStatus(updatedBreakStatus);
 
-      if (breakCount >= 1) {
-        toast.error("You have already taken a break today!", { autoClose: 1000 });
-        setIsTakingBreak(false);
-        return;
-      }
+    await fetchAttendance(false);
+    await fetchUser();
 
-      const response = await startBreak(attendanceId, new Date().toISOString());
-      const updatedBreakStatus = response.data.data?.breakStatus;
-      setBreakStatus(updatedBreakStatus);
+    toast.success("Break started successfully!", { autoClose: 1000 });
+    setBreakModalOpen(false);
+  } catch (err) {
+    console.error("Error starting break:", err);
+    toast.error("Failed to start break", { autoClose: 1000 });
+  }
 
-      await fetchTodayRecord();
-      await fetchAttendanceTable(false);
-      await fetchUser();
+  setIsTakingBreak(false);
+};
 
-      toast.success("Break started successfully!", { autoClose: 1000 });
-      setBreakModalOpen(false);
-    } catch (err) {
-      console.error("Error starting break:", err);
-      toast.error("Failed to start break", { autoClose: 1000 });
-    }
-
-    setIsTakingBreak(false);
-  };
-
+  
   const handleEndBreak = async () => {
-    if (isEndingBreak) return;
-    setIsEndingBreak(true);
 
-    if (!attendanceId) {
-      toast.error("No active attendance record found!", { autoClose: 1000 });
-      setIsEndingBreak(false);
-      return;
-    }
+  
+  if (isEndingBreak) return;
+  setIsEndingBreak(true);
 
-    try {
-      const response = await startBreak(attendanceId, new Date().toISOString());
-      const updatedBreakStatus = response.data.data?.breakStatus;
-      setBreakStatus(updatedBreakStatus);
-
-      await fetchTodayRecord();
-      await fetchAttendanceTable(false);
-      await fetchUser();
-
-      toast.success("Break ended successfully!", { autoClose: 1000 });
-    } catch (err) {
-      console.error("Error ending break:", err);
-      toast.error("Failed to end break", { autoClose: 1000 });
-    }
-
+  if (!attendanceId) {
+    toast.error("No active attendance record found!", { autoClose: 1000 });
     setIsEndingBreak(false);
-  };
+    return;
+  }
+
+  try {
+   
+    const response = await startBreak(attendanceId, new Date().toISOString());
+    const updatedBreakStatus = response.data.data?.breakStatus;
+    setBreakStatus(updatedBreakStatus);
+
+    await fetchAttendance(false);
+    await fetchUser();
+
+    toast.success("Break ended successfully!", { autoClose: 1000 });
+  } catch (err) {
+    console.error("Error ending break:", err);
+    toast.error("Failed to end break", { autoClose: 1000 });
+  }
+
+  setIsEndingBreak(false);
+};
 
   const handleCheckoutConfirm = async (remarks) => {
     if (isCheckingOut) return;
@@ -382,14 +390,16 @@ const Dashboard = () => {
     try {
       const checkoutTime = new Date().toISOString();
       await checkOut(attendanceId, remarks, userId, checkoutTime);
-
-      await fetchTodayRecord();
-      await fetchAttendanceTable(false);
+     
+      await fetchAttendance(false);
       await fetchUser();
       toast.success("Checkout successful!", { autoClose: 1000 });
     } catch (err) {
       let errMsg =
-        err.response?.data?.message || err.response?.data || err.message || "Something went wrong, please try again.";
+        err.response?.data?.message ||
+        err.response?.data ||
+        err.message ||
+        "Something went wrong, please try again.";
       toast.error(errMsg, { autoClose: 1000 });
     } finally {
       setIsCheckingOut(false);
@@ -399,12 +409,17 @@ const Dashboard = () => {
 
   const handleCheckOut = () => setCheckoutOpen(true);
 
+  
   const isCheckedIn = Boolean(todayRecord?.inTime);
   const isCheckedOut = Boolean(todayRecord?.outTime);
+ 
   const isOnBreak = Boolean(todayRecord?.breakStatus) || breakStatus === true;
   const breakCount = todayRecord?.breakTime?.length || 0;
+
+  
   const hasCheckedInToday = !!(todayRecord && todayRecord.inTime && !todayRecord.deleted);
 
+  
   const tableFormatTime = (timestamp) => {
     if (!timestamp) return "-";
     const adjustedTime = moment.utc(timestamp);
@@ -469,39 +484,55 @@ const Dashboard = () => {
         <div className={styles.second}>
           <p className={styles.subtitle}>Your future starts with today’s attendance</p>
           <div className={styles.check}>
+   
             {!isCheckedIn && !isCheckedOut ? (
+              
               <button
-                disabled={hasCheckedInToday || isCheckingIn}
-                onClick={() => {
-                  if (!hasCheckedInToday && !isCheckingIn) setCheckInModalOpen(true);
-                }}
-                className={hasCheckedInToday || isCheckingIn ? styles.disabledCheckIn : styles.checkIn}
-              >
-                {isCheckingIn ? "Processing..." : "Check-in"}
-              </button>
+  disabled={hasCheckedInToday || isCheckingIn}
+  onClick={() => {
+    if (!hasCheckedInToday && !isCheckingIn) setCheckInModalOpen(true);
+  }}
+  className={hasCheckedInToday || isCheckingIn ? styles.disabledCheckIn : styles.checkIn}
+>
+  {isCheckingIn ? "Processing..." : "Check-in"}
+</button>
+
             ) : isOnBreak && !isCheckedOut ? (
-              <button className={styles.break} disabled={isEndingBreak} onClick={() => setEndBreakModalOpen(true)}>
-                {isEndingBreak ? "Processing..." : "End Break"}
-              </button>
+              
+              <button
+  className={styles.break}
+  disabled={isEndingBreak}          
+  onClick={() => setEndBreakModalOpen(true)}
+>
+  {isEndingBreak ? "Processing..." : "End Break"}   
+</button>
+
             ) : (
               <>
-                {isCheckedIn && !isOnBreak && !isCheckedOut && breakCount < 1 && (
-                  <button className={styles.break} disabled={isTakingBreak} onClick={() => setBreakModalOpen(true)}>
-                    {isTakingBreak ? "Processing..." : "Take Break"}
-                  </button>
-                )}
+               
+               {isCheckedIn && !isOnBreak && !isCheckedOut && breakCount < 1 && (
+    <button
+      className={styles.break}
+      disabled={isTakingBreak}    
+      onClick={() => setBreakModalOpen(true)}
+    >
+      {isTakingBreak ? "Processing..." : "Take Break"}   
+    </button>
+  )}
 
+                
                 {isCheckedIn && !isCheckedOut && (
-                  <button
-                    className={styles.checkOut}
-                    disabled={isCheckingOut}
-                    onClick={() => {
-                      if (!isCheckingOut) setCheckoutOpen(true);
-                    }}
-                  >
-                    {isCheckingOut ? "Processing..." : "Check-out"}
-                  </button>
-                )}
+  <button
+    className={styles.checkOut}
+    disabled={isCheckingOut}           
+    onClick={() => {
+      if (!isCheckingOut) setCheckoutOpen(true);
+    }}
+  >
+    {isCheckingOut ? "Processing..." : "Check-out"}
+  </button>
+)}
+
               </>
             )}
           </div>
@@ -519,7 +550,13 @@ const Dashboard = () => {
           <div className={styles.marqueeTrack}>
             {[...Array(5)].flatMap(() =>
               events.map((ev, index) => (
-                <EventCard key={`${ev.id}-${index}`} title={ev.title.charAt(0).toUpperCase() + ev.title.slice(1)} subtitle={ev.subtitle.charAt(0).toUpperCase() + ev.subtitle.slice(1)} date={ev.date} type={ev.icon} />
+                <EventCard
+                  key={`${ev.id}-${index}`}
+                  title={ev.title.charAt(0).toUpperCase() + ev.title.slice(1)}
+                  subtitle={ev.subtitle.charAt(0).toUpperCase() + ev.subtitle.slice(1)}
+                  date={ev.date}
+                  type={ev.icon}
+                />
               ))
             )}
           </div>
@@ -619,6 +656,7 @@ const Dashboard = () => {
                     <td>{row.breakTime}</td>
                     <td>{row.classHours}</td>
                     <td>{row.permission}</td>
+                    {/* <td></td> */}
                   </tr>
                 )
               )
@@ -677,7 +715,7 @@ const Dashboard = () => {
         isOpen={isBreakModalOpen}
         onClose={() => setBreakModalOpen(false)}
         attendanceId={attendanceId}
-        refreshAttendance={fetchAttendanceTable}
+        refreshAttendance={fetchAttendance}
         refreshUser={fetchUser}
         handleStartBreak={handleStartBreak}
       />
@@ -686,27 +724,35 @@ const Dashboard = () => {
       <CheckInModal
         isOpen={isCheckInModalOpen}
         onClose={() => setCheckInModalOpen(false)}
-        onConfirm={async () => {
-          if (isCheckingIn) return;
-          setIsCheckingIn(true);
-          await handleCheckIn();
-          setIsCheckingIn(false);
-          setCheckInModalOpen(false);
-        }}
+       onConfirm={async () => {
+  if (isCheckingIn) return; 
+
+  setIsCheckingIn(true);
+
+  await handleCheckIn();      
+  setIsCheckingIn(false);
+  setCheckInModalOpen(false);
+}}
+
       />
 
       <CheckoutModal
-        isOpen={isCheckoutOpen}
-        onClose={() => setCheckoutOpen(false)}
-        onCheckout={async (selectedRemark) => {
-          if (isCheckingOut) return;
-          setIsCheckingOut(true);
-          await handleCheckoutConfirm(selectedRemark);
-          setIsCheckingOut(false);
-          setCheckoutOpen(false);
-        }}
-        isCheckingOut={isCheckingOut}
-      />
+  isOpen={isCheckoutOpen}
+  onClose={() => setCheckoutOpen(false)}
+  onCheckout={async (selectedRemark) => {
+
+    if (isCheckingOut) return;  
+
+    setIsCheckingOut(true);   
+
+    await handleCheckoutConfirm(selectedRemark);
+
+    setIsCheckingOut(false);
+    setCheckoutOpen(false);
+  }}
+  isCheckingOut={isCheckingOut}  
+/>
+
     </div>
   );
 };
