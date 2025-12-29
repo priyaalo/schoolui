@@ -588,6 +588,26 @@ const [isEndingBreak, setIsEndingBreak] = useState(false);
             </p>
           </div>
         </div>
+        {/* <div className={styles.col}>
+          <div className={styles.card}>
+            <button className={styles.circle1}>TP</button>
+            <h4>Term Percentage</h4>
+            <p>
+              Percentage :
+              {attendanceRate !== null ? (attendanceRate.toString().includes("%") ? attendanceRate : `${attendanceRate}%`) : "Loading..."}
+            </p>
+          </div>
+        </div>
+        <div className={styles.col}>
+          <div className={styles.card}>
+            <button className={styles.circle1}>SE</button>
+            <h4>Semester Percentage</h4>
+            <p>
+              Percentage :
+              {attendanceRate !== null ? (attendanceRate.toString().includes("%") ? attendanceRate : `${attendanceRate}%`) : "Loading..."}
+            </p>
+          </div>
+        </div> */}
       </div>
 
       <div className={styles.tableContainer}>

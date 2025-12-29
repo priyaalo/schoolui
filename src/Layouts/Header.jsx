@@ -224,10 +224,18 @@ const Header = ({ handleLogout }) => {
           >
             Policies
           </button>
+          <button
+            className={`${styles.linkBtn} ${
+              location.pathname.includes("/academics") ? styles.activeLink : ""
+            }`}
+            onClick={() => handleNavClick(`/academics/${userId}`)}
+          >
+           Academics
+          </button>
         </div>
       </nav>
 
-      {/* Desktop Right Section */}
+
       <div className={`${styles.rightSection} ${styles.hideOnMobile}`}>
         <div className={styles.profile}>
           {userProfile?.profileURL ? (

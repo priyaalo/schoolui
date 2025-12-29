@@ -97,3 +97,8 @@ export const getAttendanceRate = (userId, fromDate, toDate) =>{
   return apiService.get( `/attendance/studentrate?userId=${userId}&fromDate=${fromDate}&toDate=${toDate}`
   );
 }
+export const getPerformance = (params) => {
+  return apiService.get("/performance", { params });
+};
+
+

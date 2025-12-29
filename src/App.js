@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Dashboard from "./Dashboard/Dashboard";
 import LeaveManagement from "./LeaveManagement/LeaveManagement";
+import Academics from "./Academics/Academics";
 import Policies from "./Policies/PoliciesApp";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import Login from "./Login/Login";
@@ -78,6 +79,14 @@ function App() {
           element={
             <PrivateRoute isAuthenticated={isAuthenticated}>
               <Policies />
+            </PrivateRoute>
+          }
+        />
+          <Route
+          path="/academics/:userId"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated}>
+              <Academics />
             </PrivateRoute>
           }
         />
