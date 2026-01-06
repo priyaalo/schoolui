@@ -75,11 +75,10 @@ const Academics = () => {
           <option value="term1">Term 1</option>
           <option value="term2">Term 2</option>
           <option value="sem1">Semester1</option>
-          <option value="sem1">Semester1</option>
+          <option value="sem1">Semester2</option>
         </select>
       </div>
 
-      {/* Summary Cards */}
       <div className={styles.cards}>
         <div className={styles.card}>
           <p>Total Marks</p>
@@ -91,19 +90,25 @@ const Academics = () => {
           <h3>{summary.average}%</h3>
         </div>
 
-        <div className={styles.card}>
-          <p>Result</p>
-          <h3
-            className={
-              summary.average >= 40 ? styles.pass : styles.fail
-            }
-          >
-            {summary.average >= 40 ? "PASS" : "FAIL"}
-          </h3>
-        </div>
+       <div className={styles.card}>
+  <p>Result</p>
+
+  {subjects.length === 0 ? (
+    <h3 className={styles.nil}>Nil</h3>
+  ) : (
+    <h3
+      className={
+        summary.average >= 40 ? styles.pass : styles.fail
+      }
+    >
+      {summary.average >= 40 ? "PASS" : "FAIL"}
+    </h3>
+  )}
+</div>
+
       </div>
 
-      {/* Table */}
+
       <div className={styles.tableWrapper}>
         {loading ? (
           <p className={styles.loading}>Loading...</p>

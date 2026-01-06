@@ -80,7 +80,7 @@ export const updateNotification = (notificationId,read) => {
 }
 
 
-//update Attendance
+
 export const updateAttendance=(id,time,userId)=>{
   return apiService.put(`/attendance/${id}`, {
     inTime: time,
