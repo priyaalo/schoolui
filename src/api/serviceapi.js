@@ -98,7 +98,13 @@ export const getAttendanceRate = (userId, fromDate, toDate) =>{
   );
 }
 export const getPerformance = (params) => {
-  return apiService.get("/performance", { params });
+  return apiService.get("/performance", {
+    params: {
+      studentId: params.studentId,
+      academic: params.academic,
+    },
+  });
 };
+;
 
 

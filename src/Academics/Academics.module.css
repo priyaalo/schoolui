@@ -10,11 +10,13 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  
 }
 
 .header h2 {
   font-size: 22px;
   font-weight: 600;
+  margin-left: 15px;
 }
 
 .header select {
@@ -22,6 +24,7 @@
   border-radius: 8px;
   border: 1px solid #ddd;
   outline: none;
+  margin-right: 15px;
 }
 
 .cards {
@@ -36,6 +39,7 @@
   border-radius: 14px;
   padding: 16px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  margin: 10px;
 }
 
 .card p {
@@ -63,6 +67,7 @@
   padding: 10px;
   overflow-x: auto;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  margin:10px;
 }
 
 .table {
