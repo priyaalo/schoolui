@@ -100,46 +100,52 @@ const Academics = () => {
       </div>
 
       {/* Table */}
-      <div className={styles.tableWrapper}>
-        {loading ? (
-          <p className={styles.loading}>Loading...</p>
-        ) : subjects.length === 0 ? (
-          <p className={styles.noData}>No records found</p>
-        ) : (
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Subject</th>
-                <th>Mark</th>
-                <th>Total</th>
-                <th>%</th>
-           
-              </tr>
-            </thead>
-            <tbody>
-              {subjects.map((s, i) => {
-                const mark = Number(s.mark) || 0;
-                const total = Number(s.total) || 100;
-                const percentage = ((mark / total) * 100).toFixed(1);
+     <div className={styles.tableWrapper}>
+  {loading ? (
+    <p className={styles.loading}>Loading...</p>
+  ) : (
+    <table className={styles.table}>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Subject</th>
+          <th>Mark</th>
+          <th>Total</th>
+          <th>Percentage</th>
+        </tr>
+      </thead>
 
-                return (
-                  <tr key={i}>
-                    <td>{student.id}</td>
-                    <td>{student.name}</td>
-                    <td>{s.subject}</td>
-                    <td>{mark}</td>
-                    <td>{total}</td>
-                    <td>{percentage}%</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-          
+      <tbody>
+        {subjects.length === 0 ? (
+          <tr>
+            <td colSpan="6" className={styles.noData}>
+              No records found
+            </td>
+          </tr>
+        ) : (
+          subjects.map((s, i) => {
+            const mark = Number(s.mark) || 0;
+            const total = Number(s.total) || 100;
+            const percentage = ((mark / total) * 100).toFixed(1);
+
+            return (
+              <tr key={i}>
+                <td>{student.id}</td>
+                <td>{student.name}</td>
+                <td>{s.subject}</td>
+                <td>{mark}</td>
+                <td>{total}</td>
+                <td>{percentage}%</td>
+              </tr>
+            );
+          })
         )}
-      </div>
+      </tbody>
+    </table>
+  )}
+</div>
+
     </div>
   );
 };
