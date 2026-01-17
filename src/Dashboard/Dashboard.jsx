@@ -14,6 +14,7 @@ import Loader from "../loader/Loader";
 import noDataImg from "../assets/AloLogo/nodatasearch.png";
 import EndBreakModal from "./EndBreakModal";
 
+
 import {
   getUserId,
   getAttendance,
@@ -608,6 +609,7 @@ const [isEndingBreak, setIsEndingBreak] = useState(false);
             </p>
           </div>
         </div> */}
+
       </div>
 
       <div className={styles.tableContainer}>

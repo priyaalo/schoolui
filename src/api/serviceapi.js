@@ -105,6 +105,14 @@ export const getPerformance = (params) => {
     },
   });
 };
-;
+
+export const getLeaderboard = (academic) => {
+  return apiService.get("/performance/leaderboard", {
+    params: {
+      Academic: academic, 
+    },
+  });
+};
+
 
 

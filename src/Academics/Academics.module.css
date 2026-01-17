@@ -91,3 +91,37 @@
 .table tr:hover {
   background: #f9fafc;
 }
+.topperSection {
+  margin-top: 24px;
+}
+
+.topperList {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.topperCard {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  width: 180px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.rank {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ff9800;
+}
+
+.name {
+  font-weight: 600;
+  margin: 8px 0;
+}
+
+.percent {
+  color: #2e7d32;
+  font-weight: bold;
+}
