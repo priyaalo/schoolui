@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styles from "./Academics.module.css";
-import { getPerformance, getLeaderboard } from "../api/serviceapi";
+import { getPerformance } from "../api/serviceapi";
 
 const semesterOptions = {
   "Semester 1": ["Term 1", "Term 2", "Semester 1"],
@@ -15,14 +15,13 @@ const Academics = () => {
   const [summary, setSummary] = useState({ total: 0, average: 0 });
   const [student, setStudent] = useState({ id: "", name: "" });
   const [loading, setLoading] = useState(false);
-  const [toppers, setToppers] = useState([]);
 
-
+  /* Reset term when semester changes */
   useEffect(() => {
     setTerm(semesterOptions[semester][0]);
   }, [semester]);
 
- 
+  /* Fetch data when term changes */
   useEffect(() => {
     fetchAcademics();
   }, [term]);
@@ -34,17 +33,17 @@ const Academics = () => {
       const studentId = localStorage.getItem("studentId");
       if (!studentId) return;
 
-
       const perfRes = await getPerformance({
-        studentId,
+        studentId,          // 🔒 Student-only data
         academic: term,
       });
 
       const records = perfRes?.data?.data?.data || [];
 
-    
       const record = records.find(
-        (item) => String(item.Academic).trim() === String(term).trim()
+        (item) =>
+          String(item.userDetails?.studentId) === String(studentId) &&
+          String(item.Academic).trim() === String(term).trim()
       );
 
       if (record) {
@@ -62,19 +61,6 @@ const Academics = () => {
         setSummary({ total: 0, average: 0 });
         setStudent({ id: "", name: "" });
       }
-
-      /* ================= TOPPER LIST ================= */
-      const topperRes = await getLeaderboard(term);
-
-      // ✅ FRONTEND FILTER (VERY IMPORTANT)
-      const filteredToppers = (topperRes?.data?.data || [])
-        .filter(
-          (t) => String(t.Academic).trim() === String(term).trim()
-        )
-        .sort((a, b) => b.average - a.average)
-        .slice(0, 3);
-
-      setToppers(filteredToppers);
     } catch (err) {
       console.error("Failed to fetch academics", err);
     } finally {
@@ -84,7 +70,7 @@ const Academics = () => {
 
   return (
     <div className={styles.container}>
-   
+      {/* Header */}
       <div className={styles.header}>
         <h2>Academics</h2>
 
@@ -102,7 +88,7 @@ const Academics = () => {
         </select>
       </div>
 
-
+      {/* Summary Cards */}
       <div className={styles.cards}>
         <div className={styles.card}>
           <p>Total Marks</p>
@@ -126,25 +112,7 @@ const Academics = () => {
         </div>
       </div>
 
-      <div className={styles.topperSection}>
-        <h4>{term} Topper List</h4>
-
-        {toppers.length === 0 ? (
-          <p className={styles.noData}>No topper data</p>
-        ) : (
-          <div className={styles.topperList}>
-            {toppers.map((t, index) => (
-              <div key={t.studentId} className={styles.topperCard}>
-                <span className={styles.rank}>#{index + 1}</span>
-                <p className={styles.name}>{t.name}</p>
-                <p className={styles.percent}>{t.average}%</p>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-    
+      {/* Marks Table */}
       <div className={styles.tableWrapper}>
         {loading ? (
           <p className={styles.loading}>Loading...</p>
