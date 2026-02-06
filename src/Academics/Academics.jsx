@@ -16,12 +16,11 @@ const Academics = () => {
   const [student, setStudent] = useState({ id: "", name: "" });
   const [loading, setLoading] = useState(false);
 
-  /* Reset term when semester changes */
   useEffect(() => {
     setTerm(semesterOptions[semester][0]);
   }, [semester]);
 
-  /* Fetch data when term changes */
+ 
   useEffect(() => {
     fetchAcademics();
   }, [term]);
@@ -34,7 +33,7 @@ const Academics = () => {
       if (!studentId) return;
 
       const perfRes = await getPerformance({
-        studentId,          // 🔒 Student-only data
+        studentId,          
         academic: term,
       });
 
@@ -70,25 +69,37 @@ const Academics = () => {
 
   return (
     <div className={styles.container}>
-      {/* Header */}
-      <div className={styles.header}>
-        <h2>Academics</h2>
+      
+     <div className={styles.header}>
+  <h2>Academics</h2>
 
-        <select value={semester} onChange={(e) => setSemester(e.target.value)}>
-          <option value="Semester 1">Semester 1</option>
-          <option value="Semester 2">Semester 2</option>
-        </select>
+  <div className={styles.selectGroup}>
+    <label className={styles.label}>
+      Choose Semester
+      <select
+        value={semester}
+        onChange={(e) => setSemester(e.target.value)}
+      >
+        <option value="Semester 1">Semester 1</option>
+        <option value="Semester 2">Semester 2</option>
+      </select>
+    </label>
 
-        <select value={term} onChange={(e) => setTerm(e.target.value)}>
-          {semesterOptions[semester].map((t) => (
-            <option key={t} value={t}>
-              {t}
-            </option>
-          ))}
-        </select>
-      </div>
+    <label className={styles.label}>
+      Choose Exam
+      <select value={term} onChange={(e) => setTerm(e.target.value)}>
+        {semesterOptions[semester].map((t) => (
+          <option key={t} value={t}>
+            {t}
+          </option>
+        ))}
+      </select>
+    </label>
+  </div>
+</div>
 
-      {/* Summary Cards */}
+
+      
       <div className={styles.cards}>
         <div className={styles.card}>
           <p>Total Marks</p>
@@ -100,19 +111,10 @@ const Academics = () => {
           <h3>{summary.average}%</h3>
         </div>
 
-        <div className={styles.card}>
-          <p>Result</p>
-          {subjects.length === 0 ? (
-            <h3 className={styles.nil}>Nil</h3>
-          ) : (
-            <h3 className={summary.average >= 40 ? styles.pass : styles.fail}>
-              {summary.average >= 40 ? "PASS" : "FAIL"}
-            </h3>
-          )}
-        </div>
+       
       </div>
 
-      {/* Marks Table */}
+     
       <div className={styles.tableWrapper}>
         {loading ? (
           <p className={styles.loading}>Loading...</p>
@@ -126,6 +128,7 @@ const Academics = () => {
                 <th>Mark</th>
                 <th>Total</th>
                 <th>Percentage</th>
+                <th>Status</th>
               </tr>
             </thead>
 
@@ -137,21 +140,28 @@ const Academics = () => {
                   </td>
                 </tr>
               ) : (
-                subjects.map((s, i) => {
-                  const mark = Number(s.mark) || 0;
-                  const percentage = ((mark / 100) * 100).toFixed(1);
+        subjects.map((s, i) => {
+  const mark = Number(s.mark) || 0;
+  const percentage = ((mark / 100) * 100).toFixed(1);
 
-                  return (
-                    <tr key={i}>
-                      <td>{student.id}</td>
-                      <td>{student.name}</td>
-                      <td>{s.subject}</td>
-                      <td>{mark}</td>
-                      <td>100</td>
-                      <td>{percentage}%</td>
-                    </tr>
-                  );
-                })
+  // ✅ STATUS per subject
+  const status = percentage < 40 ? "RA" : "P";
+
+  return (
+    <tr key={i}>
+      <td>{student.id}</td>
+      <td>{student.name}</td>
+      <td>{s.subject}</td>
+      <td>{mark}</td>
+      <td>100</td>
+      <td>{percentage}%</td>
+      <td className={status === "P" ? styles.pass : styles.fail}>
+        {status}
+      </td>
+    </tr>
+  );
+})
+
               )}
             </tbody>
           </table>

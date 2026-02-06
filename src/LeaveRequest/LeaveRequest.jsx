@@ -19,10 +19,8 @@ const LeaveRequestModal = ({ isOpen, onClose, onSubmit }) => {
     toTime: null,
   });
    
-const [loading, setLoading] = useState(false); // loader state
-  
+const [loading, setLoading] = useState(false); 
 
-  // Reset form when modal opens
   useEffect(() => {
     if (isOpen) {
       setFormData({
@@ -70,7 +68,7 @@ const [loading, setLoading] = useState(false); // loader state
   const validateField = (name, value, updatedForm = formData) => {
     let newErrors = { ...errors };
 
-    // Student ID validation
+    
     if (name === "studentId") {
       if (!value.trim()) newErrors.studentId = "Student ID is required";
       else if (!/^alosodt\s\d{4}$/.test(value))
@@ -78,12 +76,11 @@ const [loading, setLoading] = useState(false); // loader state
       else newErrors.studentId = "";
     }
 
-    // Leave Type validation
+
     if (name === "leaveType") {
       newErrors.leaveType = value ? "" : "Please select a leave type";
     }
 
-    // Leave Period validation
     if (
       (name === "fromDate" || name === "toDate") &&
       updatedForm.leaveType &&
@@ -96,8 +93,6 @@ const [loading, setLoading] = useState(false); // loader state
       else newErrors.dates = "";
     }
 
-    // Permission validation
-    // Permission / Early Permission validation
     if (
       updatedForm.leaveType === "Permission" ||
       updatedForm.leaveType === "Early Permission"
@@ -117,7 +112,7 @@ const [loading, setLoading] = useState(false); // loader state
       }
     }
 
-    // Reason validation
+   
     if (name === "reason") {
       if (!value.trim()) newErrors.reason = "Reason is required";
       else if (value.length < 5)
@@ -171,12 +166,12 @@ const [loading, setLoading] = useState(false); // loader state
     const hasErrors = Object.values(finalErrors).some((err) => err !== "");
 
     if (!hasErrors) {
-       setLoading(true); // show loader
+       setLoading(true); 
        if (onSubmit) await onSubmit(formData);
        setLoading(false);
 
 
-      // reset form
+     
       setFormData({
         studentId: localStorage.getItem("studentId") || "",
         leaveType: "",
@@ -213,7 +208,7 @@ const [loading, setLoading] = useState(false); // loader state
         </div>
 
         <form onSubmit={handleSubmit} className={styles.form}>
-          {/* Student ID */}
+         
           <div className={styles.inputBox}>
             <label>Student ID</label>
             <input
@@ -228,7 +223,7 @@ const [loading, setLoading] = useState(false); // loader state
             )}
           </div>
 
-          {/* Leave Type */}
+         
           <div className={styles.inputBox}>
             <label>Leave Type</label>
             <select
@@ -387,7 +382,7 @@ const [loading, setLoading] = useState(false); // loader state
               {errors.times && <p className={styles.error}>{errors.times}</p>}
             </div>
           )}
-          {/* Reason */}
+          
          <div className={styles.inputBox}>
   <label>Reason</label>
   <textarea
@@ -405,7 +400,7 @@ const [loading, setLoading] = useState(false); // loader state
 </div>
 
 
-          {/* Submit */}
+
           <div className={styles.btn}>
             <button type="submit" className={styles.submitBtn} disabled={loading}>
                 {loading ? (

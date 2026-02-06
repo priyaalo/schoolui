@@ -9,9 +9,19 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  
 }
+
+.selectGroup {
+  display: flex;
+  gap: 20px;          /* space between Semester & Exam */
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+}
+
 
 .header h2 {
   font-size: 22px;
@@ -69,6 +79,12 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   margin:10px;
 }
+/* .label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  gap: 4px;
+} */
 
 .table {
   width: 100%;
