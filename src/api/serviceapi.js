@@ -97,19 +97,22 @@ export const getAttendanceRate = (userId, fromDate, toDate) =>{
   return apiService.get( `/attendance/studentrate?userId=${userId}&fromDate=${fromDate}&toDate=${toDate}`
   );
 }
-export const getPerformance = (params) => {
-  return apiService.get("/performance", {
-    params: {
-      studentId: params.studentId,
-      academic: params.academic,
-    },
-  });
+
+// serviceapi.js
+// serviceapi.js
+export const getPerformance = ({ userId, academic, exam }) => {
+  return apiService.get(
+    `/performance?userId=${userId}&academic=${academic}&exam=${exam}`
+  );
 };
+
+
 
 export const getLeaderboard = (academic) => {
   return apiService.get("/performance/leaderboard", {
     params: {
-      Academic: academic, 
+      Academic: academic,
+       
     },
   });
 };
