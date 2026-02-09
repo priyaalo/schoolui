@@ -98,13 +98,14 @@ export const getAttendanceRate = (userId, fromDate, toDate) =>{
   );
 }
 
-// serviceapi.js
-// serviceapi.js
+
+
 export const getPerformance = ({ userId, academic, exam }) => {
   return apiService.get(
-    `/performance?userId=${userId}&academic=${academic}&exam=${exam}`
+    `/performance?userId=${userId}&Academic=${academic}&exam=${exam}`
   );
 };
+
 
 
 

@@ -2,37 +2,33 @@ import React, { useEffect, useState } from "react";
 import styles from "./Academics.module.css";
 import { getPerformance } from "../api/serviceapi";
 
-
-
 const examOptions = {
   "Semester 1": [
-    { label: "Term 1", value: "term1" },
-    { label: "Term 2", value: "term2" },
-    { label: "Semester 1", value: "sem1" },
+    { label: "Term 1", value: "Term1" },
+    { label: "Term 2", value: "Term2" },
+    { label: "Semester 1", value: "Semester" },
   ],
   "Semester 2": [
-    { label: "Term 1", value: "term1" },
-    { label: "Term 2", value: "term2" },
-    { label: "Semester 2", value: "sem2" },
+    { label: "Term 1", value: "Term1" },
+    { label: "Term 2", value: "Term2" },
+    { label: "Semester 2", value: "Semester" },
   ],
 };
 
 const Academics = () => {
-  const [semester, setSemester] = useState("Semester 1");
-  const [exam, setExam] = useState("term1");
+  const [semester, setSemester] = useState("sem1");
+  const [exam, setExam] = useState("Term1");
 
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(false);
 
- 
-  useEffect(() => {
-    setExam(examOptions[semester][0].value);
-  }, [semester]);
+  // useEffect(() => {
+  //   setExam(examOptions[semester][0].value);
+  // }, [semester]);
 
-  
   useEffect(() => {
     fetchAcademics();
-  }, [exam]);
+  }, [exam,semester]);
 
   const fetchAcademics = async () => {
     try {
@@ -43,8 +39,8 @@ const Academics = () => {
 
       const res = await getPerformance({
         userId,
-        academic: "Semester", 
-        exam: exam,           
+        academic: exam,
+        exam: semester,
       });
 
       const records = res?.data?.data?.data || [];
@@ -59,35 +55,33 @@ const Academics = () => {
 
   return (
     <div className={styles.container}>
-   
       <div className={styles.header}>
         <h2>Academics</h2>
 
         <div className={styles.selectGroup}>
-       
           <label className={styles.label}>
             Choose Semester
             <select
               value={semester}
               onChange={(e) => setSemester(e.target.value)}
             >
-              <option value="Semester 1">Semester 1</option>
-              <option value="Semester 2">Semester 2</option>
+              <option value="sem1">Semester 1</option>
+              <option value="sem2">Semester 2</option>
             </select>
           </label>
 
           {/* Exam */}
           <label className={styles.label}>
             Choose Exam
-            <select
-              value={exam}
-              onChange={(e) => setExam(e.target.value)}
-            >
-              {examOptions[semester].map((item) => (
+            <select value={exam} onChange={(e) => setExam(e.target.value)}>
+              {/* {examOptions[semester].map((item) => (
                 <option key={item.value} value={item.value}>
                   {item.label}
                 </option>
-              ))}
+              ))} */}
+              <option value="Term1">Term 1</option>
+              <option value="Term2">Term 2</option>
+              <option value="Semester">Semester</option>
             </select>
           </label>
         </div>
@@ -138,11 +132,7 @@ const Academics = () => {
                     <td>{mark.subjectCode}</td>
                     <td>{mark.subjectName}</td>
                     <td>{mark.mark}</td>
-                    <td
-                      className={
-                        mark.mark < 40 ? styles.fail : styles.pass
-                      }
-                    >
+                    <td className={mark.mark < 40 ? styles.fail : styles.pass}>
                       {mark.mark < 40 ? "RA" : "P"}
                     </td>
                   </tr>
