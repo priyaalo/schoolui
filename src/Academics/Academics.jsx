@@ -44,6 +44,7 @@ const Academics = () => {
       });
 
       const records = res?.data?.data?.data || [];
+      console.log(res.data.data.data[0].Academic)
       setSubjects(records);
     } catch (error) {
       console.error("Failed to fetch academics", error);
@@ -132,9 +133,25 @@ const Academics = () => {
                     <td>{mark.subjectCode}</td>
                     <td>{mark.subjectName}</td>
                     <td>{mark.mark}</td>
-                    <td className={mark.mark < 40 ? styles.fail : styles.pass}>
+                    {/* <td className={mark.mark < 40 ? styles.fail : styles.pass}>
                       {mark.mark < 40 ? "RA" : "P"}
-                    </td>
+                    </td> */}
+                    <td
+  className={
+    mark.mark === "AA"
+      ? styles.absent
+      : mark.mark < 40
+      ? styles.fail
+      : styles.pass
+  }
+>
+  {mark.mark === "AA"
+    ? "AA"
+    : mark.mark < 40
+    ? "RA"
+    : "P"}
+</td>
+
                   </tr>
                 ))
               )}

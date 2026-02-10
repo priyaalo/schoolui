@@ -141,3 +141,13 @@
   color: #2e7d32;
   font-weight: bold;
 }
+.absent {
+  color: orange;
+  font-weight: bold;
+}
+.fail {
+  color: red;
+}
+.pass {
+  color: green;
+}
