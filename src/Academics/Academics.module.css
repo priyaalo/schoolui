@@ -151,3 +151,15 @@
 .pass {
   color: green;
 }
+.viewBtn {
+  margin-right: 10px;
+  color: #1976d2;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.downloadBtn {
+  color: green;
+  text-decoration: none;
+  cursor: pointer;
+}

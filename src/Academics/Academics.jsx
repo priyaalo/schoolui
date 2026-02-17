@@ -117,6 +117,7 @@ const Academics = () => {
                 <th>Subject Name</th>
                 <th>Mark</th>
                 <th>Status</th>
+                  <th>Revaluation</th>
               </tr>
             </thead>
 
@@ -151,6 +152,32 @@ const Academics = () => {
     ? "RA"
     : "P"}
 </td>
+ <td>
+          {mark.revaluationUrl ? (
+            <>
+          
+              <a
+                href={mark.revaluationUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.viewBtn}
+              >
+                View
+              </a>
+
+         
+              <a
+                href={mark.revaluationUrl}
+                download
+                className={styles.downloadBtn}
+              >
+                Download
+              </a>
+            </>
+          ) : (
+            <span>-</span>
+          )}
+        </td>
 
                   </tr>
                 ))
