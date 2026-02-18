@@ -15,6 +15,8 @@ const examOptions = {
   ],
 };
 
+
+
 const Academics = () => {
   const [semester, setSemester] = useState("sem1");
   const [exam, setExam] = useState("Term1");
@@ -25,6 +27,7 @@ const Academics = () => {
   // useEffect(() => {
   //   setExam(examOptions[semester][0].value);
   // }, [semester]);
+    const [viewUrl, setViewUrl] = useState(null);
 
   useEffect(() => {
     fetchAcademics();
@@ -156,23 +159,21 @@ const Academics = () => {
           {mark.revaluationUrl ? (
             <>
           
-              <a
-                href={mark.revaluationUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.viewBtn}
-              >
-                View
-              </a>
+             <button
+  className={styles.viewBtn}
+  onClick={() => setViewUrl(mark.revaluationUrl)}
+>
+  View
+</button>
 
          
-              <a
+              {/* <a
                 href={mark.revaluationUrl}
                 download
                 className={styles.downloadBtn}
               >
                 Download
-              </a>
+              </a> */}
             </>
           ) : (
             <span>-</span>
@@ -184,8 +185,31 @@ const Academics = () => {
               )}
             </tbody>
           </table>
+          
         )}
       </div>
+      {viewUrl && (
+  <div className={styles.viewer}>
+    <div className={styles.viewerHeader}>
+      <h3>Revaluation Document</h3>
+      <button
+        className={styles.closeBtn}
+        onClick={() => setViewUrl(null)}
+      >
+        ✕ Close
+      </button>
+    </div>
+
+    <iframe
+      src={viewUrl}
+      title="Revaluation Document"
+      width="100%"
+      height="500px"
+      frameBorder="0"
+    />
+  </div>
+)}
+
     </div>
   );
 };
