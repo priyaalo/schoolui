@@ -15,8 +15,6 @@ const examOptions = {
   ],
 };
 
-
-
 const Academics = () => {
   const [semester, setSemester] = useState("sem1");
   const [exam, setExam] = useState("Term1");
@@ -27,7 +25,6 @@ const Academics = () => {
   // useEffect(() => {
   //   setExam(examOptions[semester][0].value);
   // }, [semester]);
-    const [viewUrl, setViewUrl] = useState(null);
 
   useEffect(() => {
     fetchAcademics();
@@ -56,6 +53,28 @@ const Academics = () => {
       setLoading(false);
     }
   };
+  const handleDownload = async (url) => {
+  try {
+    if (!url) return;
+
+    const response = await fetch(url);
+    const blob = await response.blob();
+
+    const blobUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = blobUrl;
+    link.download = "revaluation.pdf"; 
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(blobUrl);
+  } catch (error) {
+    console.error("Download failed", error);
+  }
+};
+
 
   return (
     <div className={styles.container}>
@@ -108,7 +127,6 @@ const Academics = () => {
         )}
       </div>
 
-      {/* TABLE */}
       <div className={styles.tableWrapper}>
         {loading ? (
           <p className={styles.loading}>Loading...</p>
@@ -156,60 +174,26 @@ const Academics = () => {
     : "P"}
 </td>
  <td>
-          {mark.revaluationUrl ? (
-            <>
-          
-             <button
-  className={styles.viewBtn}
-  onClick={() => setViewUrl(mark.revaluationUrl)}
->
-  View
-</button>
+  {mark.revaluationUrl ? (
+    <button
+      className={styles.downloadBtn}
+      onClick={() => handleDownload(mark.revaluationUrl)}
+    >
+      Download
+    </button>
+  ) : (
+    <span>-</span>
+  )}
+</td>
 
-         
-              {/* <a
-                href={mark.revaluationUrl}
-                download
-                className={styles.downloadBtn}
-              >
-                Download
-              </a> */}
-            </>
-          ) : (
-            <span>-</span>
-          )}
-        </td>
 
                   </tr>
                 ))
               )}
             </tbody>
           </table>
-          
         )}
       </div>
-      {viewUrl && (
-  <div className={styles.viewer}>
-    <div className={styles.viewerHeader}>
-      <h3>Revaluation Document</h3>
-      <button
-        className={styles.closeBtn}
-        onClick={() => setViewUrl(null)}
-      >
-        ✕ Close
-      </button>
-    </div>
-
-    <iframe
-      src={viewUrl}
-      title="Revaluation Document"
-      width="100%"
-      height="500px"
-      frameBorder="0"
-    />
-  </div>
-)}
-
     </div>
   );
 };
